@@ -76,7 +76,7 @@ a{color:var(--acc)}
 </style></head><body>
 <div id="cvwrap"><canvas id="cv"></canvas></div>
 <header class="glass"><div class="brand"><b>Race to SI</b><small>The Race to Superintelligence · <a href="v6/">v6</a> · <a href="v5/">v5</a> · <a href="v4/">v4</a> · <a href="v3/">v3</a></small></div>
-<div class="stat"><span>Date</span><b id="sD"></b></div><div class="stat hi"><span>Cash</span><b id="sCash"></b></div><div class="stat"><span>Income / mo</span><b id="sInc"></b></div><div class="stat"><span>Power</span><b id="sLand"></b></div><div class="stat opt"><span>Accelerators on</span><b id="sCars"></b></div><div class="stat"><span>Chips made</span><b id="sRk"></b></div>
+<div class="stat"><span>Date</span><b id="sD"></b></div><div class="stat hi"><span>Cash</span><b id="sCash"></b></div><div class="stat"><span>Income / mo</span><b id="sInc"></b></div><div class="stat"><span>Power</span><b id="sLand"></b></div><div class="stat opt"><span>Polysilicon made</span><b id="sCars"></b></div><div class="stat"><span>Ingots pulled</span><b id="sRk"></b></div>
 <div class="spd" id="spd"></div><div class="sp"></div>
 <button id="techBtn" class="ib" title="Research: coming soon"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M7.5 8l3.5 8M16.5 8L13 16M8.5 6h7"/></svg><span class="lb">Research</span></button><button id="srcBtn" class="ib" title="Sources"><svg viewBox="0 0 24 24"><path d="M4 5c3-1 5-1 8 1 3-2 5-2 8-1v14c-3-1-5-1-8 1-3-2-5-2-8-1z"/><path d="M12 6v14"/></svg><span class="lb">Sources</span></button>
 <button id="sheetBtn" class="ib" title="Assistant"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg></button></header>
@@ -86,57 +86,74 @@ a{color:var(--acc)}
 <div id="modal"><div class="glass" id="mbox"></div></div>
 <script>
 const GF=1/8;// ONE global time-scale: game months = real months × GF
-const DUR={gt:{m:24,src:'EIA, Assumptions to the Annual Energy Outlook 2026, Electricity Market Module, Table 3: combustion turbine lead time 2 years (same in AEO2023). Checked 22 Oct 2026',s:1},
- dc:{m:4,src:'xAI Colossus, Memphis: "from start to finish, it was done in 122 days" (Elon Musk, 2 Sep 2024; NVIDIA newsroom, Oct 2024). 122 days ≈ 4.0 months. Checked 22 Oct 2026',s:1},
- fab:{m:43,src:'TSMC Arizona Fab 21: construction started Apr 2021 (TSMC Q2 2023 earnings call); high-volume N4 production in 4Q 2024 (TSMC 2024 Annual Report). Apr 2021 → Q4 2024 = 42–44 months, 43 used. Checked 22 Oct 2026',s:1},
- hbm:{m:19,src:'SK hynix M15X, Cheongju (HBM/DRAM fab): construction to start end of Apr 2024, completion planned Nov 2025 (SK hynix newsroom, 24 Apr 2024) ≈ 19 months. Planned dates, not confirmed actuals. Checked 22 Oct 2026',s:1},
- pkg:{m:15,src:'TSMC AP7 advanced packaging plant, Chiayi: construction began May 2024 (CNA, 15 Dec 2024); equipment move-in brought forward to Aug 2025 (TrendForce/MoneyDJ, 26 Mar 2025) ≈ 15 months to tool-in. Production followed in 2026; month not published. Checked 22 Oct 2026',s:1},
- grid:{m:36,src:'Oxford Global Projects benchmark for NZ Infrastructure Commission (59 transmission lines, completed 2012+): "average duration to finish a transmission line construction project is three years" (construction only, excludes permitting). A short on-site tie line is likely faster; no source found for that. Checked 22 Oct 2026',s:1},
- belt:{m:1,src:'No public source found for on-site conveyor/logistics links. 1 month is a game assumption',s:0},
- line:{m:6,src:'No public source found for adding one production line inside an existing fab or packaging plant. 6 months is a game assumption',s:0}};
+// ===== Race to SI v8 · West vs East · layer 1: rock → 300 mm silicon ingot · S = sourced fact, A = game assumption =====
+const DUR={gt:{m:24,src:'EIA, Assumptions to the Annual Energy Outlook 2026, Electricity Market Module, Table 3: combustion turbine lead time 2 years. Checked 22 Oct 2026',s:1},
+ depot:{m:3,src:'No public source for a rail siding / bulk materials yard. 3 months is a game assumption',s:0},
+ smelt:{m:36,src:'PCC BakkiSilicon, Húsavík, Iceland (32 kt/yr silicon metal): construction 2015, first furnace started 2018 ≈ 3 years (PCC SE). Checked 22 Oct 2026',s:1},
+ poly:{m:36,src:'"Building a polysilicon plant can easily take three years" (ChemSusChem, 2023). Highland Materials says a conventional Siemens plant takes ~4 years. 36 months used. Checked 22 Oct 2026',s:1},
+ hpq:{m:30,src:'No source for opening a new high-purity quartz mine. Sibelco\'s Spruce Pine capacity-doubling ran 2023–2025 (Sibelco). 30 months is a game assumption',s:0},
+ cru:{m:12,src:'No public source for building a fused-quartz crucible plant. 12 months is a game assumption',s:0},
+ cz:{m:30,src:'GlobalWafers Sherman, Texas (300 mm wafer plant incl. crystal pulling): groundbreaking 1 Dec 2022, opened 15 May 2025 ≈ 29.5 months (GlobalWafers). Checked 22 Oct 2026',s:1},
+ grid:{m:36,src:'Oxford Global Projects benchmark for NZ Infrastructure Commission: average transmission line construction is three years (construction only). A short on-site line is likely faster; no source found. Checked 22 Oct 2026',s:1},
+ belt:{m:1,src:'No public source for on-site conveyor links. 1 month is a game assumption',s:0}};
 const gm=k=>DUR[k].m*GF;
-// ===== Race to SI (The Race to Superintelligence) v7 · learn the AI supply chain · S = sourced fact, A = game assumption =====
+const TMW=25;// MW per turbine (assumption)
+// recipes: per game month at full power. in: per 1 unit of output. mw: draw at full rate.
+const R={
+ depot:{out:'ind',rate:6000,mw:0,in:{},buy:.00000015},// $150/t
+ hpq:{out:'hpq',rate:120,mw:1,in:{}},
+ cru:{out:'cru',rate:400,mw:2,in:{hpq:.1}},
+ smelt:{out:'mgsi',rate:1200,mw:20,in:{ind:4}},
+ poly:{out:'poly',rate:240,mw:20,in:{mgsi:1.2,ind:.1}},
+ cz:{out:'ingot',rate:300,mw:5,in:{poly:.3,cru:1,ind:.05}}};
+const ITEM={ind:{n:'Industrial inputs',u:'t',col:'#b9a98a'},hpq:{n:'HPQ sand',u:'t',col:'#f2f4ff'},cru:{n:'Quartz crucibles',u:'',col:'#e8f6ff'},mgsi:{n:'MG silicon',u:'t',col:'#8d96a3'},poly:{n:'Polysilicon',u:'t',col:'#c7d2e0'},ingot:{n:'Ingots (300 mm)',u:'',col:'#a9c4ff'}};
+const PRICE_INGOT=.00015;// $150k per ingot (assumption)
+const SELL={mgsi:.0000025,poly:.00002};// surplus sold on the merchant market: $2.5k/t MG-Si, $20k/t poly (assumptions)
 const SRC=[
-['S','NVIDIA H100 SXM: up to 700 W per GPU (TDP)','NVIDIA H100 datasheet (2022)'],
-['S','NVIDIA H100 logic die is built on TSMC 4N process and uses TSMC CoWoS packaging with HBM3','NVIDIA H100 announcement, 22 Mar 2022; TSMC'],
-['S','NVIDIA B200 (Blackwell) uses 8 HBM3E stacks, 192 GB','NVIDIA Blackwell announcement, 18 Mar 2024'],
-['S','xAI Colossus, Memphis: 100,000 H100s online in 122 days (Sep 2024); site used on-site gas turbines in 2024','xAI / Elon Musk, Sep 2024; press reports 2024'],
-['S','Gas turbine makers include GE Vernova, Siemens Energy, Mitsubishi Power','company websites'],
-['S','HBM makers: SK hynix, Samsung, Micron. Foundries: TSMC, Samsung Foundry, Intel Foundry. Packaging: TSMC (CoWoS), ASE, Amkor','company websites'],
-['S','Large new grid loads wait in interconnection queues (multi-year waits common in the US)','Lawrence Berkeley National Lab, "Queued Up" (2024 ed.)'],
-['A','Gas turbine unit: 15 MW, $25M. Counts only when connected to the data center by a grid line (or touching it)','Game assumption'],
-['A','Start: $100M cash. Data center: $50M, comes with 20,000 accelerators. Belts and grid line: $1M per tile','Game assumption'],
-['A','Global time scale: every build takes (real duration × 1/8). Rows below list each real duration','Game rule'],
+['S','West vs East: China held ~90% of global polysilicon capacity in 2023; five of the top six producers are Chinese','PV Tech citing Bernreuter Research and Thunder Said Energy (2023/24)'],
+['S','West lead: ASML (Netherlands) is the only maker of EUV lithography tools; Dutch export rules bar EUV sales to China since 2019','ASML annual reports; Dutch government'],
+['S','MG silicon: quartzite + carbon (coal, coke, wood chips) reduced in a submerged-arc furnace, SiO₂ + 2C → Si + 2CO, 98–99% Si, 11–13 MWh per tonne','ScienceDirect (2018); J. Sustainable Metallurgy (Springer, 2024)'],
+['S','Charge per tonne of Si: ~2.7 t quartz, ~1.2 t reductants, ~0.1 t electrode (game uses 4 t "industrial inputs")','Roussilhe, "From silicon to wafer" (secondary source; not independently verified)'],
+['S','Siemens process: MG-Si + HCl → trichlorosilane (~300 °C), distilled, then CVD with H₂ at ~1,100 °C onto heated rods; electronic grade 9N–11N','Fraunhofer ISE report on EG polysilicon electricity (2025); Bernreuter Research'],
+['S','Siemens polysilicon electricity: 60–71 kWh/kg (solar grade, 2023); Wacker ~60 kWh/kg. Game uses 60 kWh/kg (20 MW → 240 t/month). Electronic grade needs more','Fraunhofer ISE (2025); Tongwei blog (2023)'],
+['S','Spruce Pine, North Carolina high-purity quartz is used for the fused-quartz crucibles that hold molten silicon in the Czochralski puller, not as poly feedstock','Sibelco (IOTA); Construction Physics'],
+['S','A 300 mm CZ crystal is ~2 m long and weighs ~265–300+ kg; pulled from a silica crucible in argon at ~1,420 °C','Wacker photo in Zulehner/Kiel review; GlobalWafers Japan'],
+['S','Polysilicon makers: Hemlock Semiconductor (Michigan), Wacker (Germany, Tennessee). Wafer makers: Shin-Etsu, SUMCO, GlobalWafers, Siltronic, SK Siltron','company websites'],
+['A',`Gas turbine unit: ${TMW} MW, $25M. A building runs only when wired to a built turbine (grid line or touching)`,'Game assumption'],
+['A','Unit capacities: smelter 1,200 t/month @ 20 MW (= 12 MWh/t, sourced); poly 240 t/month @ 20 MW; CZ hall 300 ingots/month @ 5 MW; crucible shop 400/month @ 2 MW; HPQ mine 120 t/month @ 1 MW','Game assumption (energy per tonne sourced where noted)'],
+['A','Recipe ratios: 1.2 t MG-Si per t poly; 0.3 t poly + 1 crucible per ingot; 0.1 t HPQ per crucible; HCl/H₂/argon/graphite make-up folded into industrial inputs','Game assumption'],
+['A','Industrial inputs (quartzite, coal, wood chips, electrodes, HCl, H₂, argon, graphite) are commodities: bought with money at $150/t','Game assumption (node rule: commoditized → folded)'],
+['A','Surplus MG silicon and polysilicon sell on the open market at $2.5k/t and $20k/t (the real market exists; prices here are game assumptions)','Game assumption'],
+['A','Start cash $600M (think CHIPS-Act-style grant). An ingot sells for $150k. Building prices are scaled down for play','Game assumption'],
+['A','Global time scale: every build takes real duration × 1/8','Game rule'],
 ...Object.keys(DUR).map(k=>[DUR[k].s?'S':'A',`Build time, ${k}: real ${DUR[k].m} months → game ${(DUR[k].m/8).toFixed(2)} months`,DUR[k].src]),
-
-['A','Each accelerator needs 1.4 kW at the wall (700 W chip + host, network, cooling)','Game assumption based on 700 W TDP'],
-['A','Each powered accelerator earns $2,500 a month from training and inference','Game assumption'],
-['A','Start: $40M cash, 1 turbine, a data center with 20,000 accelerators and room for 100,000','Game assumption'],
-['A','Foundry fab $200M → 2,000 logic dies/month. HBM fab $120M → 12,000 HBM stacks/month. Packaging plant $80M → up to 3,000 accelerators/month. Recipe: 1 logic die + 8 HBM stacks (as in B200). Real fabs cost tens of billions; prices are scaled down for play','Game assumption'],
-['A','Extra lines: fab +2,000 dies/month for $200M; HBM +12,000 stacks/month for $120M; packaging +3,000/month for $80M; data hall +100,000 slots for $300M','Game assumption'],
 ];
 const CARDS={
- gt:{t:'Gas turbine power plant',w:'Burns natural gas to spin a generator. Units can be installed in months, so AI sites use them for fast power: xAI ran gas turbines at its Memphis Colossus site in 2024.',ex:'GE Vernova · Siemens Energy · Mitsubishi Power',src:'Company sites; xAI Memphis press reports, 2024'},
- grid:{t:'Grid line',w:'High-voltage lines carry power from plants to big loads. Connecting a large new load to the public grid often waits years in an interconnection queue.',ex:'Grid operators: ERCOT (Texas) · PJM · CAISO',src:'Berkeley Lab "Queued Up", 2024'},
- dc:{t:'AI data center',w:'Racks of AI accelerators train models and then serve them (inference). One NVIDIA H100 draws up to 700 W, so power is the first limit.',ex:'Microsoft Azure · AWS · Google Cloud · xAI Colossus (100k H100s, Sep 2024)',src:'NVIDIA H100 datasheet; xAI, Sep 2024'},
- fab:{t:'Foundry fab (logic die)',w:'A foundry prints a chip design onto silicon wafers; each wafer is cut into dies. NVIDIA designs the H100, and TSMC manufactures its logic die on the 4N process.',ex:'TSMC · Samsung Foundry · Intel Foundry',src:'NVIDIA H100 announcement, Mar 2022'},
- hbm:{t:'HBM memory fab',w:'High Bandwidth Memory stacks DRAM dies vertically and sits right next to the GPU die. NVIDIA B200 carries 8 HBM3E stacks (192 GB).',ex:'SK hynix · Samsung · Micron',src:'NVIDIA Blackwell announcement, Mar 2024'},
- pkg:{t:'Advanced packaging (CoWoS)',w:'Joins one logic die and its HBM stacks on a silicon interposer to make one accelerator. TSMC calls this CoWoS (Chip-on-Wafer-on-Substrate); H100 uses it.',ex:'TSMC (CoWoS) · ASE · Amkor',src:'TSMC; NVIDIA H100 announcement'},
+ gt:{t:'Gas turbine power plant',w:'Chips are condensed electricity. Silicon smelting and polysilicon are among the most power-hungry steps in the whole chip chain. China leads the West in cheap power build-out.',ex:'GE Vernova · Siemens Energy · Mitsubishi Power',src:'EIA AEO2026; company sites'},
+ grid:{t:'Grid line',w:'High-voltage lines carry power from plants to big loads. New large loads often wait years for grid connection.',ex:'ERCOT · PJM · MISO',src:'Berkeley Lab "Queued Up", 2024'},
+ depot:{t:'Industrial inputs yard',w:'Quartzite gravel, coal, wood chips, carbon electrodes, HCl, hydrogen, argon and graphite: commodities with many suppliers. The game buys them with money instead of making each one.',ex:'Rail-served bulk yards at every smelter',src:'Game abstraction (node rule)'},
+ smelt:{t:'Submerged-arc silicon smelter',w:'Silicon starts as rock and coal. Carbon electrodes arc at ~2,000 °C and strip oxygen from quartz: SiO₂ + 2C → Si + 2CO. Out comes 98–99% "metallurgical" silicon, using 11–13 MWh per tonne.',ex:'Ferroglobe (Mississippi Silicon) · Elkem · PCC BakkiSilicon',src:'ScienceDirect 2018; Springer 2024; PCC SE'},
+ poly:{t:'Polysilicon plant (Siemens process)',w:'Silicon is turned into a gas (trichlorosilane), distilled, then grown back onto hot rods at ~1,100 °C. Chips need 99.999999999% (11N) pure silicon. China held ~90% of world capacity in 2023 (mostly solar grade); Hemlock and Wacker are major Western electronic-grade makers.',ex:'Hemlock Semiconductor (Michigan) · Wacker (Germany/Tennessee)',src:'Fraunhofer ISE 2025; Bernreuter Research; PV Tech'},
+ hpq:{t:'Spruce Pine high-purity quartz',w:'A small town in North Carolina supplies most of the ultra-pure quartz used for the crucibles that hold molten silicon. Hurricane Helene flooded the area in Sept 2024 and paused mining: a real chokepoint.',ex:'Sibelco · The Quartz Corp',src:'Sibelco; press reports Sept–Oct 2024'},
+ cru:{t:'Fused-quartz crucible shop',w:'HPQ sand is fused into a big bowl. Every crystal pull eats one: at ~1,420 °C the quartz slowly softens and dissolves, so crucibles are a consumable.',ex:'Shin-Etsu Quartz · Tosoh Quartz · Momentive (Coorstek)',src:'Zulehner/Kiel CZ review; company sites'},
+ cz:{t:'Czochralski crystal puller',w:'Polysilicon melts in a quartz crucible inside argon. A seed crystal dips in and is pulled up slowly, growing one perfect crystal: 300 mm across, ~2 m long, ~265–300 kg. Later it is sliced into wafers.',ex:'Shin-Etsu Handotai · SUMCO · GlobalWafers · Siltronic',src:'Kiel CZ review (Wacker photo); GlobalWafers Japan'},
 };
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const dstr=t=>'Month '+(1+Math.floor(t));
 const B={shell:{sz:[4,3],lead:1},col:{sz:[5,4],lead:1},turb:{sz:[3,2],lead:1},hall:{sz:[2,2],lead:1},boxfab:{sz:[3,2],lead:1},pad:{sz:[3,3],lead:1}};
 const castOut=()=>1;const W=26,H=18;
-const ITC={wafer:'#c9a8ff',hbm:'#5fe3ff',chip:'#5dffa8',power:'#ffd06e'};
-const SITES={gt:{n:'Gas turbines',x:2,y:2,sz:[2,2],col:'#ffb547'},dc:{n:'AI data center',x:7,y:11,sz:[7,4],col:'#9dffc8'},fab:{n:'Foundry fab',x:15,y:1,sz:[4,3],col:'#b48cff'},hbm:{n:'HBM fab',x:20,y:2,sz:[4,3],col:'#5fe3ff'},pkg:{n:'Packaging (CoWoS)',x:17,y:8,sz:[4,3],col:'#ff9a4d'}};
-const DEF={dc:[7,11],fab:[15,1],hbm:[20,2],pkg:[17,8]};
+const ITC={ind:'#b9a98a',hpq:'#f2f4ff',cru:'#e8f6ff',mgsi:'#8d96a3',poly:'#c7d2e0',ingot:'#a9c4ff',power:'#ffd06e'};
+const SITES={gt:{n:'Gas turbines',x:2,y:2,sz:[2,2],col:'#ffb547'},
+ depot:{n:'Industrial inputs',x:1,y:9,sz:[3,3],col:'#d8b98a'},smelt:{n:'Silicon smelter',x:6,y:9,sz:[4,3],col:'#ff8a4d'},poly:{n:'Polysilicon plant',x:12,y:9,sz:[4,4],col:'#9fd0ff'},
+ hpq:{n:'Spruce Pine HPQ',x:13,y:1,sz:[3,3],col:'#f4f1ff'},cru:{n:'Crucible shop',x:18,y:2,sz:[3,2],col:'#bfe8ff'},cz:{n:'Crystal puller',x:18,y:9,sz:[4,3],col:'#c9a8ff'}};
+const DEF={depot:[1,10],smelt:[6,10],poly:[12,10],hpq:[13,2],cru:[18,2],cz:[19,10]};
+const BK=['depot','smelt','poly','hpq','cru','cz'];
 let S;
-function newGame(){S={t:0,cash:.1,turbs:[],wire:new Map(),belt:new Map(),mode:null,bt:{},placed:{},lineQ:[],hall:[],acc:0,slots:100000,b:{},fabL:0,hbmL:0,pkgL:0,dieBuf:0,hbmBuf:0,made:0,speed:1,paused:false,month:0,goal:0,done:[],unl:{gt:1,dc:1,wire:1},newActs:{gt:1},news:[],seen:{},inAcc:0,mAcc:0,link:{},bcomp:[]};recalc();
- chat('a',`Welcome to <b>Race to SI</b>. You have <b>${money(S.cash)}</b> and an empty site. Build the first layer of AI: <b>power → grid → data center</b>.<br><br>Step 1: pick <b>Gas turbine</b> and click a green spot on the map.`);sync()}
+function newGame(){S={t:0,cash:.6,turbs:[],wire:new Map(),belt:new Map(),mode:null,bt:{},bt0:{},placed:{},b:{},inv:{},out:{},made:{},rate:{},pf:{},speed:1,paused:false,month:0,goal:0,done:[],unl:{gt:1,wire:1,belt:1,depot:1,smelt:1},newActs:{gt:1},news:[],seen:{},mAcc:0,link:{},bcomp:[],ingAcc:0};BK.forEach(k=>{S.inv[k]={};S.out[k]=0;S.made[k]=0});recalc();
+ chat('a',`<b>Whoever wins AI wins.</b> Every AI chip starts as rock. You have <b>${money(S.cash)}</b> and an empty valley. Build the bottom of the chip supply chain: <b>rock → silicon → polysilicon → a 300 mm crystal</b>.<br><br>Step 1: pick <b>Gas turbine</b> and click a green spot.`);sync()}
 const fk=n=>n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(n<1e4?1:0)+'k':String(Math.round(n));
 const money=b=>(b<0?'−':'')+'$'+(Math.abs(b)>=1?Math.abs(b).toFixed(2)+'bn':Math.max(0,Math.round(Math.abs(b)*1000))+'M');
 // ---- placement + connectivity ----
-const MW=()=>S.b.dc?15*S.turbs.filter(t=>!t.left&&t.conn).length:0;
 const key=(x,y)=>x+','+y;const N4=[[1,0],[-1,0],[0,1],[0,-1]];
 function inRect(x,y,r){return x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h}
 const rectOf=k=>{const s=SITES[k];return{x:s.x,y:s.y,w:s.sz[0],h:s.sz[1]}};
@@ -148,123 +165,125 @@ const canSite=(k,x,y)=>!S.placed[k]&&canRect(x,y,SITES[k].sz[0],SITES[k].sz[1]);
 const canWire=(x,y)=>!blocked(x,y)&&!S.wire.has(key(x,y));
 const canBelt=(x,y)=>!blocked(x,y)&&!S.wire.has(key(x,y));
 function touches(x,y,k){return S.placed[k]&&N4.some(([a,b])=>inRect(x+a,y+b,rectOf(k)))}
-function recalc(){const dist=new Map();const q=[];
- if(S.placed.dc)S.wire.forEach((w,k)=>{if(w.left)return;const[x,y]=k.split(',').map(Number);if(touches(x,y,'dc')){dist.set(k,0);q.push([x,y])}});
- while(q.length){const[x,y]=q.shift();const d=dist.get(key(x,y));for(const[a,b]of N4){const k=key(x+a,y+b);const w=S.wire.get(k);if(w&&!w.left&&!dist.has(k)){dist.set(k,d+1);q.push([x+a,y+b])}}}
- S.dist=dist;S.turbs.forEach(t=>{t.conn=false;for(let i=-1;i<=t.w;i++)for(let j=-1;j<=t.h;j++){if((i<0||i>=t.w)===(j<0||j>=t.h))continue;if(dist.has(key(t.x+i,t.y+j))||S.placed.dc&&inRect(t.x+i,t.y+j,rectOf('dc')))t.conn=true}});
- // belts: connected components of finished belt cells, and which buildings each touches
- const seen=new Set();S.bcomp=[];S.link={};S.belt.forEach((v,k0)=>{if(v.left||seen.has(k0))return;const cells=[];const qq=[k0];seen.add(k0);const tch=new Set();while(qq.length){const k=qq.shift();cells.push(k);const[x,y]=k.split(',').map(Number);for(const s of['dc','fab','hbm','pkg'])if(touches(x,y,s))tch.add(s);for(const[a,b]of N4){const k2=key(x+a,y+b);const w=S.belt.get(k2);if(w&&!w.left&&!seen.has(k2)){seen.add(k2);qq.push(k2)}}}
-  const types=[];if(tch.has('pkg')){if(tch.has('fab')){types.push('wafer');S.link.wafer=1}if(tch.has('hbm')){types.push('hbm');S.link.hbm=1}if(tch.has('dc')){types.push('chip');S.link.chip=1}}
-  // distance field toward destination (pkg for inputs, dc for chips)
-  const dest=types.length&&types[0]!=='chip'?'pkg':'dc';const bd=new Map();const q2=[];cells.forEach(k=>{const[x,y]=k.split(',').map(Number);if(touches(x,y,dest)){bd.set(k,0);q2.push(k)}});while(q2.length){const k=q2.shift();const[x,y]=k.split(',').map(Number);for(const[a,b]of N4){const k2=key(x+a,y+b);if(cells.includes(k2)&&!bd.has(k2)){bd.set(k2,bd.get(k)+1);q2.push(k2)}}}
-  S.bcomp.push({cells,types,bd})});
+function ring(r,f){for(let i=-1;i<=r.w;i++)for(let j=-1;j<=r.h;j++){if((i<0||i>=r.w)===(j<0||j>=r.h))continue;f(r.x+i,r.y+j)}}
+const powered=k=>R[k]&&R[k].mw===0;
+// power network: union-find over turbines, buildings, wire components
+function recalc(){const ent={};const par={};const f=a=>par[a]===a?a:(par[a]=f(par[a]));const u=(a,b)=>{par[f(a)]=f(b)};
+ S.turbs.forEach((t,i)=>{par['t'+i]='t'+i});for(const k of BK)if(S.placed[k])par[k]=k;
+ const wc=new Map();let ci=0;S.wire.forEach((w,k0)=>{if(w.left||wc.has(k0))return;const id='w'+(ci++);par[id]=id;const q=[k0];wc.set(k0,id);while(q.length){const k=q.shift();const[x,y]=k.split(',').map(Number);for(const[a,b]of N4){const k2=key(x+a,y+b);const w2=S.wire.get(k2);if(w2&&!w2.left&&!wc.has(k2)){wc.set(k2,id);q.push(k2)}}}});
+ const cellOwner=(x,y)=>{const k=key(x,y);if(wc.has(k))return wc.get(k);for(const b of BK)if(S.placed[b]&&inRect(x,y,rectOf(b)))return b;const ti=S.turbs.findIndex(t=>inRect(x,y,t));return ti>=0?'t'+ti:null};
+ S.turbs.forEach((t,i)=>ring(t,(x,y)=>{const o=cellOwner(x,y);if(o)u('t'+i,o)}));for(const k of BK)if(S.placed[k])ring(rectOf(k),(x,y)=>{const o=cellOwner(x,y);if(o&&(o[0]==='w'||o[0]==='t'))u(k,o)});
+ const sup={},dem={};S.turbs.forEach((t,i)=>{if(!t.left){const r=f('t'+i);sup[r]=(sup[r]||0)+TMW}});for(const k of BK)if(S.b[k]&&R[k].mw){const r=f(k);dem[r]=(dem[r]||0)+R[k].mw}
+ S.pf={};for(const k of BK)if(S.placed[k]){if(!R[k].mw){S.pf[k]=1;continue}const r=f(k);S.pf[k]=Math.min(1,(sup[r]||0)/Math.max(1,dem[r]||R[k].mw))}
+ S.turbs.forEach((t,i)=>{const r=f('t'+i);t.conn=!!dem[r]||BK.some(k=>S.placed[k]&&R[k].mw&&f(k)===r)});
+ // wire distance field from turbines (for pulse direction)
+ const dist=new Map();const q=[];S.wire.forEach((w,k)=>{if(w.left)return;const[x,y]=k.split(',').map(Number);if(S.turbs.some(t=>!t.left&&N4.some(([a,b])=>inRect(x+a,y+b,t)))){dist.set(k,0);q.push([x,y])}});while(q.length){const[x,y]=q.shift();const d=dist.get(key(x,y));for(const[a,b]of N4){const k=key(x+a,y+b);const w=S.wire.get(k);if(w&&!w.left&&!dist.has(k)){dist.set(k,d+1);q.push([x+a,y+b])}}}S.dist=dist;
+ // belts: each component links producers → consumers it touches
+ const seen=new Set();S.bcomp=[];S.link={};S.belt.forEach((v,k0)=>{if(v.left||seen.has(k0))return;const cells=[];const qq=[k0];seen.add(k0);const tch=new Set();while(qq.length){const k=qq.shift();cells.push(k);const[x,y]=k.split(',').map(Number);for(const s of BK)if(touches(x,y,s))tch.add(s);for(const[a,b]of N4){const k2=key(x+a,y+b);const w=S.belt.get(k2);if(w&&!w.left&&!seen.has(k2)){seen.add(k2);qq.push(k2)}}}
+  const types=[];let dest=null,src=null;for(const p of tch)for(const c of tch){if(p===c)continue;const it=R[p].out;if(R[c].in[it]!=null){S.link[it+'>'+c]=p;if(!types.includes(it))types.push(it);dest=dest||c;src=src||p}}
+  const bd=new Map();const q2=[];if(dest)cells.forEach(k=>{const[x,y]=k.split(',').map(Number);if(touches(x,y,dest)){bd.set(k,0);q2.push(k)}});while(q2.length){const k=q2.shift();const[x,y]=k.split(',').map(Number);for(const[a,b]of N4){const k2=key(x+a,y+b);if(cells.includes(k2)&&!bd.has(k2)){bd.set(k2,bd.get(k)+1);q2.push(k2)}}}
+  S.bcomp.push({cells,types,bd,dest,src})});
  OCC=new Set();for(const k in S.placed){const r=rectOf(k);for(let i=-1;i<=r.w;i++)for(let j=-1;j<=r.h+1;j++)OCC.add(key(r.x+i,r.y+j))}S.turbs.forEach(t=>{for(let i=0;i<2;i++)for(let j=0;j<2;j++)OCC.add(key(t.x+i,t.y+j))});S.wire.forEach((v,k)=>OCC.add(k));S.belt.forEach((v,k)=>OCC.add(k));
  const w0=S.wire.keys().next().value;if(w0&&typeof PSEUDO!=='undefined'){const[x,y]=w0.split(',').map(Number);PSEUDO.grid.x=x;PSEUDO.grid.y=y;PSEUDO.grid.sz=[1,1]}}
-function placeTurb(x,y,quiet){if(!canTurb(x,y))return quiet?null:say('b','That spot is blocked.');if(S.cash<COST.gt)return quiet?null:say('b',`A gas turbine costs ${money(COST.gt)}.`);S.cash-=COST.gt;bumpCash();const t={x,y,w:2,h:2,left:gm('gt'),tot:gm('gt')};S.turbs.push(t);recalc();delete S.newActs.gt;checkGoal();return say('a',`Gas turbine placed: building for <b>${gm('gt').toFixed(1)} game months</b> (real lead time ~${DUR.gt.m} months). ${!S.placed.dc?'Next: place the <b>data center</b>.':t.conn?'It touches the data center.':'⚠ Connect it with a <b>grid line</b> to the data center.'}`)}
+const MW=()=>TMW*S.turbs.filter(t=>!t.left&&t.conn).length;
+const MWall=()=>TMW*S.turbs.filter(t=>!t.left).length;
+const demand=()=>BK.reduce((a,k)=>a+(S.b[k]?R[k].mw:0),0);
+function placeTurb(x,y,quiet){if(!canTurb(x,y))return quiet?null:say('b','That spot is blocked.');if(S.cash<COST.gt)return quiet?null:say('b',`A gas turbine costs ${money(COST.gt)}.`);S.cash-=COST.gt;bumpCash();const t={x,y,w:2,h:2,left:gm('gt'),tot:gm('gt')};S.turbs.push(t);recalc();delete S.newActs.gt;checkGoal();return say('a',`Gas turbine placed: <b>${gm('gt').toFixed(1)} game months</b> to build (real lead time ~${DUR.gt.m} months). ${TMW} MW once a building is wired to it.`)}
 function placeSite(k,x,y,quiet){if(!S.unl[k])return quiet?null:say('a','That is locked. Finish the current goal first.');if(S.placed[k])return quiet?null:say('a',`You already have a ${SITES[k].n}.`);if(!canSite(k,x,y))return quiet?null:say('b','That spot is blocked.');if(S.cash<COST[k])return quiet?null:say('b',`The ${SITES[k].n} costs ${money(COST[k])}.`);
- S.cash-=COST[k];bumpCash();SITES[k].x=x;SITES[k].y=y;S.placed[k]=1;S.bt[k]=gm(k);S.bt0=S.bt0||{};S.bt0[k]=gm(k);delete S.newActs[k];recalc();checkGoal();
- const nxt=k==='dc'?' Connect a turbine to it with a <b>grid line</b> (or place a turbine right next to it).':k==='pkg'?' Lay <b>belts</b> from the fab and the HBM fab to it, and from it to the data center.':S.placed.pkg?' Lay a <b>belt</b> to the packaging plant.':'';
- return say('a',`<b>${SITES[k].n}</b> placed. Construction: <b>${gm(k).toFixed(1)} game months</b> (real reference ~${DUR[k].m} months).${nxt}`)}
+ S.cash-=COST[k];bumpCash();SITES[k].x=x;SITES[k].y=y;S.placed[k]=1;S.bt[k]=gm(k);S.bt0[k]=gm(k);delete S.newActs[k];recalc();checkGoal();
+ const ins=Object.keys(R[k].in).map(i=>ITEM[i].n).join(' + ');
+ return say('a',`<b>${SITES[k].n}</b> placed. Construction: <b>${gm(k).toFixed(1)} game months</b> (real ~${DUR[k].m} months${DUR[k].s?'':', assumption'}).${ins?` Needs <b>${ins}</b> by belt`:''}${R[k].mw?`${ins?' and':' Needs'} <b>${R[k].mw} MW</b> by grid line.`:'.'}`)}
 function placeWire(x,y,quiet){if(!canWire(x,y))return false;if(S.cash<COST.wire){if(!quiet)say('b','Grid line costs $1M per tile.');return false}S.cash-=COST.wire;S.wire.set(key(x,y),{left:gm('grid'),tot:gm('grid')});recalc();if(!S.seen.grid)S.pendCard='grid';return true}
 function placeBelt(x,y,quiet){if(!canBelt(x,y))return false;if(S.cash<COST.belt){if(!quiet)say('b','Belts cost $1M per tile.');return false}S.cash-=COST.belt;S.belt.set(key(x,y),{left:gm('belt'),tot:gm('belt')});recalc();return true}
 function nearRect(w,h,px,py,adjFn){const c=[];for(let x=0;x<=W-w;x++)for(let y=0;y<=H-h;y++)if(canRect(x,y,w,h)){let adj=0;if(adjFn)for(let i=-1;i<=w;i++)for(let j=-1;j<=h;j++){if((i<0||i>=w)===(j<0||j>=h))continue;if(adjFn(x+i,y+j))adj=1}c.push({x,y,adj,d:Math.hypot(x-px,y-py)})}c.sort((a,b)=>(b.adj-a.adj)||(a.d-b.d));return c[0]}
-function autoTurb(){const dc=S.placed.dc?rectOf('dc'):{x:7,y:11};const c=nearRect(2,2,dc.x-3,dc.y-4,(x,y)=>S.dist.has(key(x,y))||S.placed.dc&&inRect(x,y,rectOf('dc')));if(!c)return say('b','No free spot for a turbine.');const r=placeTurb(c.x,c.y);if(!c.adj&&S.placed.dc)autoPath(S.turbs[S.turbs.length-1],'wire');return r}
-function autoSite(k){const[px,py]=DEF[k];const c=nearRect(SITES[k].sz[0],SITES[k].sz[1],px,py);if(!c)return say('b','No free spot.');const r=placeSite(k,c.x,c.y);if(S.placed[k]&&k!=='dc')autoBelts();return r}
-// BFS path of free cells from the edge of rect A to a cell touching target
-function autoPath(A,kind,target){const ok=kind==='wire'?canWire:canBelt;const has=kind==='wire'?S.wire:S.belt;const goal=kind==='wire'?(x,y)=>S.dist.has(key(x,y))||touches(x,y,'dc'):(x,y)=>touches(x,y,target);
- const starts=[];for(let i=-1;i<=A.w;i++)for(let j=-1;j<=A.h;j++){if((i<0||i>=A.w)===(j<0||j>=A.h))continue;starts.push([A.x+i,A.y+j])}
- const prev=new Map();const q=[];for(const s of starts){if(ok(...s)||has.has(key(...s))){prev.set(key(...s),null);q.push(s)}}let end=null;
+function autoTurb(){const c=nearRect(2,2,4+3*S.turbs.length,4);if(!c)return say('b','No free spot for a turbine.');const r=placeTurb(c.x,c.y);autoWires();return r}
+function autoSite(k){const[px,py]=DEF[k];const c=nearRect(SITES[k].sz[0],SITES[k].sz[1],px,py);if(!c)return say('b','No free spot.');const r=placeSite(k,c.x,c.y);if(S.placed[k]){autoBelts();autoWires()}return r}
+// BFS path of free cells from the edge of rect A to a cell satisfying goal
+function autoPath(A,kind,goal){const ok=kind==='wire'?canWire:canBelt;const has=kind==='wire'?S.wire:S.belt;
+ const starts=[];ring(A,(x,y)=>starts.push([x,y]));const prev=new Map();const q=[];for(const s of starts){if(ok(...s)||has.has(key(...s))){prev.set(key(...s),null);q.push(s)}}let end=null;
  while(q.length){const[x,y]=q.shift();if(goal(x,y)){end=[x,y];break}for(const[a,b]of N4){const n=[x+a,y+b],k=key(...n);if(prev.has(k))continue;if(!ok(...n)&&!(kind==='wire'&&S.wire.has(k)))continue;prev.set(k,[x,y]);q.push(n)}}
  let c=end;while(c){if(!has.has(key(...c)))(kind==='wire'?placeWire:placeBelt)(c[0],c[1],true);c=prev.get(key(...c))}return!!end}
-function autoBelts(){if(!S.placed.pkg)return;const P2=rectOf('pkg');if(S.placed.fab&&!S.link.wafer)autoPath(rectOf('fab'),'belt','pkg');if(S.placed.hbm&&!S.link.hbm)autoPath(rectOf('hbm'),'belt','pkg');if(S.placed.dc&&!S.link.chip)autoPath(P2,'belt','dc')}
+function autoWires(){const T=S.turbs[0];if(!T)return;for(const k of BK){if(!S.placed[k]||!R[k].mw)continue;let ok=false;ring(rectOf(k),(x,y)=>{if(S.wire.has(key(x,y))||S.turbs.some(t=>inRect(x,y,t)))ok=true});if(ok&&S.wire.size)continue;const tgt=(x,y)=>S.wire.has(key(x,y))?false:S.turbs.some(t=>N4.some(([a,b])=>inRect(x+a,y+b,t)))||[...S.wire.keys()].some(w=>{const[wx,wy]=w.split(',').map(Number);return Math.abs(wx-x)+Math.abs(wy-y)===1});if(!ok)autoPath(rectOf(k),'wire',tgt)}recalc()}
+function autoBelts(){for(const c of BK){if(!S.placed[c])continue;for(const it in R[c].in){if(S.link[it+'>'+c])continue;const p=BK.find(b=>S.placed[b]&&R[b].out===it);if(!p)continue;autoPath(rectOf(p),'belt',(x,y)=>touches(x,y,c));recalc()}}}
 // ---- economy ----
-function econ(){const pw=MW()*1000/1.4;const inst=S.b.dc?Math.min(S.acc,S.slots):0;const on=Math.min(inst,pw);const inc=on*2500/1e9;
- const dieR=S.b.fab?2000*(1+S.fabL):0,hbmR=S.b.hbm?12000*(1+S.hbmL):0,pkgCap=S.b.pkg?3000*(1+S.pkgL):0;const L=S.link;
- const pkgR=L.chip?Math.min(pkgCap,L.wafer?dieR:0,L.hbm?hbmR/8:0):0;const lim=!S.b.pkg?'':!L.wafer?'belt from fab':!L.hbm?'belt from HBM fab':!L.chip?'belt to data center':pkgR===pkgCap?'packaging':pkgR===dieR?'logic dies':'HBM';
- return{pw,on,inst,inc,lim:on<inst?'power':S.acc>=S.slots&&S.b.pkg?'slots':'',dieR,hbmR,pkgCap,pkgR,plim:lim,powered:on>=inst-1}}
+function econ(){const o={};let inc=0;for(const k of BK){if(!S.b[k]){o[k]={r:0,lim:S.placed[k]?'building':'not built'};continue}const r=R[k];let lim='',cap=r.rate*(S.pf[k]==null?0:S.pf[k]);if(r.mw&&!(S.pf[k]>0))lim='no power';else if(S.pf[k]<1)lim='power';
+  for(const it in r.in){if(!S.link[it+'>'+k]){cap=0;lim='no '+ITEM[it].n+' belt';break}}
+  o[k]={r:cap,lim}}
+ return{b:o,inc:((S.rate&&S.rate.cz)||0)*PRICE_INGOT+(S.saleR||0),mw:MW(),dem:demand()}}
 // ---- goals ----
 const GOALS=[
- {n:'Place a gas turbine',par:'Pick Gas turbine, click a green spot',ok:()=>S.turbs.length>0,msg:'Turbine under construction. Now place the <b>data center</b>.',un:['dc']},
- {n:'Place the AI data center',par:'It comes with 20,000 accelerators (game assumption)',ok:()=>S.placed.dc,msg:'Now connect power to it with a <b>grid line</b>.',un:[]},
- {n:'Connect turbine → data center',par:'Drag a grid line between them',ok:()=>MW()>0,msg:'Power flows and powered accelerators earn money every second.',un:[]},
- {n:'Power all 20,000 accelerators',par:'More turbines, all connected',ok:()=>S.b.dc&&econ().on>=S.acc-1,msg:'Every accelerator is running. To grow you need <b>more accelerators</b>, and you will <b>make them</b>. Unlocked: <b>Foundry fab</b>.',un:['fab']},
- {n:'Build a foundry fab',par:'Makes the logic die (TSMC-style)',ok:()=>S.b.fab,msg:'Logic dies are being made. A GPU also needs memory. Unlocked: <b>HBM fab</b>.',un:['hbm']},
- {n:'Build an HBM memory fab',par:'Makes stacked memory (SK hynix-style)',ok:()=>S.b.hbm,msg:'Dies and memory are piling up. Join them. Unlocked: <b>Packaging plant</b> and <b>belts</b>.',un:['pkg','belt']},
- {n:'Build a CoWoS packaging plant and belt it up',par:'Belts: fab → packaging, HBM → packaging, packaging → data center',ok:()=>S.b.pkg&&S.link.wafer&&S.link.hbm&&S.link.chip,msg:'Accelerators roll onto the belt to your data center. Unlocked: <b>extra lines</b>.',un:['fabL','hbmL','pkgL','hall']},
- {n:'Ship 5,000 home-made accelerators',par:'Watch which input runs short',ok:()=>S.made>=5000,msg:'Your own chip supply chain works.',un:[]},
- {n:'Run 60,000 accelerators',par:'Power, chips and memory must all keep up',ok:()=>econ().on>=60000,msg:'Next layers: training runs, models and the race to superintelligence.',un:[]},
+ {n:'Place a gas turbine',par:'Chips are condensed electricity. Pick Gas turbine, click a green spot',ok:()=>S.turbs.length>0,msg:'Turbine under construction. Now the first transformation: rock to silicon. Place the <b>silicon smelter</b> and the <b>industrial inputs</b> yard.',un:[]},
+ {n:'Make metallurgical silicon',par:'Smelter needs 4 t inputs per t (belt) + 20 MW (grid line)',ok:()=>S.made.smelt>=1,msg:'98–99% silicon. Chips need 11 nines. Unlocked: <b>Polysilicon plant</b>.',un:['poly']},
+ {n:'Make electronic-grade polysilicon',par:'Belt MG-Si + inputs to the poly plant; it needs 20 MW more',ok:()=>S.made.poly>=1,msg:'Pure enough for chips. To grow a crystal you need a quartz pot. Unlocked: <b>Spruce Pine HPQ</b> and <b>Crucible shop</b>.',un:['hpq','cru']},
+ {n:'Make fused-quartz crucibles',par:'HPQ sand → crucible shop by belt',ok:()=>S.made.cru>=1,msg:'Unlocked: <b>Crystal puller</b>.',un:['cz']},
+ {n:'Pull your first 300 mm ingot',par:'Puller needs poly + a crucible + inputs + 5 MW',ok:()=>S.made.cz>=1,msg:'One perfect crystal, ~2 m long, ~265–300 kg. The West just made the base of every AI chip.',un:[]},
+ {n:'Pull 1,000 ingots',par:'Keep every input flowing; watch the bottleneck',ok:()=>S.made.cz>=1000,msg:'Layer 1 done. Next: slice wafers, then lithography (ASML EUV), memory and packaging. And the East is building too.',un:[]},
 ];
 function checkGoal(){const g=GOALS[S.goal];if(!g||!g.ok())return;S.done.push({n:g.n,at:dstr(S.t)});chat('g',`🎯 <b>${g.n}</b>. ${g.msg}`);g.un.forEach(u=>{S.unl[u]=1;S.newActs[u]=1});S.goal++;celebrate();checkGoal()}
 // ---- actions ----
-const COST={wire:.001,belt:.001,gt:.025,dc:.05,fab:.2,hbm:.12,pkg:.08,fabL:.2,hbmL:.12,pkgL:.08,hall:.3};
-function act(id){delete S.newActs[id];if(id==='gt')return autoTurb();if(['dc','fab','hbm','pkg'].includes(id))return autoSite(id);if(id==='belt'){autoBelts();return say('a','Belts laid where links were missing.')}if(!S.unl[id])return say('a','That is locked. Finish the current goal first.');const c=COST[id];if(S.cash<c)return say('b',`That costs ${money(c)}. Your powered accelerators keep earning; wait a little.`);
- S.cash-=c;bumpCash();
- if(id==='hall'){S.hall.push(gm('dc'));return say('a',`Data hall expansion started: +100k slots in ${gm('dc').toFixed(2)} game months (real: Colossus took ~${DUR.dc.m} months).`)}
- if(id.endsWith('L')){const b=id.slice(0,-1);S.lineQ.push({k:id,left:gm('line'),tot:gm('line')});return say('a',`${SITES[b].n}: new line ordered, online in <b>${gm('line').toFixed(2)} game months</b> (real ~${DUR.line.m} months, game assumption).`)}}
+const COST={wire:.001,belt:.001,gt:.025,depot:.01,smelt:.1,poly:.15,hpq:.03,cru:.02,cz:.06};
+function act(id){delete S.newActs[id];if(id==='gt')return autoTurb();if(BK.includes(id))return autoSite(id);if(id==='belt'){autoBelts();return say('a','Belts laid where links were missing.')}if(id==='wire'){autoWires();return say('a','Grid lines laid where buildings lacked power.')}}
 function month(){checkGoal();sync()}
-let mwAcc=0;
-function builds(dm){let ch=0;S.turbs.forEach(t=>{if(t.left>0){t.left=Math.max(0,t.left-dm);if(!t.left){ch=1;t.done=1}}});S.wire.forEach(w=>{if(w.left>0){w.left=Math.max(0,w.left-dm);if(!w.left)ch=1}});S.belt.forEach(w=>{if(w.left>0){w.left=Math.max(0,w.left-dm);if(!w.left)ch=1}});
- for(const k in S.bt){S.bt[k]-=dm;if(S.bt[k]<=0){delete S.bt[k];S.b[k]=1;ch=1;if(k==='dc'&&!S.acc)S.acc=20000;buildFx(k);chat('g',`🏗 <b>${SITES[k].n}</b> finished.`);setTimeout(()=>showCard(k),600)}}
- if(ch){const before=MW();recalc();S.turbs.forEach(t=>{t.done=0});const d=MW()-before;if(d>0)popMW(d);checkGoal()}
- S.lineQ=S.lineQ.filter(q=>{q.left-=dm;if(q.left<=0){S[q.k]++;pop(SITES[q.k.slice(0,-1)],'+1 line');return false}return true});
- S.hall=S.hall.map(x=>x-dm).filter(x=>{if(x<=0){S.slots+=100000;pop(SITES.dc,'+100k slots');return false}return true})}
-// one aggregated power pop anchored on the turbines' centroid
-function popMW(d){const T=S.turbs.filter(t=>!t.left);if(!T.length)return;const cx=T.reduce((a,t)=>a+t.x,0)/T.length,cy=T.reduce((a,t)=>a+t.y,0)/T.length;PWRS.x=cx;PWRS.y=cy;const o=pops.find(p=>p.site===PWRS&&p.a<90);if(o){o.v+=d;o.t=`+${o.v} MW`;o.a=Math.min(o.a,10);o.bump=8}else pops.push({site:PWRS,t:`+${d} MW`,v:d,a:0,dx:0,bump:0,b0:tick,mw:1})}
+function builds(dm){let ch=0;S.turbs.forEach(t=>{if(t.left>0){t.left=Math.max(0,t.left-dm);if(!t.left)ch=1}});S.wire.forEach(w=>{if(w.left>0){w.left=Math.max(0,w.left-dm);if(!w.left)ch=1}});S.belt.forEach(w=>{if(w.left>0){w.left=Math.max(0,w.left-dm);if(!w.left)ch=1}});
+ for(const k in S.bt){S.bt[k]-=dm;if(S.bt[k]<=0){delete S.bt[k];S.b[k]=1;ch=1;buildFx(k);chat('g',`🏗 <b>${SITES[k].n}</b> finished.`);setTimeout(()=>showCard(k),600)}}
+ if(ch){const before=MW();recalc();const d=MW()-before;if(d>0)popMW(d);checkGoal()}}
+function popMW(d){const T=S.turbs.filter(t=>!t.left);if(!T.length)return;PWRS.x=T.reduce((a,t)=>a+t.x,0)/T.length;PWRS.y=T.reduce((a,t)=>a+t.y,0)/T.length;const o=pops.find(p=>p.site===PWRS&&p.a<90);if(o){o.v+=d;o.t=`+${o.v} MW`;o.a=Math.min(o.a,10);o.bump=8}else pops.push({site:PWRS,t:`+${d} MW`,v:d,a:0,dx:0,bump:0,b0:tick,mw:1})}
 const PWRS={x:0,y:0,sz:[2,2]};
-// ---- loop ----
+const BUF=k=>R[k].rate*2;// output buffer cap: 2 months
 let lastT=performance.now();const SECPM=5;
 function loop(now){const dt=Math.min(.1,(now-lastT)/1000);lastT=now;if(!S.paused&&!cardOpen())advance(dt*S.speed/SECPM);requestAnimationFrame(loop)}
-function advance(dm){S.t+=dm;builds(dm);const e=econ();S.cash+=e.inc*dm;S.mAcc+=e.inc*1000*dm;if(S.mAcc>=(MOB?8:4)){pop(SITES.dc,'+$'+Math.round(S.mAcc)+'M',S.mAcc);S.mAcc=0}
- if(S.b.fab)S.dieBuf+=e.dieR*dm;if(S.b.hbm)S.hbmBuf+=e.hbmR*dm;
- if(e.pkgR>0&&S.acc<S.slots){const n=Math.min(e.pkgR*dm,S.dieBuf,S.hbmBuf/8,S.slots-S.acc);S.dieBuf-=n;S.hbmBuf-=n*8;S.inAcc+=n;if(S.inAcc>=500){S.acc=Math.min(S.slots,S.acc+S.inAcc);S.made+=S.inAcc;S.inAcc=0;pop(SITES.dc,'+500 GPUs');checkGoal()}}
- S.dieBuf=Math.min(S.dieBuf,20000);S.hbmBuf=Math.min(S.hbmBuf,160000);
+function advance(dm){S.t+=dm;builds(dm);const e=econ();S.rate={};const sold0=S.sold||0;
+ // pull inputs over belts, then produce; order follows the chain
+ for(const k of['depot','hpq','smelt','cru','poly','cz']){const r=R[k];const cap=e.b[k].r;if(!S.b[k]||cap<=0){S.rate[k]=0;continue}
+  for(const it in r.in){const p=S.link[it+'>'+k];const want=r.in[it]*cap*dm*1.5-(S.inv[k][it]||0);if(p&&want>0){const mv=Math.min(want,S.out[p]);S.out[p]-=mv;S.inv[k][it]=(S.inv[k][it]||0)+mv}}
+  let n=cap*dm;for(const it in r.in)n=Math.min(n,(S.inv[k][it]||0)/r.in[it]);if(!SELL[r.out])n=Math.max(0,Math.min(n,BUF(k)-S.out[k]));if(k==='cz')n=cap*dm>0?Math.min(cap*dm,...Object.keys(r.in).map(it=>(S.inv[k][it]||0)/r.in[it])):0;
+  for(const it in r.in)S.inv[k][it]-=n*r.in[it];if(k!=='cz'){S.out[k]+=n;if(SELL[r.out]&&S.out[k]>BUF(k)){const x=S.out[k]-BUF(k);S.out[k]-=x;S.cash+=x*SELL[r.out];S.sold=(S.sold||0)+x*SELL[r.out]}}S.made[k]+=n;S.rate[k]=n/dm}
+ // depot: pay for what was drawn
+ const inc=S.rate.cz*PRICE_INGOT*dm;S.cash+=inc;S.mAcc+=inc*1000;if(S.mAcc>=(MOB?8:4)){pop(SITES.cz,'+$'+Math.round(S.mAcc)+'M',S.mAcc);S.mAcc=0}
+ if(S.rate.depot)S.cash-=S.rate.depot*dm*R.depot.buy;
+ S.saleR=S.saleR==null?0:S.saleR*.9+.1*((S.sold||0)-sold0)/dm;S.mAcc+=((S.sold||0)-sold0)*1000;
+ S.ingAcc+=S.rate.cz*dm;if(S.ingAcc>=1&&S.made.cz<50||S.ingAcc>=50){pop(SITES.cz,`+${Math.floor(S.ingAcc)} ingot${S.ingAcc>=2?'s':''}`);S.ingAcc=0}
+ if(S.made.cz>=1||S.made.cru>=1||S.made.poly>=1||S.made.smelt>=1)checkGoal();
  while(Math.floor(S.t)>S.month){S.month++;month()}uiTick()}
-
-function actions(){const e=econ();const nb=S.turbs.filter(t=>t.left).length,nc=S.turbs.filter(t=>!t.left&&!t.conn).length;const L=[{id:'gt',n:'Gas turbine',s:`+15 MW · ${money(COST.gt)} · ${gm('gt').toFixed(1)} mo${nb?' · '+nb+' building':''}`,cmd:'build turbine',ic:'pow',mode:'turb'}];
- if(!S.placed.dc)L.push({id:'dc',n:'AI data center',s:`${money(COST.dc)} · ${gm('dc').toFixed(1)} mo`,cmd:'build data center',ic:'dc',mode:'dc'});else if(S.bt.dc)L.push({id:'dc',n:'AI data center',s:`building · ${S.bt.dc.toFixed(1)} mo`,cmd:'',ic:'dc',mode:''});
- L.push({id:'wire',n:'Grid line',s:nc?`⚠ ${nc} not connected`:`drag · $1M/tile · ${gm('grid').toFixed(1)} mo`,cmd:'',ic:'grid',mode:'wire'});
- for(const k of['fab','hbm','pkg'])if(S.unl[k]&&!S.b[k])L.push({id:k,n:SITES[k].n,s:S.bt[k]?`building · ${S.bt[k].toFixed(1)} mo`:`${money(COST[k])} · ${gm(k).toFixed(1)} mo`,cmd:S.placed[k]?'':'build '+({fab:'fab',hbm:'hbm',pkg:'packaging'})[k],ic:k,mode:S.placed[k]?'':k});
- if(S.unl.belt){const miss=['wafer','hbm','chip'].filter(t=>!S.link[t]).length;L.push({id:'belt',n:'Belt',s:miss?`drag · $1M/tile · ${miss} link${miss>1?'s':''} missing`:'drag · $1M/tile',cmd:'lay belts',ic:'belt',mode:'belt'})}
- const q=k=>S.lineQ.filter(x=>x.k===k).length;
- if(S.unl.fabL){L.push({id:'fabL',n:'Fab line',s:`+2k dies/mo · ${money(COST.fabL)} · ${gm('line').toFixed(2)} mo${q('fabL')?' · '+q('fabL')+' coming':''}`,cmd:'add fab line',ic:'fab'});L.push({id:'hbmL',n:'HBM line',s:`+12k stacks/mo · ${money(COST.hbmL)}${q('hbmL')?' · '+q('hbmL')+' coming':''}`,cmd:'add hbm line',ic:'hbm'});L.push({id:'pkgL',n:'Packaging line',s:`+3k/mo · ${money(COST.pkgL)}${q('pkgL')?' · '+q('pkgL')+' coming':''}`,cmd:'add packaging line',ic:'pkg'})}
- if(S.unl.hall&&(S.acc+5000>S.slots*.8||S.hall.length))L.push({id:'hall',n:'Expand data hall',s:S.hall.length?`building · ${S.hall[0].toFixed(2)} mo`:`+100k slots · ${money(COST.hall)} · ${gm('dc').toFixed(1)} mo`,cmd:'expand data hall',ic:'dc'});
- L.push({id:'soon',n:'Train a model',s:'coming soon',cmd:'',ic:'lock',soon:1});return L}
-const AIC={belt:'<path d="M3 15h18M3 19h18"/><circle cx="7" cy="17" r="1.5"/><circle cx="17" cy="17" r="1.5"/><rect x="8" y="8" width="8" height="5"/>',grid:'<path d="M12 2l-5 20M12 2l5 20M6 9h12M8 15h8"/>',pow:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',fab:'<circle cx="12" cy="12" r="8"/><path d="M8 8h8v8H8z"/>',hbm:'<rect x="6" y="4" width="12" height="3"/><rect x="6" y="9" width="12" height="3"/><rect x="6" y="14" width="12" height="3"/>',pkg:'<rect x="3" y="7" width="18" height="10" rx="1"/><rect x="9" y="9" width="6" height="6"/><path d="M5 9v6M19 9v6"/>',dc:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M7 7h10M7 11h10M7 15h10"/>',lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'};
+const AICK={depot:'ind',smelt:'smelt',poly:'poly',hpq:'hpq',cru:'cru',cz:'cz'};
+function actions(){const nb=S.turbs.filter(t=>t.left).length,nc=S.turbs.filter(t=>!t.left&&!t.conn).length;const L=[{id:'gt',n:'Gas turbine',s:`+${TMW} MW · ${money(COST.gt)} · ${gm('gt').toFixed(1)} mo${nb?' · '+nb+' building':''}`,cmd:'build turbine',ic:'pow',mode:'turb'}];
+ for(const k of BK)if(S.unl[k]&&!S.b[k])L.push({id:k,n:SITES[k].n,s:S.bt[k]?`building · ${S.bt[k].toFixed(1)} mo`:`${money(COST[k])} · ${gm(k).toFixed(1)} mo`,cmd:S.placed[k]?'':'build '+k,ic:AICK[k],mode:S.placed[k]?'':k});
+ const np=BK.filter(k=>S.b[k]&&R[k].mw&&!(S.pf[k]>0)).length;L.push({id:'wire',n:'Grid line',s:np?`⚠ ${np} building${np>1?'s':''} unpowered`:`drag · $1M/tile · ${gm('grid').toFixed(1)} mo`,cmd:'',ic:'grid',mode:'wire'});
+ const miss=missLinks().length;L.push({id:'belt',n:'Belt',s:miss?`drag · ${miss} link${miss>1?'s':''} missing`:'drag · $1M/tile',cmd:'lay belts',ic:'belt',mode:'belt'});
+ L.push({id:'soon',n:'Slice wafers',s:'next layer',cmd:'',ic:'lock',soon:1});return L}
+function missLinks(){const m=[];for(const c of BK){if(!S.placed[c])continue;for(const it in R[c].in)if(!S.link[it+'>'+c]&&BK.some(b=>S.placed[b]&&R[b].out===it))m.push([it,c])}return m}
+const AIC={belt:'<path d="M3 15h18M3 19h18"/><circle cx="7" cy="17" r="1.5"/><circle cx="17" cy="17" r="1.5"/><rect x="8" y="8" width="8" height="5"/>',grid:'<path d="M12 2l-5 20M12 2l5 20M6 9h12M8 15h8"/>',pow:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',ind:'<path d="M3 20h18M5 20l3-8 4 4 3-6 4 10"/>',smelt:'<path d="M6 21V9h12v12M9 9V4h2v5M13 9V3h2v6"/><path d="M9 16h6"/>',poly:'<path d="M7 21V5M12 21V3M17 21V6"/><path d="M4 21h16"/>',hpq:'<path d="M12 3l6 7-6 11-6-11z"/><path d="M6 10h12"/>',cru:'<path d="M5 8h14l-2 11H7z"/><path d="M5 8c0-2 14-2 14 0"/>',cz:'<path d="M12 2v6"/><rect x="9" y="8" width="6" height="11" rx="3"/><path d="M5 21h14"/>',lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'};
 function chat(k,html){S&&S.news.push({k,html});const c=document.getElementById('chat');if(!c)return;const d=document.createElement('div');d.className='msg '+k;d.innerHTML=(k==='u'?'':`<span class="who">${k==='g'?'Milestone':k==='b'?'Warning':'Guide'}</span>`)+html;c.appendChild(d);while(c.children.length>30)c.firstChild.remove();c.scrollTop=c.scrollHeight}
 function say(k,h){chat(k,h);sync();return h}
-const SYN={dc:['data center','datacenter','data centre'],belt:['belt','belts','conveyor'],gt:['turbine','turbines','gas','power','generator'],fab:['fab','foundry','logic','die','tsmc','wafer'],hbm:['hbm','memory','dram','hynix'],pkg:['packaging','package','cowos','assemble'],hall:['hall','slots','expand data'],line:['line','lines','add','more'],status:['status','report','summary'],pause:['pause','stop','freeze'],resume:['resume','play','unpause'],restart:['restart','new game','reset'],help:['help','commands'],learn:['what is','explain','learn','tell me']};
+const SYN={belt:['belt','belts','conveyor'],wire:['grid','wire','line'],gt:['turbine','turbines','gas','power','generator'],depot:['inputs','industrial','yard','depot','coal'],smelt:['smelter','furnace','arc','metallurgical','mg si'],poly:['polysilicon','poly','siemens','hemlock'],hpq:['quartz','spruce','hpq','pine','mine'],cru:['crucible','crucibles'],cz:['puller','czochralski','ingot','crystal'],status:['status','report','summary'],pause:['pause','stop','freeze'],resume:['resume','play','unpause'],restart:['restart','new game','reset'],help:['help','commands'],learn:['what is','explain','learn','tell me']};
 function lev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=Array(n+1).fill(0).map((_,i)=>i);for(let i=1;i<=m;i++){let q=[i];for(let j=1;j<=n;j++)q[j]=Math.min(p[j]+1,q[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=q}return p[n]}
 function fz(text,words){const t=' '+text+' ';let best=0;words.forEach(w=>{if(t.includes(' '+w+' ')||t.includes(w)&&w.length>4)best=Math.max(best,w.length+10);else{text.split(' ').forEach(tk=>{if(tk.length>3&&w.length>3&&!w.includes(' ')){const d=lev(tk,w);if(d<=(w.length>6?2:1))best=Math.max(best,w.length+4-d)}})}});return best}
 function parse(raw){const text=raw.toLowerCase().replace(/[^a-z0-9?\s]/g,' ').replace(/\s+/g,' ').trim();if(!text)return null;
  if(/what should|next|advice|stuck|hint/.test(text))return{i:'next'};const sc={};for(const k in SYN)sc[k]=fz(text,SYN[k]);
  if(sc.restart>12)return{i:'restart'};if(/\b(1x|2x|4x)\b/.test(text)){return{i:'speed',v:+text.match(/(1|2|4)x/)[1]}}
  if(sc.pause>12&&!/un/.test(text))return{i:'pause'};if(sc.resume>12&&text.length<14)return{i:'resume'};
- let best=null,bs=0;for(const k of['gt','dc','fab','hbm','pkg','belt'])if(sc[k]>bs){bs=sc[k];best=k}
- if(sc.learn>10||/\?$/.test(text)&&!/next/.test(text))return{i:'learn',k:best||(/grid/.test(text)?'grid':/data/.test(text)?'dc':null)};
- if(sc.hall>12)return{i:'act',k:'hall'};if(best&&bs>9){if(['fab','hbm','pkg'].includes(best)&&(sc.line>9||S.b[best]))return{i:'act',k:best+'L'};return{i:'act',k:best}}
+ let best=null,bs=0;for(const k of['gt','belt','wire',...BK])if(sc[k]>bs){bs=sc[k];best=k}
+ if(sc.learn>10||/\?$/.test(text)&&!/next/.test(text))return{i:'learn',k:best==='wire'?'grid':best==='belt'?null:best};
+ if(best&&bs>9)return{i:'act',k:best};
  if(sc.status>10)return{i:'status'};if(sc.help>9)return{i:'help'};return null}
 function command(raw){chat('u',String(raw).replace(/</g,'&lt;'));const p=parse(raw);if(!p)return say('a',`Try: ${actions().filter(a=>!a.soon).map(a=>'<b>'+a.cmd+'</b>').join(', ')}, "what is HBM?", or "what should I do next?"`);
- const M={act:()=>act(p.k),learn:()=>{if(!p.k)return say('a','Ask about: gas turbine, grid, data center, foundry fab, HBM, packaging.');showCard(p.k);return say('a',`<b>${CARDS[p.k].t}</b>: ${CARDS[p.k].w}`)},next:()=>say('a',advice()),help:()=>say('a','Try "build turbine", "build fab", "add hbm line", "what is CoWoS?", "status", "pause", "4x". Click buildings to learn about them.'),
-  status:()=>{const e=econ();return say('a',`${money(S.cash)} cash, +${money(e.inc)}/mo. ${fk(e.on)} of ${fk(S.acc)} accelerators powered (${MW()} MW). ${S.b.pkg?`Making ${fk(e.pkgR)} accelerators/month, limited by <b>${e.plim}</b>.`:''}`)},
+ const M={act:()=>act(p.k),learn:()=>{if(!p.k)return say('a','Ask about: turbine, grid, smelter, polysilicon, Spruce Pine quartz, crucible, crystal puller.');showCard(p.k);return say('a',`<b>${CARDS[p.k].t}</b>: ${CARDS[p.k].w}`)},next:()=>say('a',advice()),help:()=>say('a','Try "build turbine", "build smelter", "lay belts", "what is polysilicon?", "status", "pause", "4x". Click buildings to learn about them.'),
+  status:()=>{const e=econ();return say('a',`${money(S.cash)} cash, +${money(e.inc)}/mo. Power ${MW()} MW connected, demand ${e.dem} MW. ${BK.filter(k=>S.b[k]).map(k=>`${SITES[k].n}: ${fk(S.rate[k]||0)}${ITEM[R[k].out].u?' '+ITEM[R[k].out].u:''}/mo${e.b[k].lim?' ('+e.b[k].lim+')':''}`).join(' · ')}`)},
   pause:()=>{S.paused=true;return say('a','Paused.')},resume:()=>{S.paused=false;return say('a','Running.')},speed:()=>{S.speed=p.v;S.paused=false;return say('a',`Speed ${p.v}x.`)},restart:()=>{document.getElementById('chat').innerHTML='';newGame();return''}};return M[p.i]()}
-function advice(){const e=econ();if(!S.turbs.length)return'Pick <b>Gas turbine</b> and click a green spot.';if(!S.placed.dc)return'Pick <b>AI data center</b> and place it near your turbine.';if(S.b.pkg&&!(S.link.wafer&&S.link.hbm&&S.link.chip))return`Packaging is waiting on the <b>${e.plim}</b>. Pick <b>Belt</b> and drag it so it touches both buildings.`;const nc=S.turbs.filter(t=>!t.left&&!t.conn).length;if(nc)return`${nc} turbine(s) are built but <b>not connected</b>. Pick <b>Grid line</b> and drag a line from the turbine to the data center.`;if(S.acc>=S.slots&&S.b.pkg)return'Racks are full: packaging has stopped and chips pile up. <b>Expand the data hall</b>.';if(S.acc>S.slots&&S.unl.hall)return`${fk(S.acc-S.slots)} accelerators have no rack slot. <b>Expand the data hall</b>.`;if(e.lim==='power')return`${fk(S.acc-e.on)} accelerators sit dark: not enough power. <b>Build a gas turbine</b> (+15 MW powers ~10,700).`;
- for(const k of['fab','hbm','pkg'])if(S.unl[k]&&!S.b[k])return`Save up for the <b>${SITES[k].n}</b> (${money(COST[k])}).`;
- if(S.b.pkg)return`Packaging is limited by <b>${e.plim}</b>. ${e.plim==='HBM'?'Each accelerator needs 8 HBM stacks: add an <b>HBM line</b>.':e.plim==='logic dies'?'Add a <b>fab line</b>.':'Add a <b>packaging line</b>.'}`;return'Keep your accelerators powered.'}
+function blocker(){const e=econ();for(const k of['depot','smelt','poly','hpq','cru','cz'])if(S.b[k]&&e.b[k].lim&&e.b[k].lim!=='building')return[k,e.b[k].lim];return null}
+function advice(){if(!S.turbs.length)return'Pick <b>Gas turbine</b> and click a green spot.';for(const k of BK)if(S.unl[k]&&!S.placed[k])return`Place the <b>${SITES[k].n}</b> (${money(COST[k])}).`;const m=missLinks();if(m.length)return`The ${SITES[m[0][1]].n} needs <b>${ITEM[m[0][0]].n}</b>. Pick <b>Belt</b> and drag one that touches both buildings.`;const b=blocker();if(b){if(/power/.test(b[1]))return`The ${SITES[b[0]].n} has ${b[1]==='no power'?'<b>no power</b>: drag a <b>grid line</b> from it to a turbine':'too little power: build another <b>gas turbine</b> and wire it in'}.`;return`${SITES[b[0]].n}: ${b[1]}.`}if(S.turbs.some(t=>t.left)||Object.keys(S.bt).length)return'Construction is under way. Speed up time with <b>4×</b>.';return'Keep every input flowing.'}
 const $=id=>document.getElementById(id);let shownCash=-1;
-function uiTick(){const e=econ();$('sD').textContent=dstr(S.t);shownCash=shownCash<0?S.cash:shownCash+(S.cash-shownCash)*.18;$('sCash').textContent=money(shownCash);$('sInc').textContent='+'+money(e.inc);$('sLand').textContent=MW()+' MW';$('sCars').textContent=fk(e.on)+' / '+fk(S.acc);$('sRk').textContent=S.b.pkg?fk(e.pkgR)+'/mo':'—'}
+function uiTick(){const e=econ();$('sD').textContent=dstr(S.t);shownCash=shownCash<0?S.cash:shownCash+(S.cash-shownCash)*.18;$('sCash').textContent=money(shownCash);$('sInc').textContent='+'+money(e.inc);$('sLand').textContent=MW()+' / '+e.dem+' MW';$('sCars').textContent=fk(S.made.poly)+' t';$('sRk').textContent=fk(S.made.cz)}
 function bumpCash(){const e=$('sCash');e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}
-function goalBar(){const g=S.goal-3,e=econ();let p=0,t='';if(g<0){p=0;t=S.goal===2&&S.turbs.some(t=>t.left)?'turbine still building':S.goal===2&&S.bt.dc?'data center still building':''}else if(g===0){p=100*e.on/Math.max(1,S.acc);t=`${fk(e.on)} / ${fk(S.acc)} powered`}else if(g<4){const k=['','fab','hbm','pkg'][g];p=100*Math.min(1,S.cash/COST[k]);t=`${money(S.cash)} / ${money(COST[k])}`}else if(g===4){p=S.made/50;t=`${fk(S.made)} / 5k made`}else{p=100*e.on/60000;t=`${fk(e.on)} / 60k running`}return`<div class="prog"><i style="width:${Math.min(100,p)}%"></i></div><div class="par">${t}</div>`}
-function hintId(){const e=econ();if(!S.turbs.length)return'gt';if(!S.placed.dc)return'dc';if(S.b.pkg&&!(S.link.wafer&&S.link.hbm&&S.link.chip))return'belt';if(S.turbs.some(t=>!t.left&&!t.conn))return'wire';if(S.acc>=S.slots&&S.unl.hall)return'hall';if(e.lim==='power')return'gt';for(const k of['fab','hbm','pkg'])if(S.unl[k]&&!S.b[k])return k;if(S.b.pkg)return e.plim==='HBM'?'hbmL':e.plim==='logic dies'?'fabL':'pkgL';return'gt'}
+function goalBar(){const g=S.goal;let p=0,t='';const bk=Object.keys(S.bt);if(g===5){p=S.made.cz/10;t=`${fk(S.made.cz)} / 1,000 ingots`}else{const k=['','smelt','poly','cru','cz'][g];if(k&&S.bt[k]){p=100*(1-S.bt[k]/S.bt0[k]);t=`${SITES[k].n} building · ${S.bt[k].toFixed(1)} mo`}else if(k&&S.b[k]){const e=econ();t=e.b[k].lim?'⚠ '+e.b[k].lim:'running';p=e.b[k].lim?10:90}}return`<div class="prog"><i style="width:${Math.min(100,p)}%"></i></div><div class="par">${t}</div>`}
+function hintId(){if(!S.turbs.length)return'gt';for(const k of BK)if(S.unl[k]&&!S.placed[k])return k;if(missLinks().length)return'belt';const b=blocker();if(b&&b[1]==='no power')return'wire';if(b&&b[1]==='power')return'gt';return''}
 let lastSig='';function sync(){if(!S)return;uiTick();const g=GOALS[S.goal],e=econ();
  $('goalc').innerHTML=g?`<h3 style="margin:0 0 4px">Goal ${S.goal+1} of ${GOALS.length}</h3><div class="gt">${g.n}</div><div class="par">${g.par}</div>${goalBar()}`:`<h3 style="margin:0">All goals done</h3><div class="par">More layers coming.</div>`;
  const row=(c,n,v,sub,bad)=>`<div class="lbr"><span style="color:${c}">● ${n}</span><div class="bar"><i style="width:${Math.min(100,v)}%;background:${bad?'#ff6b6b':c}"></i></div><span></span></div><div class="par" style="margin:-2px 0 6px">${sub}</div>`;
- $('lb').innerHTML=`<h3 style="margin:0 0 6px">Supply chain</h3>`+row('#ffb547','Power',100*Math.min(1,e.pw/Math.max(1,S.acc)),`${MW()} MW connected · powers ${fk(e.pw)}`,e.lim==='power')+row('#9dffc8','Data center',100*e.on/Math.max(1,S.acc),`${fk(e.on)} running · ${fk(S.acc)}/${fk(S.slots)} racks${S.acc>=S.slots?' · FULL':''}`,false)+
-  (S.b.fab||S.unl.fab?row('#b48cff','Logic dies',S.b.fab?100*Math.min(1,e.dieR/Math.max(1,e.pkgCap)):0,S.b.fab?`${fk(e.dieR)}/mo · ${fk(S.dieBuf)} waiting`:'build the foundry fab',e.plim==='logic dies'):'')+
-  (S.b.hbm||S.unl.hbm?row('#5fe3ff','HBM stacks',S.b.hbm?100*Math.min(1,e.hbmR/8/Math.max(1,e.pkgCap)):0,S.b.hbm?`${fk(e.hbmR)}/mo = ${fk(e.hbmR/8)} chips' worth · ${fk(S.hbmBuf)} waiting`:'build the HBM fab',e.plim==='HBM'):'')+
-  (S.b.pkg||S.unl.pkg?row('#ff9a4d','Packaging',S.b.pkg?100*e.pkgR/Math.max(1,e.pkgCap):0,S.b.pkg?`${fk(e.pkgR)} of ${fk(e.pkgCap)}/mo capacity`:'build the CoWoS plant',false):'')+`<div class="par soon" style="margin-top:6px">🔒 Coming soon: training runs · models · rival labs</div>`;
+ const pw=e.dem?100*Math.min(1,MW()/e.dem):0;$('lb').innerHTML=`<h3 style="margin:0 0 6px">Supply chain · layer 1</h3>`+row('#ffb547','Power',pw,`${MW()} MW connected · ${e.dem} MW demand`,MW()<e.dem)+BK.filter(k=>S.unl[k]).map(k=>{const it=ITEM[R[k].out];const st=e.b[k];const rt=S.rate[k]||0;return row(SITES[k].col,SITES[k].n,S.b[k]?100*rt/R[k].rate:0,S.b[k]?`${fk(rt)}${it.u?' '+it.u:''} ${it.n}/mo${st.lim?' · ⚠ '+st.lim:''}`:st.lim,!!(S.b[k]&&st.lim))}).join('')+`<div class="par soon" style="margin-top:6px">🔒 Next layers: wafers · ASML EUV · HBM · packaging · the East</div>`;
  const L=actions();const hint=hintId();const sig=JSON.stringify(L)+hint+JSON.stringify(S.newActs)+(S.mode||'');if(sig!==lastSig){lastSig=sig;$('actbar').innerHTML=L.map(a=>`<button class="act ${S.mode&&S.mode===a.mode?'sel':''} ${a.soon?'soon':''} ${S.newActs[a.id]?'new':''} ${hint===a.id?'hint':''}" data-cmd="${a.cmd}" data-id="${a.id}" data-mode="${a.mode||''}" ${a.soon?'disabled':''}><span class="ai"><svg viewBox="0 0 24 24">${AIC[a.ic]}</svg></span>${a.n}<small>${a.s}</small></button>`).join('');
  $('actbar').querySelectorAll('.act:not(.soon)').forEach(b=>b.onclick=()=>{delete S.newActs[b.dataset.id];if(b.dataset.mode){setMode(b.dataset.mode);return}command(b.dataset.cmd)});
- const chips=['what should I do next?','what is HBM?','status'];$('chips').innerHTML=chips.map(c=>`<button class="chipb">${c}</button>`).join('');$('chips').querySelectorAll('button').forEach(b=>b.onclick=()=>command(b.textContent))}
+ const chips=['what should I do next?','what is polysilicon?','status'];$('chips').innerHTML=chips.map(c=>`<button class="chipb">${c}</button>`).join('');$('chips').querySelectorAll('button').forEach(b=>b.onclick=()=>command(b.textContent))}
  $('spd').innerHTML=[[0,'❚❚'],[1,'1×'],[2,'2×'],[4,'4×']].map(([v,l])=>`<button class="${(v===0&&S.paused)||(v&&!S.paused&&S.speed===v)?'sel':''}" data-v="${v}">${l}</button>`).join('');$('spd').querySelectorAll('button').forEach(b=>b.onclick=()=>{const v=+b.dataset.v;if(!v)S.paused=!S.paused;else{S.speed=v;S.paused=false}sync()})}
 // ---- learning cards (first contact) ----
 let cardK=null;function cardOpen(){return!!cardK}
@@ -276,13 +295,16 @@ let pops=[];function pop(site,t,v){const same=pops.find(p=>p.site===site&&p.t===
 let shake=0;
 function celebrate(){for(let i=0;i<80;i++){const[X,Y]=P(12,8,60);emit('spark',X+(Math.random()-.5)*400,Y+(Math.random()-.5)*120)}}
 function buildFx(k){const s=SITES[k];const[X,Y]=P(s.x+s.sz[0]/2,s.y+s.sz[1]/2,10);shake=6;for(let i=0;i<40;i++)emit('spark',X,Y);for(let i=0;i<14;i++)emit('steam',X+(Math.random()-.5)*60,Y);S.grow=S.grow||{};S.grow[k]=0}
-function blds(){const L=[];for(const k in SITES){if(k==='gt'||!S.placed[k])continue;const s=SITES[k];L.push({t:k,x:s.x,y:s.y,sz:s.sz,left:0,site:k,building:!!S.bt[k]})}return L}
-const MODEMSG={turb:'Click a green spot to place a gas turbine (2×2). Esc to cancel.',wire:'Click or drag to lay grid line from a turbine to the data center. Esc to stop.',belt:'Drag a belt so it touches both buildings (e.g. fab → packaging). Esc to stop.',dc:'Click a green spot to place the data center. Esc to cancel.',fab:'Click a green spot to place the foundry fab.',hbm:'Click a green spot to place the HBM fab.',pkg:'Click a green spot to place the packaging plant.'};
+function blds(){const L=[];for(const k of BK){if(!S.placed[k])continue;const s=SITES[k];L.push({t:k,x:s.x,y:s.y,sz:s.sz,left:0,site:k,building:!!S.bt[k]})}return L}
+const MODEMSG={turb:'Click a green spot to place a gas turbine (2×2). Esc to cancel.',wire:'Drag a grid line from a turbine to a building. Esc to stop.',belt:'Drag a belt so it touches both buildings (producer → consumer). Esc to stop.',depot:'Place the industrial inputs yard.',smelt:'Place the silicon smelter.',poly:'Place the polysilicon plant.',hpq:'Place the Spruce Pine quartz mine.',cru:'Place the crucible shop.',cz:'Place the crystal puller.'};
 function setMode(m){S.mode=S.mode===m?null:m;lastSig='';sync();if(S.mode)chat('a',MODEMSG[m]);}
 const modeWH=m=>m==='turb'?[2,2]:SITES[m]&&m!=='gt'?SITES[m].sz:[1,1];
 let wireDrag=false;function modeDown(){if(!S.mode||S.hx==null)return;const m=S.mode;const n0=S.turbs.length;if(m==='turb')placeTurb(S.hx,S.hy);else if(SITES[m])placeSite(m,S.hx,S.hy);else{wireDrag=true;(m==='wire'?placeWire:placeBelt)(S.hx,S.hy);sync();return}if(m==='turb'?S.turbs.length>n0:S.placed[m]){S.mode=null;lastSig=''}sync()}
 function modeMove(){if((S.mode==='wire'||S.mode==='belt')&&wireDrag&&S.hx!=null){if((S.mode==='wire'?placeWire:placeBelt)(S.hx,S.hy,true))sync()}}
 addEventListener('pointerup',()=>{wireDrag=false;if(S&&S.pendCard){const k=S.pendCard;S.pendCard=null;setTimeout(()=>showCard(k),300)}});addEventListener('keydown',e=>{if(e.key==='Escape'){S.mode=null;lastSig='';sync()}});
+// ---- intro: West vs East ----
+function intro(){if(typeof __NOINTRO!=='undefined')return;const el=document.createElement('div');el.id='intro';el.innerHTML=`<div class="ibox"><div class="ik">RACE TO SI</div><h1>Whoever wins AI wins.</h1><p>The <b style="color:#8fc8ff">West</b> holds the hardest pieces: ASML is the only maker of EUV lithography tools, and US-allied firms (TSMC, SK hynix, Samsung, Micron) lead in leading-edge chips and HBM memory.</p><p>The <b style="color:#ff8a7a">East</b> builds power fast and dominates materials: China held ~90% of world polysilicon capacity in 2023.</p><p>You are the West. Every AI chip starts as <b>rock</b>. Build the chain from the ground up.</p><div class="isrc">Sources: ASML annual reports; Dutch export rules (2019–); PV Tech citing Bernreuter Research (2023). China arrives as a rival in a later layer.</div><button id="igo">Start building</button></div>`;document.body.appendChild(el);S.paused=true;$('igo').onclick=()=>{el.remove();S.paused=false;sync()}}
+(()=>{const st=document.createElement('style');st.textContent=`#intro{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 40%,rgba(30,70,140,.55),rgba(5,8,14,.92) 60%),linear-gradient(90deg,rgba(40,90,170,.25),rgba(170,40,40,.25))}#intro .ibox{max-width:520px;padding:30px 34px;border-radius:18px;background:rgba(10,15,24,.85);border:1px solid rgba(255,255,255,.15);color:#e8eef7;font:15px/1.5 ui-sans-serif,system-ui;box-shadow:0 20px 80px rgba(0,0,0,.6)}#intro .ik{letter-spacing:.25em;font-size:11px;color:#9fb3cc}#intro h1{margin:6px 0 14px;font-size:34px;line-height:1.1}#intro .isrc{font-size:11px;color:#8899ad;margin-top:10px}#intro button{margin-top:18px;padding:11px 22px;border-radius:10px;border:0;background:#5dffa8;color:#05140c;font-weight:800;font-size:15px;cursor:pointer}`;document.head.appendChild(st)})();
 // ============ RENDER (v3c: isometric 2.5D, procedural art, no external assets) ============
 const cv=document.getElementById('cv'),cx=cv.getContext('2d'),wrap=document.getElementById('cvwrap');let g=cx,tick=0,hov=null,fx=[],VW=1,VH=1,DP=1;
 const TW=64,TH=32,MOB=matchMedia('(max-width:760px)').matches||('ontouchstart' in window&&innerWidth<900);
@@ -423,23 +445,29 @@ let CL=null;function drawClouds(){if(!CL){CL=[];for(let i=0;i<7;i++)CL.push({x:M
 function glow(X,Y,r,c,a){g.save();g.globalCompositeOperation='lighter';const gr=g.createRadialGradient(X,Y,0,X,Y,r);gr.addColorStop(0,`rgba(${c},${a})`);gr.addColorStop(1,`rgba(${c},0)`);g.fillStyle=gr;g.fillRect(X-r,Y-r,r*2,r*2);g.restore()}
 const RGB=h=>hx(h).join(',');
 function trimL(x,y,w,h,z0,z1,c){faceL(x,y,w,h,0,w,z0,z1,c)}function trimR(x,y,w,h,z0,z1,c){faceR(x,y,w,h,0,h,z0,z1,c)}
-function art(b){const s=SITES[b.site];const[w,h]=b.sz;const x=b.x+.1,y=b.y+.1,W2=w-.2,H2=h-.2;const T=tick;const gr=(S.grow&&S.grow[b.site]!=null)?Math.min(1,(S.grow[b.site]+=.02)):1;const Z=k=>k*(0.2+.8*gr*gr*(3-2*gr));const ac=s.col;const e=econ();
- if(b.ghost){g.save();g.globalAlpha=.55+.2*Math.sin(T/20);poly([P(b.x,b.y),P(b.x+w,b.y),P(b.x+w,b.y+h),P(b.x,b.y+h)],`rgba(${RGB(ac)},.18)`,ac,1.5);g.restore();g.setLineDash([4,4]);g.strokeStyle=ac;g.lineWidth=1;g.beginPath();[[x,y],[x+W2,y],[x+W2,y+H2],[x,y+H2]].forEach(p=>{g.moveTo(...P(...p,0));g.lineTo(...P(...p,30))});g.stroke();g.setLineDash([]);return}
- if(b.site==='gt'){prism(x,y+H2*.45,W2*.62,H2*.55,0,Z(20),'#8b8f96');trimL(x,y+H2*.45,W2*.62,H2*.55,Z(15),Z(18),sh(ac,1));
-  cyl(x+W2*.78,y+H2*.7,.42,0,Z(26),'#a7acb3','#c9cdd3');
-  const n=4;for(let i=0;i<n;i++){const sx=x+.35+i*(W2-.6)/Math.max(1,n-1)*.6,sy=y+.35;cyl(sx,sy,.16,0,Z(62),'#b9bec5','#5a5f66');const[X,Y]=P(sx,sy,Z(64));if(T%7===i%7)emit('steam',X,Y);glow(X,Y+4,10,'255,190,110',.25)}
-  return}
- if(b.site==='dc'){const z=Z(28);prism(x,y,W2,H2,0,z,'#dfe3e8');for(let i=0;i<6;i++)faceL(x,y,W2,H2,.3+i*W2/6,.3+i*W2/6+.5,6,z-8,sh('#2a3138',1));trimR(x,y,W2,H2,z-5,z-2,sh(ac,1));
-  const f=e.on/Math.max(1,S.acc);for(let i=0;i<7;i++)for(let j=0;j<2;j++){const cx0=x+.5+i*(W2-1)/6,cy0=y+.7+j*(H2-1.4);prism(cx0-.25,cy0-.25,.5,.5,z,z+6,'#c4c9cf',{edge:false});const[X,Y]=P(cx0,cy0,z+6.5);g.save();g.translate(X,Y);g.scale(1,.5);g.rotate(T*.3*f+i);g.strokeStyle='rgba(60,70,80,.7)';g.lineWidth=1.2;g.beginPath();g.moveTo(-6,0);g.lineTo(6,0);g.moveTo(0,-6);g.lineTo(0,6);g.stroke();g.restore()}
-  g.save();g.globalCompositeOperation='lighter';for(let i=0;i<6;i++){const[X,Y]=P(x+.55+i*W2/6,y+H2,z*.5);g.fillStyle=`rgba(120,255,180,${.25+.5*f*(.6+.4*Math.sin(T/9+i))})`;g.fillRect(X-1,Y-8,10,3)}g.restore();return}
- if(b.site==='fab'){const z=Z(46);prism(x+.2,y+.2,W2-.4,H2-.4,0,6,'#4a4f57');prism(x,y,W2,H2,6,z,'#eeeaf6');trimL(x,y,W2,H2,z*.55,z*.55+3,sh('#ffd56a',1));trimR(x,y,W2,H2,z*.55,z*.55+3,sh('#ffd56a',1));trimL(x,y,W2,H2,z-4,z-1,sh(ac,1));
-  for(let i=0;i<5;i++)for(let j=0;j<3;j++)cyl(x+.5+i*(W2-1)/4,y+.5+j*(H2-1)/2,.11,z,z+8+((i+j)%3)*4,'#b8b4c4','#8f8a9e');const[X,Y]=P(x+W2/2,y+H2,z*.55);glow(X,Y,26,'255,215,120',.25);return}
- if(b.site==='hbm'){let z0=0;[[0,1,22],[.35,.78,16],[.7,.56,12]].forEach(([o,k,hh],i)=>{const ww=W2*k,hh2=H2*k;const xx=x+(W2-ww)/2,yy=y+(H2-hh2)/2;prism(xx,yy,ww,hh2,Z(z0),Z(z0+hh),i%2?'#d8f3fa':'#e9f8fb');trimL(xx,yy,ww,hh2,Z(z0+hh-3),Z(z0+hh),sh(ac,1));trimR(xx,yy,ww,hh2,Z(z0+hh-3),Z(z0+hh),sh(ac,1));z0+=hh});const[X,Y]=P(x+W2/2,y+H2/2,Z(z0));glow(X,Y,24,'95,227,255',.3);return}
- if(b.site==='pkg'){const z=Z(18);prism(x,y,W2,H2,0,z,'#e6e1da');trimL(x,y,W2,H2,z-4,z-1,sh(ac,1));trimR(x,y,W2,H2,z-4,z-1,sh(ac,1));poly([P(x+.3,y+.3,z),P(x+W2-.3,y+.3,z),P(x+W2-.3,y+H2-.3,z),P(x+.3,y+H2-.3,z)],'rgba(140,200,240,.55)','rgba(255,255,255,.6)');
-  const[X,Y]=P(x+W2/2,y+H2/2,z);g.fillStyle='rgba(60,70,80,.9)';g.fillRect(X-9,Y-4,18,8);g.fillStyle='#5dffa8';g.fillRect(X-3,Y-2.5,6,5);g.fillStyle='#5fe3ff';for(let i=0;i<4;i++){g.fillRect(X-8,Y-3.5+i*2,3,1.5);g.fillRect(X+5,Y-3.5+i*2,3,1.5)}
-  const a=Math.sin(T/12)*.8;g.strokeStyle='#ff9a4d';g.lineWidth=2.2;g.beginPath();g.moveTo(X-20,Y+2);g.lineTo(X-20+Math.cos(a)*10,Y-10+Math.sin(a)*4);g.lineTo(X-6,Y-4);g.stroke();g.beginPath();g.moveTo(X+20,Y+2);g.lineTo(X+20-Math.cos(a)*10,Y-10-Math.sin(a)*4);g.lineTo(X+6,Y-4);g.stroke();return}}
+function art(b){const s=SITES[b.site];const[w,h]=b.sz;const x=b.x+.1,y=b.y+.1,W2=w-.2,H2=h-.2;const T=tick;const gr=(S.grow&&S.grow[b.site]!=null)?Math.min(1,(S.grow[b.site]+=.02)):1;const Z=k=>k*(0.2+.8*gr*gr*(3-2*gr));const ac=s.col;const on=!b.ghost&&S.b[b.site]&&(S.rate[b.site]||0)>0;
+  if(b.site==='depot'){prism(x,y+H2-.5,W2,.35,0,2,'#6b6258');for(let i=0;i<3;i++){const px=x+.2+i*.92,py=y+.25;const c=['#cfc3a8','#2e2b29','#8b6a45'][i];poly([P(px,py,0),P(px+.8,py,0),P(px+.8,py+1.7,0),P(px,py+1.7,0)],sh(c,.85));const[X,Y]=P(px+.4,py+.85,0);g.fillStyle=sh(c,1.05);g.beginPath();g.moveTo(X-20,Y+3);g.quadraticCurveTo(X,Y-Z(30),X+20,Y+3);g.fill()}
+   prism(x+W2*.1,y+H2-.48,W2*.55,.3,2,Z(9),'#7a3b2a');prism(x+W2*.7,y+H2-.48,.5,.3,2,Z(12),'#ffb547');return}
+  if(b.site==='smelt'){const z=Z(30);prism(x,y,W2*.62,H2,0,z,'#5c5f66');trimL(x,y,W2*.62,H2,z-5,z-2,sh(ac,1));trimR(x,y,W2*.62,H2,z-5,z-2,sh(ac,1));
+   for(let i=0;i<3;i++)cyl(x+.5+i*.6,y+H2*.5,.13,z,z+Z(20),'#3a3d42','#222');const[X,Y]=P(x+W2*.31,y+H2,z*.35);glow(X,Y,on?34:12,'255,120,40',on?.55+.2*Math.sin(T/5):.15);
+   cyl(x+W2*.82,y+H2*.35,.38,0,Z(44),'#8d9198','#6d7178');cyl(x+W2*.82,y+H2*.8,.3,0,Z(22),'#9aa0a7','#777');const[X2,Y2]=P(x+W2*.82,y+H2*.35,Z(46));if(on&&T%6===0)emit('steam',X2,Y2);
+   if(on){g.save();g.globalCompositeOperation='lighter';g.fillStyle=`rgba(255,${150+60*Math.sin(T/3)|0},60,.85)`;const[a,c]=P(x+W2*.31,y+H2,6);g.fillRect(a-8,c-4,16,4);g.restore()}return}
+  if(b.site==='poly'){prism(x,y,W2*.45,H2,0,Z(22),'#e9edf2');trimL(x,y,W2*.45,H2,Z(18),Z(21),sh(ac,1));trimR(x,y,W2*.45,H2,Z(18),Z(21),sh(ac,1));
+   for(let i=0;i<3;i++)cyl(x+W2*.22,y+.5+i*(H2-1)/2,.2,Z(22),Z(56),'#d7dde4','#aab3bd');
+   for(let i=0;i<3;i++)for(let j=0;j<2;j++){const cx0=x+W2*.6+i*.5,cy0=y+.8+j*1.6;cyl(cx0,cy0,.2,0,Z(20),'#cfd6de','#9fb0c2');const[X,Y]=P(cx0,cy0,Z(10));if(on)glow(X,Y,9,'255,160,80',.25+.15*Math.sin(T/7+i+j))}
+   const[X,Y]=P(x+W2*.22,y+.5,Z(58));if(on&&T%11===0)emit('steam',X,Y);return}
+  if(b.site==='hpq'){for(let i=0;i<3;i++){const o=i*.38;poly([P(x+o,y+o,-i*4),P(x+W2-o,y+o,-i*4),P(x+W2-o,y+H2-o,-i*4),P(x+o,y+H2-o,-i*4)],i%2?'#e3e0ee':'#f8f7ff','rgba(140,140,165,.7)')}
+   const[X,Y]=P(x+W2*.55,y+H2*.55,-8);g.fillStyle='#ffcf3a';g.fillRect(X-7,Y-5,14,6);g.fillStyle='#333';g.fillRect(X-6,Y+1,3,2);g.fillRect(X+3,Y+1,3,2);if(on){g.strokeStyle='#ffcf3a';g.lineWidth=2;g.beginPath();g.moveTo(X+7,Y-3);g.lineTo(X+13,Y-9+Math.sin(T/6)*3);g.stroke()}
+   for(let i=0;i<6;i++){const[a,c]=P(x+.4+i*.42,y+H2-.25,0);g.fillStyle='rgba(255,255,255,.95)';g.beginPath();g.moveTo(a,c-6);g.lineTo(a+3,c);g.lineTo(a,c+2);g.lineTo(a-3,c);g.fill()}return}
+  if(b.site==='cru'){const z=Z(18);prism(x,y,W2,H2,0,z,'#dfe9f2');trimL(x,y,W2,H2,z-4,z-1,sh(ac,1));trimR(x,y,W2,H2,z-4,z-1,sh(ac,1));
+   for(let i=0;i<3;i++){const[X,Y]=P(x+.55+i*.85,y+H2*.5,z);g.fillStyle='rgba(240,250,255,.95)';g.beginPath();g.ellipse(X,Y-3,8,4,0,0,7);g.fill();g.strokeStyle='#9fb9cc';g.lineWidth=1;g.stroke();g.fillStyle='rgba(170,205,230,.8)';g.beginPath();g.ellipse(X,Y-3,5,2.3,0,0,7);g.fill()}
+   const[X,Y]=P(x+W2*.85,y+H2*.3,z);if(on)glow(X,Y,14,'160,220,255',.35+.2*Math.sin(T/6));return}
+  if(b.site==='cz'){const z=Z(20);prism(x,y,W2,H2,0,z,'#ebe7f3');trimL(x,y,W2,H2,z-4,z-1,sh(ac,1));trimR(x,y,W2,H2,z-4,z-1,sh(ac,1));
+   for(let i=0;i<4;i++){const cx0=x+.5+i*(W2-1)/3,cy0=y+H2*.5;cyl(cx0,cy0,.24,z,z+Z(28),'#c9ccd6','#9aa0b4');cyl(cx0,cy0,.08,z+Z(28),z+Z(44),'#8e94a6','#6d7385');const[X,Y]=P(cx0,cy0,z+Z(14));if(on)glow(X,Y,11,'255,170,90',.3+.2*Math.sin(T/8+i))}
+   const[X,Y]=P(x+W2*.5,y+H2+.2,4);if(S.made.cz>=1){const gg=g.createLinearGradient(X-16,Y,X+16,Y);gg.addColorStop(0,'#8ea2d8');gg.addColorStop(.5,'#e6ecff');gg.addColorStop(1,'#7d8fc4');g.fillStyle=gg;g.save();g.translate(X,Y);g.rotate(-.46);g.fillRect(-16,-4,32,8);g.restore()}return}
+}
 function pylon(px,py){const[X,Y]=P(px,py,0);const h=46;g.strokeStyle=sh('#7a8088',1);g.lineWidth=1.3;g.beginPath();g.moveTo(X-6,Y);g.lineTo(X-1.5,Y-h);g.moveTo(X+6,Y);g.lineTo(X+1.5,Y-h);for(let i=0;i<4;i++){const y0=Y-i*h/4,y1=Y-(i+1)*h/4,w0=6-4.5*i/4,w1=6-4.5*(i+1)/4;g.moveTo(X-w0,y0);g.lineTo(X+w1,y1);g.moveTo(X+w0,y0);g.lineTo(X-w1,y1)}g.moveTo(X-10,Y-h+6);g.lineTo(X+10,Y-h+6);g.stroke();return[X,Y-h+6]}
-function gridDraw(){const e=econ();const load=e.on/Math.max(1,e.pw);const cells=[...S.wire.entries()].map(([k,w])=>{const[x,y]=k.split(',').map(Number);return{x,y,k,w}});cells.sort((a,b)=>a.x+a.y-b.x-b.y);const top={};
+function gridDraw(){const e=econ();const load=Math.min(1,e.dem/Math.max(1,MW()));const cells=[...S.wire.entries()].map(([k,w])=>{const[x,y]=k.split(',').map(Number);return{x,y,k,w}});cells.sort((a,b)=>a.x+a.y-b.x-b.y);const top={};
  for(const c of cells){g.globalAlpha=c.w.left?.45:1;const t=pylonH(c.x+.5,c.y+.5,c.w.left?20:34);top[c.k]=t;if(c.w.left){const[X,Y]=P(c.x+.5,c.y+.5,0);g.fillStyle='#ffb547';g.fillRect(X-10,Y+4,20*(1-c.w.left/c.w.tot),3)}g.globalAlpha=1}
  g.strokeStyle='rgba(40,45,50,.85)';g.lineWidth=1;const edges=[];for(const c of cells)for(const[a,b]of[[1,0],[0,1]]){const k2=(c.x+a)+','+(c.y+b);if(top[k2]){edges.push([c.k,k2]);for(const o of[-6,6]){const A=top[c.k],B=top[k2];g.beginPath();g.moveTo(A[0]+o,A[1]);g.quadraticCurveTo((A[0]+B[0])/2+o,(A[1]+B[1])/2+6,B[0]+o,B[1]);g.stroke()}}}
  if(MW()>0){g.save();g.globalCompositeOperation='lighter';for(const[k1,k2]of edges){const d1=S.dist.get(k1),d2=S.dist.get(k2);if(d1==null||d2==null)continue;const[F,Tt]=d1>d2?[top[k1],top[k2]]:[top[k2],top[k1]];const dd=Math.max(d1,d2);const u=((tick*.03*(.4+load))-dd*.5)%1;const uu=(u+1)%1;const X=F[0]+(Tt[0]-F[0])*uu,Y=F[1]+(Tt[1]-F[1])*uu+6*4*uu*(1-uu);const gg=g.createRadialGradient(X,Y,0,X,Y,6);gg.addColorStop(0,'rgba(255,230,140,.95)');gg.addColorStop(1,'rgba(255,190,80,0)');g.fillStyle=gg;g.fillRect(X-6,Y-6,12,12)}g.restore()}}
@@ -452,16 +480,19 @@ function ghostDraw(){if(!S.mode||S.hx==null)return;const m=S.mode;const[w,h]=mod
  // high-contrast footprint: bright green with white edge vs. saturated red with a cross
  g.lineWidth=2;for(let i=0;i<w;i++)for(let j=0;j<h;j++){const x=S.hx+i,y=S.hy+j;const bad=m==='turb'||m==='wire'||m==='belt'?!good:(blocked(x,y)||S.wire.has(key(x,y))||!c);const p=cellQuad(x,y,bad?'rgba(255,40,40,.62)':'rgba(40,255,120,.5)',bad?'#ffe0e0':'#eafff1');if(bad){g.strokeStyle='rgba(120,0,0,.9)';g.beginPath();g.moveTo(...p[0]);g.lineTo(...p[2]);g.moveTo(...p[1]);g.lineTo(...p[3]);g.stroke()}}
  if(good){g.globalAlpha=.55;if(m==='turb')turbArt({x:S.hx,y:S.hy,left:0,conn:true});else if(SITES[m]){const sx=SITES[m].x,sy=SITES[m].y;art({t:m,x:S.hx,y:S.hy,sz:SITES[m].sz,site:m});}g.globalAlpha=1}}
-function beltCells(){const e=econ();const full=S.acc>=S.slots;for(const[k,v]of S.belt){const[x,y]=k.split(',').map(Number);cellQuad(x+.12,y+.12,null,null);const p=[P(x+.15,y+.15,1),P(x+.85,y+.15,1),P(x+.85,y+.85,1),P(x+.15,y+.85,1)];g.beginPath();p.forEach((q,n)=>n?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]));g.closePath();g.globalAlpha=v.left?.45:1;g.fillStyle='#3a4048';g.fill();g.strokeStyle='#8b939c';g.lineWidth=1;g.stroke();if(v.left){const[X,Y]=P(x+.5,y+.5,0);g.fillStyle='#ffb547';g.fillRect(X-10,Y+6,20*(1-v.left/v.tot),3)}g.globalAlpha=1}
- for(const c of S.bcomp){if(!c.types.length)continue;const ty=c.types[0];const jam=ty==='chip'?full:ty==='wafer'?(e.pkgR===0||e.plim==='HBM'&&S.dieBuf>3000):(e.pkgR===0||e.plim==='logic dies'&&S.hbmBuf>20000);
-  const flow=!jam&&(ty==='wafer'?S.b.fab:ty==='hbm'?S.b.hbm:e.pkgR>0);
-  for(const k of c.cells){const[x,y]=k.split(',').map(Number);const d=c.bd.get(k);if(jam){g.strokeStyle='rgba(255,80,80,.8)';g.lineWidth=1.5;const p=[P(x+.15,y+.15,1),P(x+.85,y+.15,1),P(x+.85,y+.85,1),P(x+.15,y+.85,1)];g.beginPath();p.forEach((q,n)=>n?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]));g.closePath();g.stroke()}
-   // next cell toward destination
-   let nx=null;for(const[a,b]of N4){const k2=key(x+a,y+b);if(c.bd.get(k2)===d-1){nx=[x+a,y+b];break}}if(!nx&&d===0){const dst=ty==='chip'?'dc':'pkg';for(const[a,b]of N4)if(inRect(x+a,y+b,rectOf(dst))){nx=[x+a*.6,y+b*.6];break}}if(!nx)continue;
-   const u=flow?((tick*.02)%1):.5;for(const o of[0,.5]){const t=(u+o)%1;const[X,Y]=P(x+.5+(nx[0]-x)*t,y+.5+(nx[1]-y)*t,2);item(ty,X,Y)}}}}
-function item(k,X,Y){if(k==='wafer'){const gg=g.createLinearGradient(X-6,Y-3,X+6,Y+3);gg.addColorStop(0,'#d9c6ff');gg.addColorStop(.5,'#8fd6ff');gg.addColorStop(1,'#ffb3e6');g.fillStyle=gg;g.beginPath();g.ellipse(X,Y-2,6.5,3.3,0,0,7);g.fill();g.strokeStyle='rgba(255,255,255,.7)';g.lineWidth=.6;g.stroke()}
- else if(k==='hbm'){for(let i=0;i<4;i++){g.fillStyle=i%2?'#3fc7e8':'#8af0ff';g.fillRect(X-4,Y-3-i*2.2,8,2)}}
- else{g.fillStyle='#2b3a33';g.fillRect(X-6,Y-6,12,6);g.fillStyle='#5dffa8';g.fillRect(X-2.5,Y-5,5,4);g.fillStyle='#5fe3ff';g.fillRect(X-5.5,Y-5,2,4);g.fillRect(X+3.5,Y-5,2,4)}}
+function beltCells(){const seg=(x0,y0,x1,y1,wd,col)=>{const dx=x1-x0,dy=y1-y0;const nx=-dy*wd,ny=dx*wd;const p=[P(x0+nx,y0+ny,1),P(x1+nx,y1+ny,1),P(x1-nx,y1-ny,1),P(x0-nx,y0-ny,1)];g.beginPath();p.forEach((q,n)=>n?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]));g.closePath();g.fillStyle=col;g.fill()};
+ const isB=(x,y)=>S.belt.has(key(x,y))||BK.some(k=>S.placed[k]&&inRect(x,y,rectOf(k)));
+ for(const pass of[0,1])for(const[k,v]of S.belt){const[x,y]=k.split(',').map(Number);g.globalAlpha=v.left?.45:1;const cx0=x+.5,cy0=y+.5;let any=false;for(const[a,b]of N4)if(isB(x+a,y+b)){any=true;seg(cx0,cy0,cx0+a*.5,cy0+b*.5,pass?.17:.24,pass?'#59626d':'#2b3036')}
+  if(!any||1){const r=pass?.17:.24;seg(cx0-r,cy0,cx0+r,cy0,r,pass?'#59626d':'#2b3036')}
+  if(pass&&v.left){const[X,Y]=P(x+.5,y+.5,0);g.fillStyle='#ffb547';g.fillRect(X-10,Y+6,20*(1-v.left/v.tot),3)}g.globalAlpha=1}
+ for(const c of S.bcomp){if(!c.types.length){if(tick%60<40)for(const k of c.cells){const[x,y]=k.split(',').map(Number);const[X,Y]=P(x+.5,y+.5,2);g.fillStyle='rgba(255,90,90,.85)';g.fillRect(X-2,Y-2,4,4)}continue}const flow=(S.rate[c.dest]||0)>0;
+  for(const k of c.cells){const[x,y]=k.split(',').map(Number);const d=c.bd.get(k);let nx=null;for(const[a,b]of N4){const k2=key(x+a,y+b);if(c.bd.get(k2)===d-1){nx=[x+a,y+b];break}}if(!nx&&d===0){for(const[a,b]of N4)if(inRect(x+a,y+b,rectOf(c.dest))){nx=[x+a*.6,y+b*.6];break}}if(!nx)continue;
+   const u=flow?((tick*.02*Math.min(2,S.speed))%1):.5;for(const o of[0,.5]){const t=(u+o)%1;const[X,Y]=P(x+.5+(nx[0]-x)*t,y+.5+(nx[1]-y)*t,2);item(c.types[(o?1:0)%c.types.length],X,Y)}}}}
+function item(k,X,Y){if(k==='cru'){g.fillStyle='#eef8ff';g.beginPath();g.moveTo(X-6,Y-7);g.lineTo(X+6,Y-7);g.lineTo(X+3.5,Y);g.lineTo(X-3.5,Y);g.fill();g.strokeStyle='#7fa6c2';g.lineWidth=.8;g.stroke();return}
+ if(k==='poly'){for(let i=0;i<3;i++){g.fillStyle=i%2?'#aebdd0':'#dfe7f1';g.fillRect(X-5+i*3.5,Y-9,2.6,9)}return}
+ if(k==='mgsi'){g.fillStyle='#6f7884';g.beginPath();g.moveTo(X-6,Y);g.lineTo(X-2,Y-7);g.lineTo(X+5,Y-6);g.lineTo(X+6,Y);g.fill();g.fillStyle='#c5ccd6';g.fillRect(X-1,Y-6,3,2);return}
+ if(k==='hpq'){g.fillStyle='#ffffff';g.beginPath();g.ellipse(X,Y-2,6,3,0,0,7);g.fill();g.strokeStyle='#9a9ab8';g.lineWidth=.7;g.stroke();return}
+ g.fillStyle='#a08c6c';g.beginPath();g.moveTo(X-6,Y);g.quadraticCurveTo(X,Y-9,X+6,Y);g.fill();g.fillStyle='#3a3533';g.fillRect(X-2,Y-3,3,2)}
 function beltDraw(k,on,jam,rate){const pts=BELT[k];if(!({wafer:S.b.fab,hbm:S.b.hbm,chip:S.b.pkg})[k]||S.beltT[{wafer:'fab',hbm:'hbm',chip:'pkg'}[k]]>0)return;const p=pts.map(q=>P(q[0],q[1],1));g.lineJoin='round';g.lineCap='round';g.strokeStyle='rgba(20,25,30,.35)';g.lineWidth=13;g.beginPath();p.forEach((q,i)=>i?g.lineTo(q[0],q[1]+2):g.moveTo(q[0],q[1]+2));g.stroke();g.strokeStyle=jam?'#7a3a3a':sh('#5b6068',1);g.lineWidth=10;g.beginPath();p.forEach((q,i)=>i?g.lineTo(...q):g.moveTo(...q));g.stroke();g.strokeStyle=jam?'#c85050':sh('#2f3338',1);g.lineWidth=6;g.stroke();
  if(!on)return;const c=hx(ITC[k]);g.save();g.globalCompositeOperation='lighter';g.strokeStyle=`rgba(${c},${jam?.08:.18})`;g.lineWidth=12;g.stroke();g.restore();
  const len=pathLen(pts),n=Math.max(3,Math.min(16,Math.round(len*.9*Math.min(1.5,.4+rate))));const sp=jam?.0006:.0035*Math.min(2.5,S.speed);for(let i=0;i<n;i++){let t=(tick*sp*(8/len)+i/n)%1;if(jam)t=Math.min(t,1-i*.035);const[wx,wy]=along(pts,t);const[X,Y]=P(wx,wy,3);item(k,X,Y)}}
@@ -479,14 +510,11 @@ function draw4(){tick++;const r=wrap.getBoundingClientRect();if(Math.abs(VW-r.wi
  g.setTransform(DP,0,0,DP,0,0);const vg=g.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.35,VW/2,VH/2,Math.max(VW,VH)*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(20,30,50,.22)');g.fillStyle=vg;g.fillRect(0,0,VW,VH);const hz=g.createLinearGradient(0,0,0,VH);hz.addColorStop(0,'rgba(225,238,248,.25)');hz.addColorStop(.45,'rgba(225,238,248,0)');g.fillStyle=hz;g.fillRect(0,0,VW,VH);
  // pill labels
  const pill=(wx,wy,wz,a,b,col)=>{const p=P(wx,wy,wz);const sx=(p[0]-cam.x)*cam.z+VW/2,sy=(p[1]-cam.y)*cam.z+VH/2;g.font='700 11px ui-sans-serif,system-ui';const w1=g.measureText(a).width;g.font='10.5px ui-sans-serif,system-ui';const w=Math.max(w1,b?g.measureText(b).width:0)+22;const hh=b?33:20;const x=sx-w/2,y=sy-hh-6;g.fillStyle='rgba(10,15,24,.82)';rr(x,y,w,hh,hh/2>12?9:10);g.fill();g.strokeStyle=col;g.globalAlpha=.7;g.lineWidth=1;g.stroke();g.globalAlpha=1;g.fillStyle=col;g.beginPath();g.arc(x+9,y+10,3,0,7);g.fill();g.textAlign='left';g.font='700 11px ui-sans-serif,system-ui';g.fillStyle='#f1f6fd';g.fillText(a,x+16,y+14);if(b){g.font='10.5px ui-sans-serif,system-ui';g.fillStyle='#a9b9cf';g.fillText(b,x+16,y+27)}};
- const sub=k=>k==='gt'?`${S.turbs.filter(t=>!t.left).length} turbines · ${MW()} MW connected`:k==='dc'?`${fk(e.on)} of ${fk(S.acc)} accelerators powered`:k==='fab'?`${fk(e.dieR)} logic dies / month`:k==='hbm'?`${fk(e.hbmR)} HBM stacks / month`:k==='pkg'?`${fk(e.pkgR)} accelerators / month`:'';
- S.blds.forEach(b=>{const s=SITES[b.site];const zt={gt:64,dc:40,fab:60,hbm:52,pkg:30}[b.site];if(b.building){pill(b.x+b.sz[0]/2,b.y+b.sz[1]/2,zt,s.n,`building · ${S.bt[b.site].toFixed(1)} mo left`,'#ffb547');return}const warn=b.site==='dc'&&(e.lim==='power'||MW()===0);pill(b.x+b.sz[0]/2,b.y+b.sz[1]/2,zt,s.n+(HOV===b.site?'  ⓘ':''),(HOV===b.site||warn)&&!MOB?sub(b.site):'',warn?'#ff6b6b':s.col)});
- S.turbs.forEach(t=>{if(t.big)return;if(t.left>0)pill(t.x+1,t.y+1,50,'Gas turbine',`building · ${t.left.toFixed(1)} mo`,'#ffb547');else if(!t.conn&&tick%60<45)pill(t.x+1,t.y+1,54,'⚠ Not connected','drag a grid line to the data center','#ff6b6b')});
- if(S.mode&&S.hx!=null){const m=S.mode;const[w,h]=modeWH(m);const nm={turb:'Gas turbine',wire:'Grid line',belt:'Belt',dc:'AI data center',fab:'Foundry fab',hbm:'HBM fab',pkg:'Packaging (CoWoS)'}[m];const ck=m==='turb'?'gt':m;const dk=m==='turb'?'gt':m==='wire'?'grid':m;const ok=ghostOK()&&S.cash>=COST[ck];pill(S.hx+w+1.2,S.hy-1.6,0,`${nm} · ${money(COST[ck])}${m==='wire'||m==='belt'?'/tile':''}`,ok?`${gm(dk).toFixed(2)} mo build${m==='turb'?' · +15 MW once connected':''}`:(S.cash<COST[ck]?'not enough cash':'blocked'),ok?'#5dffa8':'#ff6b6b')}
- if(S.acc>=S.slots&&S.b.pkg&&S.placed.pkg){const s=SITES.pkg;pill(s.x+s.sz[0]/2,s.y+s.sz[1]/2,70,'⚠ Racks full','packaging stopped · chips pile up','#ff6b6b')}
- if(HOV==='grid'&&!MOB)pill(6.5,8.5,50,'Grid line  ⓘ',`${MW()} MW to the data center`,'#ffd06e');
- // power warning pulse on dark data center
- if(S.b.dc&&(e.lim==='power'||MW()===0)){const s=SITES.dc;const p=P(s.x+s.sz[0]/2,s.y+s.sz[1]/2,0);const sx=(p[0]-cam.x)*cam.z+VW/2,sy=(p[1]-cam.y)*cam.z+VH/2;g.strokeStyle=`rgba(255,90,90,${.4+.4*Math.sin(tick/8)})`;g.lineWidth=2.5;g.beginPath();g.ellipse(sx,sy,140*cam.z,70*cam.z,0,0,7);g.stroke()}
+ const sub=k=>{if(k==='gt')return`${S.turbs.filter(t=>!t.left).length} turbines · ${MW()} MW connected`;const r=S.rate[k]||0,it=ITEM[R[k].out];return`${fk(r)}${it.u?' '+it.u:''} ${it.n} / month`};
+ S.blds.forEach(b=>{const s=SITES[b.site];const zt={depot:34,smelt:62,poly:60,hpq:16,cru:30,cz:60}[b.site];if(b.building){pill(b.x+b.sz[0]/2,b.y+b.sz[1]/2,zt,s.n,`building · ${S.bt[b.site].toFixed(1)} mo left`,'#ffb547');return}const lim=e.b[b.site].lim;const warn=!!lim;pill(b.x+b.sz[0]/2,b.y+b.sz[1]/2,zt,(warn?'⚠ ':'')+s.n+(HOV===b.site?'  ⓘ':''),warn?lim:(HOV===b.site&&!MOB?sub(b.site):''),warn?'#ff6b6b':s.col)});
+ S.turbs.forEach(t=>{if(t.left>0)pill(t.x+1,t.y+1,50,'Gas turbine',`building · ${t.left.toFixed(1)} mo`,'#ffb547');else if(!t.conn&&tick%60<45)pill(t.x+1,t.y+1,54,'⚠ Not connected','wire it to a building','#ff6b6b')});
+ if(S.mode&&S.hx!=null){const m=S.mode;const[w,h]=modeWH(m);const nm=m==='turb'?'Gas turbine':m==='wire'?'Grid line':m==='belt'?'Belt':SITES[m].n;const ck=m==='turb'?'gt':m;const dk=m==='turb'?'gt':m==='wire'?'grid':m;const ok=ghostOK()&&S.cash>=COST[ck];pill(S.hx+w+1.2,S.hy-1.6,0,`${nm} · ${money(COST[ck])}${m==='wire'||m==='belt'?'/tile':''}`,ok?`${gm(dk).toFixed(2)} mo build${m==='turb'?` · +${TMW} MW once wired`:''}`:(S.cash<COST[ck]?'not enough cash':'blocked'),ok?'#5dffa8':'#ff6b6b')}
+ if(HOV==='grid'&&!MOB)pill(PSEUDO.grid.x,PSEUDO.grid.y,50,'Grid line  ⓘ',`${MW()} MW connected`,'#ffd06e');
  pops=pops.filter(o=>{o.a++;const s=o.site;const[X,Y]=P(s.x+s.sz[0]/2,s.y+s.sz[1]/2,90+o.a*.7);const sx=(X-cam.x)*cam.z+VW/2+o.dx,sy=(Y-cam.y)*cam.z+VH/2;if(o.bump>0)o.bump--;const sc=(o.a<8?.6+o.a*.07:1)*(1+o.bump*.04);g.save();g.globalAlpha=Math.max(0,1-Math.max(0,o.a-60)/50);g.translate(sx,sy);g.scale(sc,sc);g.font='800 15px ui-sans-serif,system-ui';g.textAlign='center';g.lineWidth=4;g.strokeStyle='rgba(4,20,12,.85)';g.strokeText(o.t,0,0);g.fillStyle=o.t[0]==='+'&&o.t[1]==='$'?'#9dffc8':'#ffe9a8';g.shadowColor='#4ef0a0';g.shadowBlur=12;g.fillText(o.t,0,0);g.restore();return o.a<110});
  requestAnimationFrame(draw4)}
 // ---- input: pan/zoom + tooltips ----
@@ -505,7 +533,7 @@ document.getElementById('cset').onclick=()=>{document.getElementById('mbox').inn
  document.getElementById('lsave').onclick=()=>{LLM.on=document.getElementById('lon').checked;LLM.url=document.getElementById('lurl').value;LLM.model=document.getElementById('lmod').value;const k=document.getElementById('lkey').value;if(k&&!k.startsWith('•'))LLM.key=k;localStorage.setItem('et_llm_on',LLM.on?'1':'0');localStorage.setItem('et_llm_url',LLM.url);localStorage.setItem('et_llm_model',LLM.model);if(LLM.key)localStorage.setItem('et_llm_key',LLM.key);closeM()};
  document.getElementById('lclear').onclick=()=>{LLM.key='';LLM.on=false;localStorage.removeItem('et_llm_key');localStorage.setItem('et_llm_on','0');closeM()}};
 async function llm(v){chat('u',v.replace(/</g,'&lt;'));try{const r=await fetch(LLM.url,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+LLM.key},body:JSON.stringify({model:LLM.model,messages:[{role:'system',content:'Translate the player request into ONE short game command from: build turbine | build fab | build hbm | build packaging | add fab line | add hbm line | add packaging line | expand data hall | what is <gas turbine|grid|data center|fab|hbm|packaging>? | what should I do next | status | pause | 1x|2x|4x. Reply with the command only.'},{role:'user',content:v}]})});const j=await r.json();const c=(j.choices&&j.choices[0].message.content||'').trim();if(c){document.getElementById('chat').lastChild.remove();command(c)}}catch(e){say('b','LLM call failed; using the local parser.');command(v)}}
-resize();newGame();fitV(true);draw4();requestAnimationFrame(loop);
+resize();newGame();intro();fitV(true);draw4();requestAnimationFrame(loop);
 document.getElementById('techBtn').onclick=()=>say('a','🔒 Research, xAI and rival labs are coming in the next build.');
 document.getElementById('techBtn').onclick=()=>say('a','🔒 Training runs, models and research come in the next layer.');document.getElementById('rmin').onclick=()=>{$('right').classList.toggle('min');$('rmin').textContent=$('right').classList.contains('min')?'+':'–'};
 window.__G={scr:(x,y)=>{const p=P(x,y,0);return[(p[0]-cam.x)*cam.z+VW/2,(p[1]-cam.y)*cam.z+VH/2]},MW:()=>MW(),place:(x,y)=>placeTurb(x,y),wire:(x,y)=>placeWire(x,y),setMode:m=>setMode(m),econ,showCard,closeCard,get S(){return S},command,parse,step(m){for(let i=0;i<m*20;i++)advance(1/20)},actions};
