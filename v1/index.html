@@ -1,0 +1,191 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Colossus Tycoon — play as Elon (v1: compute + energy)</title>
+<style>
+:root{--bg:#0b0f17;--pan:#131a26;--ln:#24324a;--tx:#dbe6f5;--mut:#8696ad;--ok:#3ddc84;--warn:#ffb020;--bad:#ff4d5e;--acc:#4da3ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.35 system-ui,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;height:100vh}
+header{display:flex;gap:16px;align-items:center;padding:8px 14px;background:var(--pan);border-bottom:1px solid var(--ln);flex-wrap:wrap}
+header h1{font-size:16px;margin:0 12px 0 0}.stat{display:flex;flex-direction:column;min-width:92px}.stat b{font-size:17px}.stat span{font-size:11px;color:var(--mut);text-transform:uppercase}
+button{background:#1d2a40;color:var(--tx);border:1px solid var(--ln);border-radius:6px;padding:6px 10px;cursor:pointer;font:inherit}button:hover{border-color:var(--acc)}button.sel{background:#21436e;border-color:var(--acc)}button:disabled{opacity:.4;cursor:not-allowed}
+#next{background:#1e5f3a;border-color:#3ddc84;font-weight:600}
+main{flex:1;display:flex;min-height:0}#left{width:250px;padding:10px;overflow:auto;background:var(--pan);border-right:1px solid var(--ln)}#right{width:300px;padding:10px;overflow:auto;background:var(--pan);border-left:1px solid var(--ln)}
+#mid{flex:1;position:relative;display:flex;align-items:center;justify-content:center;min-width:0}canvas{max-width:100%;max-height:100%}
+.pal{display:block;width:100%;text-align:left;margin:4px 0;padding:7px}.pal small{display:block;color:var(--mut);font-size:11px}
+h3{font-size:12px;text-transform:uppercase;color:var(--mut);margin:12px 0 6px}.bar{height:8px;background:#0a0e15;border-radius:4px;overflow:hidden;margin:3px 0 8px}.bar i{display:block;height:100%}
+#log div{font-size:12px;padding:3px 0;border-bottom:1px dashed #1f2a3c}.ev{color:var(--warn)}.good{color:var(--ok)}.badc{color:var(--bad)}
+.goal{padding:6px;border:1px solid var(--ln);border-radius:6px;margin:4px 0}.goal.done{border-color:var(--ok)}
+#modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:9}#modal .box{background:var(--pan);border:1px solid var(--ln);border-radius:10px;max-width:900px;max-height:86vh;overflow:auto;padding:18px 22px}
+table{border-collapse:collapse;width:100%;font-size:12px}td,th{border-bottom:1px solid var(--ln);padding:4px 6px;text-align:left;vertical-align:top}.tag{font-size:10px;padding:1px 5px;border-radius:8px;white-space:nowrap}.S{background:#173d2a;color:#7ff0b0}.D{background:#18324f;color:#8cc4ff}.A{background:#4a3410;color:#ffcf7a}
+a{color:var(--acc)}#tip{position:absolute;pointer-events:none;background:#000d;border:1px solid var(--ln);padding:6px 8px;border-radius:6px;font-size:12px;display:none;max-width:260px}
+</style></head><body>
+<header><h1>⚡ Colossus Tycoon <small style="color:var(--mut);font-weight:400">play as Elon · v1</small></h1>
+<div class="stat"><span>Quarter</span><b id="sQ"></b></div><div class="stat"><span>Cash</span><b id="sCash"></b></div>
+<div class="stat"><span>Compute online</span><b id="sGW"></b></div><div class="stat"><span>Firm power</span><b id="sPow"></b></div>
+<div class="stat"><span>GPUs online</span><b id="sGPU"></b></div><div class="stat"><span>Compute index</span><b id="sIdx"></b></div>
+<div style="flex:1"></div><button id="srcBtn">📚 Sources</button><button id="helpBtn">❓ How to play</button><button id="next">End quarter ▶</button></header>
+<main><div id="left"><h3>Build (click, then click a tile)</h3><div id="palette"></div><button class="pal" id="sellBtn">🗑 Demolish (no refund)<small>click a building</small></button>
+<h3>Market this quarter</h3><div id="market"></div></div>
+<div id="mid"><canvas id="cv" width="960" height="576"></canvas><div id="tip"></div></div>
+<div id="right"><h3>Goals</h3><div id="goals"></div><h3>Bottlenecks</h3><div id="bn"></div><h3>Rivals' share of supply</h3><div id="rivals"></div><h3>News feed</h3><div id="log"></div></div></main>
+<div id="modal"><div class="box" id="mbox"></div></div>
+<script>
+// ======================= SOURCES (every number used) =======================
+// kind: S = sourced figure, D = derived from sourced figures (arithmetic shown), A = game-balance assumption (NOT a real fact)
+const SRC=[
+{id:'nv_vr',k:'S',v:'~$40bn NVIDIA content per GW (Vera Rubin)',s:'Jensen Huang, as logged in AI Ecosystem factory notes (Oct 2026)'},
+{id:'nv_gb',k:'S',v:'~$25bn NVIDIA content per GW (Grace Blackwell)',s:'NVIDIA / Jensen, as logged in AI Ecosystem factory notes (Oct 2026)'},
+{id:'allin',k:'D',v:'~$30–35bn all-in cost per GW (SpaceX/xAI)',s:'Factory arithmetic on SpaceX Q3 call guidance, 20 Oct 2026 (derived, not printed by SpaceX). SemiAnalysis says ~$50bn/GW.'},
+{id:'gev',k:'S',v:'GE Vernova gas turbines: 20 GW/yr run-rate (3Q26) → 24 GW (2028); "mostly sold out through \'30"',s:'GE Vernova Q2 call, 22 Jul 2026 — gevernova.com webcast transcript (factory source B1-062-GEV-CAP)'},
+{id:'sie',k:'S',v:'Siemens Energy: ~50 large gas turbines/yr from FY27',s:'Siemens Energy, as logged in factory notes (RQ-062 power-gen capacity, Oct 2026)'},
+{id:'glob',k:'S',v:'Global gas-turbine capacity ~60–70 GW/yr',s:'Wood Mackenzie, as logged in factory notes (Oct 2026)'},
+{id:'gb300',k:'S',v:'~200–220k GB300 per month for SpaceX/xAI 13 GW plan',s:'Musk, SpaceX Q3 call 20 Oct 2026 (some summaries print 20k — primary transcript pending)'},
+{id:'start',k:'S',v:'Real-start mode: ~2.5 GW already online at end-2026 (low end of ~2.5–3 GW)',s:'Musk, SpaceX Q3 call 20 Oct 2026'},
+{id:'thirteen',k:'S',v:'"Surprised" if under 13 GW nameplate compute by end-2027; ~10 GW added in 2027 from ~2.5–3 GW end-2026',s:'Musk, SpaceX Q3 call 20 Oct 2026'},
+{id:'col2',k:'S',v:'Colossus 2: ~170 MW for ~110k GPUs',s:'Factory notes on xAI Colossus 2 (Oct 2026)'},
+{id:'permit',k:'S',v:'MDEQ PSD permit: 41 turbines ≈ 1.2 GW (approved 10 Mar 2026), xAI Southaven',s:'Factory source B1-059-XAI-SOUTHAVEN (RQ-059, 5 Oct 2026)'},
+{id:'xfmr',k:'S',v:'Large power transformer lead time 18–36 months (US DC critical electrical)',s:'Wood Mackenzie band, factory source RQ-039 (3 Oct 2026); NLR says 30–36 mo'},
+{id:'castings',k:'S',v:'Turbine castings named as a constraint',s:'Musk, SpaceX Q3 call 20 Oct 2026'},
+// derived
+{id:'mwturb',k:'D',v:'~29 MW per turbine → turbine bank of 10 = 290 MW',s:'1.2 GW ÷ 41 turbines (permit)'},
+{id:'kwgpu',k:'D',v:'~1.55 kW all-in per GPU → 500 MW hall ≈ 324k GPUs',s:'170 MW ÷ 110k GPUs (Colossus 2)'},
+{id:'alloc',k:'D',v:'Base allocation 2 rack halls (1 GW) per quarter',s:'~210k GB300/mo × 3 ≈ 630k/qtr ÷ 324k per hall ≈ 1.9'},
+{id:'chipcost',k:'D',v:'Hall chips: GB300 $12.5bn, Vera Rubin $20bn per 500 MW',s:'0.5 GW × $25bn / $40bn per GW'},
+{id:'turbmkt',k:'D',v:'Global turbine output ≈ 16 GW/quarter, GE Vernova ≈ 5 GW/quarter',s:'65 GW ÷ 4; 20 GW ÷ 4'},
+{id:'gridlead',k:'D',v:'Grid hookup lead time 7 quarters',s:'Inside the 18–36 month transformer band (6–12 quarters)'},
+// assumptions
+{id:'a_cash',k:'A',v:'Start cash $80bn; funding each quarter $60bn + $8bn per GW online',s:'Game balance — not a real SpaceX/xAI figure'},
+{id:'a_shell',k:'A',v:'Datacenter shell: 500 MW, $3bn, 2 quarters',s:'Game balance (sized so shell+cooling+power+chips ≈ the $30–35bn/GW all-in band for GB300)'},
+{id:'a_cool',k:'A',v:'Cooling plant: 500 MW, $0.75bn, 1 quarter',s:'Game balance'},
+{id:'a_hall',k:'A',v:'Rack hall install: 1 quarter after CoWoS+HBM allocation',s:'Game balance'},
+{id:'a_turb',k:'A',v:'Heavy turbine bank: $1.0bn, 4-quarter lead, max 4/qtr. Aero/mobile bank: $2.0bn, 1-quarter lead, max 3/qtr',s:'Game balance (real heavy-frame slots are sold out for years per GE Vernova)'},
+{id:'a_solar',k:'A',v:'Solar+Megapack farm: 500 MW nameplate, 30% counted as firm (150 MW), $1.2bn, 2 quarters, max 6/qtr',s:'Game balance'},
+{id:'a_grid',k:'A',v:'Grid hookup: 1,000 MW, $0.6bn, max 2 per game',s:'Game balance'},
+{id:'a_vr',k:'A',v:'Vera Rubin available from Q2 2027; 2.5× compute index per MW vs GB300',s:'Game balance — not an NVIDIA spec'},
+{id:'a_bid',k:'A',v:'Extra CoWoS/HBM slot: $3bn premium each, up to +3/qtr (rival events can remove slots)',s:'Game balance'},
+{id:'a_riv',k:'A',v:'Rival shares of CoWoS/HBM/turbine supply (Microsoft, Google, AWS, Meta) and their swings',s:'Game balance — illustrative only, NOT real allocations'},
+{id:'a_ev',k:'A',v:'All news events are fictional scenarios inspired by real constraints',s:'Game design'},
+];
+// ======================= GAME DATA =======================
+const QS=['Q4 2026','Q1 2027','Q2 2027','Q3 2027','Q4 2027','Q1 2028','Q2 2028','Q3 2028','Q4 2028'];
+const B={
+ turbine:{n:'Heavy gas turbines',ic:'🔥',c:1.0,lead:4,pow:290,col:'#ff8a3d',d:'10 × ~29 MW · 4 qtr lead',cat:'power'},
+ aero:{n:'Aero/mobile turbines',ic:'✈️',c:2.0,lead:1,pow:290,col:'#ffb36b',d:'10 × ~29 MW · fast, pricey',cat:'power'},
+ solar:{n:'Solar + Megapacks',ic:'☀️',c:1.2,lead:2,pow:150,col:'#ffd84d',d:'500 MW nameplate · 150 firm',cat:'power'},
+ grid:{n:'Grid hookup',ic:'🗼',c:0.6,lead:7,pow:1000,col:'#b28dff',d:'1 GW · 7 qtr wait (transformers)',cat:'power'},
+ shell:{n:'Datacenter shell',ic:'🏢',c:3.0,lead:2,cap:500,col:'#7aa7d9',d:'500 MW IT capacity',cat:'dc'},
+ cool:{n:'Cooling plant',ic:'❄️',c:0.75,lead:1,cool:500,col:'#5fe0ff',d:'500 MW heat rejection',cat:'dc'},
+ gb300:{n:'GB300 rack hall',ic:'🟩',c:12.5,lead:1,mw:500,idx:1,col:'#3ddc84',d:'500 MW · ~324k GPUs · needs CoWoS+HBM slot',cat:'chips'},
+ legacy:{n:'Existing Colossus campus',ic:'🏭',c:0,lead:0,pow:2500,cap:2500,cool:2500,mw:2500,idx:1,col:'#c0c8d8',d:'Inherited ~2.5 GW (real-start mode)',cat:'x',hide:1},
+ vr:{n:'Vera Rubin rack hall',ic:'🟦',c:20,lead:1,mw:500,idx:2.5,col:'#4da3ff',d:'500 MW · from Q2 2027 · needs slot',cat:'chips'},
+};
+const LIM={turbine:4,aero:3,solar:6,grid:2};
+const COLS=20,ROWS=12,T=48;
+let S;
+function rnd(){S.seed=(S.seed*1103515245+12345)&0x7fffffff;return S.seed/0x7fffffff}
+function newGame(mode){S={q:0,cash:80,grid:Array(COLS*ROWS).fill(null),tool:null,built:{},extra:0,slots:2,lostSlots:0,log:[],goals:{g1:null,g2:null},over:false,seed:20261022,gridUsed:0,
+ thisQ:{},slotsLeft:2,riv:{Microsoft:26,Google:22,AWS:20,Meta:18,You:14},castDelay:0,coolDerate:0,hist:[]};
+ for(const k in B)S.built[k]=0;if(mode==='real'){S.grid[0]={t:'legacy',left:0,slot:true};addLog('Real start: ~2.5 GW already online (Musk: ~2.5–3 GW at end-2026, 20 Oct 2026 call).','good')}
+ addLog('Q4 2026. '+(mode==='real'?'Existing campus':'Empty site')+' in Memphis-ish. Goal: 1 GW online, then 13 GW by end-2027 (Musk, 20 Oct 2026 call).','good');refresh();}
+function addLog(t,c=''){S.log.unshift({t:`[${QS[S.q]||'end'}] `+t,c});S.log=S.log.slice(0,40)}
+// ======================= SIM =======================
+function stats(){let pow=0,cap=0,cool=0,halls=[],powB=[],shells=[],cools=[];
+ S.grid.forEach((b,i)=>{if(!b)return;const d=B[b.t];if(b.left>0)return;
+  if(d.pow){pow+=d.pow;powB.push(i)} if(d.cap){cap+=d.cap;shells.push(i)} if(d.cool){cool+=d.cool*(1-S.coolDerate);cools.push(i)} if(d.mw&&b.slot)halls.push(i)});
+ const want=halls.reduce((a,i)=>a+B[S.grid[i].t].mw,0);const online=Math.min(want,pow,cap,cool);
+ let idx=0,gpus=0;if(want>0){const f=online/want;halls.forEach(i=>{const m=B[S.grid[i].t].mw;idx+=B[S.grid[i].t].idx*m*f/1000;gpus+=m*f*1000/1.55})}
+ const waiting=S.grid.filter(b=>b&&b.t.match(/gb300|vr/)&&!b.slot).length;
+ return{pow,cap,cool,want,online,idx,gpus,waiting,limit:online<want?(online===pow?'power':online===cap?'shell':'cooling'):null}}
+function canPlace(t){const d=B[t];if(S.over)return'Game over';if(S.cash<d.c)return'Not enough cash';
+ if(LIM[t]&&(S.thisQ[t]||0)>=LIM[t]-(t==='turbine'?S.castDelay:0))return'Supply limit reached this quarter';
+ if(t==='grid'&&S.gridUsed>=2)return'Utility caps you at 2 hookups';if(t==='vr'&&S.q<2)return'Vera Rubin not shipping until Q2 2027 (assumption)';return null}
+function place(i,t){const e=canPlace(t);if(e){flash(e);return}
+ const d=B[t];S.cash-=d.c;S.thisQ[t]=(S.thisQ[t]||0)+1;if(t==='grid')S.gridUsed++;
+ let lead=d.lead;if(t==='turbine'&&S.castLeadHit)lead++;
+ const b={t,left:lead,slot:false};if(d.mw){if(S.slotsLeft>0){S.slotsLeft--;b.slot=true}}
+ S.grid[i]=b;refresh()}
+function endQuarter(){if(S.over)return;
+ // progress construction
+ S.grid.forEach(b=>{if(!b)return;if(B[b.t].mw&&!b.slot){if(S.slotsLeft>0){S.slotsLeft--;b.slot=true}else return}if(b.left>0)b.left--});
+ const st=stats();S.hist.push(st.online);
+ if(st.online>=1000&&!S.goals.g1){S.goals.g1=QS[S.q];addLog('🎉 1 GW of compute online!','good')}
+ if(st.online>=13000&&S.q<=4&&!S.goals.g2){S.goals.g2=QS[S.q];S.over=true;refresh();return end(true)}
+ if(S.q===4&&!S.goals.g2){addLog('End-2027 passed below 13 GW. Musk would be "surprised". Keep going to 2028 for partial credit.','badc')}
+ if(S.q>=QS.length-1){S.over=true;refresh();return end(false)}
+ S.q++;S.cash+=60+8*st.online/1000;S.coolDerate=0;S.castLeadHit=false;S.castDelay=0;
+ // market
+ S.slots=2;S.extra=0;S.thisQ={};events();S.slotsLeft=Math.max(0,S.slots);refresh()}
+function events(){const r=rnd();let e;
+ const R=S.riv;const sw=(who,d)=>{R[who]+=d;R.You=Math.max(5,R.You-d/2)};
+ if(r<.16){S.castDelay=1;S.castLeadHit=true;e='Turbine castings delayed: −1 heavy turbine slot and +1 quarter lead on new orders.'}
+ else if(r<.30){S.slots-=1;sw('Microsoft',4);e='Microsoft books extra CoWoS capacity — your allocation drops by 1 slot.'}
+ else if(r<.42){S.slots-=1;sw('Google',3);e='HBM yield hiccup at a memory vendor — 1 fewer HBM slot this quarter.'}
+ else if(r<.52){S.coolDerate=.2;e='Heatwave: cooling plants derated 20% this quarter.'}
+ else if(r<.62){S.slots+=1;e='A rival defers a cluster — a spare CoWoS/HBM slot frees up for you (+1).'}
+ else if(r<.72){sw('Meta',3);S.castDelay=1;e='Meta orders a gigawatt of aero turbines — 1 fewer heavy turbine slot.'}
+ else if(r<.80){sw('AWS',3);S.slots-=1;e='AWS pulls in Trainium + GPU orders — your allocation −1.'}
+ else e='Quiet quarter. Suppliers deliver on time.';
+ addLog('📰 '+e,'ev');}
+function buySlot(){if(S.extra>=3||S.cash<3||S.over)return flash('Cannot buy more slots');S.cash-=3;S.extra++;S.slotsLeft++;
+ S.grid.forEach(b=>{if(b&&B[b.t].mw&&!b.slot&&S.slotsLeft>0){S.slotsLeft--;b.slot=true}});refresh()}
+function end(win){const st=stats();const m=document.getElementById('mbox');
+ m.innerHTML=`<h2>${win?'🚀 You hit 13 GW!':'💥 Game over'}</h2><p>${win?`13 GW online in ${S.goals.g2} — the plan Musk gave on the 20 Oct 2026 call.`:`You finished at <b>${(st.online/1000).toFixed(2)} GW</b>. Target was 13 GW by end-2027.`}</p>
+ <p>1 GW milestone: ${S.goals.g1||'missed'} · Compute index: ${st.idx.toFixed(1)} · GPUs: ${(st.gpus/1e6).toFixed(2)}M · Cash left: $${S.cash.toFixed(1)}bn</p>
+ <p style="color:var(--mut)">Note: the outcome reflects game-balance assumptions, not a forecast.</p><button onclick="closeM();newGame('real')">Play again (real start)</button> <button onclick="closeM();newGame('empty')">Play again (empty)</button> <button onclick="closeM()">Look at my site</button>`;openM()}
+// ======================= RENDER =======================
+const cv=document.getElementById('cv'),cx=cv.getContext('2d');let tick=0;
+function draw(){tick++;cx.fillStyle='#0d1320';cx.fillRect(0,0,cv.width,cv.height);
+ for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){cx.strokeStyle='#18233a';cx.strokeRect(x*T+.5,y*T+.5,T-1,T-1)}
+ const st=stats();const c=i=>[(i%COLS)*T+T/2,Math.floor(i/COLS)*T+T/2];
+ const live=(i)=>S.grid[i]&&S.grid[i].left===0;const ids=S.grid.map((b,i)=>b?i:-1).filter(i=>i>=0);
+ const shells=ids.filter(i=>B[S.grid[i].t].cap),halls=ids.filter(i=>B[S.grid[i].t].mw),pw=ids.filter(i=>B[S.grid[i].t].pow),cl=ids.filter(i=>B[S.grid[i].t].cool);
+ const near=(i,arr)=>{let best=-1,bd=1e9;arr.forEach(j=>{const[a,b]=c(i),[p,q]=c(j);const d=(a-p)**2+(b-q)**2;if(d<bd){bd=d;best=j}});return best};
+ const links=[];pw.forEach(i=>{const j=near(i,shells);if(j>=0)links.push([i,j,'#ffb020',live(i)])});cl.forEach(i=>{const j=near(i,shells);if(j>=0)links.push([i,j,'#5fe0ff',live(i)])});
+ halls.forEach(i=>{const j=near(i,shells);if(j>=0)links.push([j,i,'#3ddc84',live(i)&&S.grid[i].slot])});
+ const ratio=st.want?st.online/st.want:0;
+ links.forEach(([a,b,col,on])=>{const[x1,y1]=c(a),[x2,y2]=c(b);cx.strokeStyle=on?col+'66':'#33415566';cx.lineWidth=3;cx.setLineDash(on?[]:[4,5]);cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x2,y2);cx.stroke();cx.setLineDash([]);
+  if(on){const n=4;for(let k=0;k<n;k++){const f=((tick/90)+k/n)%1;cx.fillStyle=col;cx.beginPath();cx.arc(x1+(x2-x1)*f,y1+(y2-y1)*f,3.2,0,7);cx.fill()}}});
+ S.grid.forEach((b,i)=>{if(!b)return;const d=B[b.t];const x=(i%COLS)*T,y=Math.floor(i/COLS)*T;
+  let state='ok';if(b.left>0)state='build';else if(d.mw&&!b.slot)state='starved';else if(d.mw&&ratio<1)state='starved';else if(d.pow&&st.pow>st.online&&st.want<st.pow)state='backed';
+  if(d.mw&&!b.slot)state='starved';
+  cx.fillStyle=d.col+(b.left>0?'33':'cc');cx.fillRect(x+5,y+5,T-10,T-10);
+  const pulse=.5+.5*Math.sin(tick/8);
+  if(state==='starved'){cx.strokeStyle=`rgba(255,77,94,${.4+.6*pulse})`;cx.lineWidth=3;cx.strokeRect(x+4,y+4,T-8,T-8)}
+  if(state==='backed'){cx.strokeStyle=`rgba(255,176,32,${.3+.5*pulse})`;cx.lineWidth=3;cx.strokeRect(x+4,y+4,T-8,T-8)}
+  cx.font='20px serif';cx.textAlign='center';cx.fillText(d.ic,x+T/2,y+T/2+6);
+  if(b.left>0){cx.fillStyle='#fff';cx.font='bold 11px system-ui';cx.fillText('⏳'+b.left+'q',x+T/2,y+T-8)}
+  else if(d.mw&&!b.slot){cx.fillStyle='#ff9aa5';cx.font='bold 9px system-ui';cx.fillText('NO COWOS',x+T/2,y+T-7)}});
+ if(hover>=0&&S.tool){const x=(hover%COLS)*T,y=Math.floor(hover/COLS)*T;cx.strokeStyle=S.grid[hover]?'#ff4d5e':'#4da3ff';cx.lineWidth=2;cx.strokeRect(x+2,y+2,T-4,T-4)}
+ requestAnimationFrame(draw)}
+let hover=-1;const tip=document.getElementById('tip');
+cv.addEventListener('mousemove',e=>{const r=cv.getBoundingClientRect();const x=Math.floor((e.clientX-r.left)/r.width*COLS),y=Math.floor((e.clientY-r.top)/r.height*ROWS);hover=y*COLS+x;
+ const b=S.grid[hover];if(b){const d=B[b.t];tip.style.display='block';tip.style.left=(e.offsetX+14)+'px';tip.style.top=(e.offsetY+14)+'px';
+  tip.innerHTML=`<b>${d.ic} ${d.n}</b><br>${d.d}<br>${b.left>0?'Under construction: '+b.left+' qtr':'Operational'}${d.mw?(b.slot?'<br>CoWoS+HBM: allocated':'<br><span class=badc>Waiting for CoWoS/HBM allocation</span>'):''}`}else tip.style.display='none'});
+cv.addEventListener('mouseleave',()=>{hover=-1;tip.style.display='none'});
+cv.addEventListener('click',e=>{if(hover<0)return;if(S.tool==='sell'){if(S.grid[hover]){S.grid[hover]=null;refresh()}return}if(!S.tool)return;if(S.grid[hover])return flash('Tile occupied');place(hover,S.tool)});
+// ======================= UI =======================
+function fmt(n){return n>=1000?(n/1000).toFixed(2)+' GW':Math.round(n)+' MW'}
+function flash(t){addLog('⚠ '+t,'badc');refresh()}
+function refresh(){const st=stats();const $=id=>document.getElementById(id);
+ $('sQ').textContent=QS[S.q];$('sCash').textContent='$'+S.cash.toFixed(1)+'bn';$('sGW').textContent=fmt(st.online);$('sPow').textContent=fmt(st.pow);$('sGPU').textContent=(st.gpus/1e6).toFixed(2)+'M';$('sIdx').textContent=st.idx.toFixed(1);
+ $('palette').innerHTML=Object.entries(B).filter(([k,d])=>!d.hide).map(([k,d])=>{const e=canPlace(k);const lim=LIM[k]?` · ${(LIM[k]-(k==='turbine'?S.castDelay:0))-(S.thisQ[k]||0)} left this qtr`:'';
+  return`<button class="pal ${S.tool===k?'sel':''}" ${e&&e!=='Not enough cash'&&e.indexOf('limit')<0&&e.indexOf('Vera')<0?'':''} onclick="S.tool='${k}';refresh()" title="${e||''}">${d.ic} ${d.n} — $${d.c}bn<small>${d.d}${lim}${e?' · ⛔ '+e:''}</small></button>`}).join('');
+ document.getElementById('sellBtn').className='pal'+(S.tool==='sell'?' sel':'');
+ $('market').innerHTML=`<div>CoWoS + HBM slots free: <b>${S.slotsLeft}</b> <small style="color:var(--mut)">(base 2/qtr ≈ Musk's ~210k GB300/mo)</small></div>
+ <button class="pal" onclick="buySlot()">💸 Outbid rivals: +1 slot for $3bn<small>${3-S.extra} left this quarter</small></button>
+ <div style="font-size:12px;color:var(--mut)">Halls waiting for allocation: ${st.waiting}</div>`;
+ const g=(t,v,tgt,done)=>`<div class="goal ${done?'done':''}">${done?'✅':'🎯'} ${t}<div class="bar"><i style="width:${Math.min(100,v/tgt*100)}%;background:${done?'var(--ok)':'var(--acc)'}"></i></div><small>${fmt(v)} / ${fmt(tgt)} ${done?'· done '+done:''}</small></div>`;
+ $('goals').innerHTML=g('1 GW online',st.online,1000,S.goals.g1)+g('13 GW by end-2027 (Q4 2027)',st.online,13000,S.goals.g2)+`<small style="color:var(--mut)">Quarters left to end-2027: ${Math.max(0,4-S.q+1)}</small>`;
+ const row=(n,v,max,col)=>`<div style="font-size:12px">${n}: ${fmt(v)}</div><div class="bar"><i style="width:${max?Math.min(100,v/max*100):0}%;background:${col}"></i></div>`;const mx=Math.max(st.want,st.pow,st.cap,st.cool,1);
+ $('bn').innerHTML=row('Rack demand',st.want,mx,'#3ddc84')+row('Firm power',st.pow,mx,'#ffb020')+row('Shell capacity',st.cap,mx,'#7aa7d9')+row('Cooling',st.cool,mx,'#5fe0ff')+
+  (st.limit?`<div class="badc">Binding constraint: <b>${st.limit}</b></div>`:st.waiting?`<div class="badc">Binding constraint: <b>CoWoS/HBM allocation</b></div>`:st.want?'<div class="good">All racks fed ✔</div>':'<div style="color:var(--mut)">Build a rack hall to start.</div>');
+ const R=S.riv,tot=Object.values(R).reduce((a,b)=>a+b,0);$('rivals').innerHTML=Object.entries(R).map(([k,v])=>`<div style="font-size:12px">${k} ${(v/tot*100).toFixed(0)}%</div><div class="bar"><i style="width:${v/tot*100}%;background:${k==='You'?'#3ddc84':'#6b7a90'}"></i></div>`).join('')+'<small style="color:var(--mut)">Illustrative shares (game assumption)</small>';
+ $('log').innerHTML=S.log.map(l=>`<div class="${l.c}">${l.t}</div>`).join('');$('next').disabled=S.over}
+function openM(){document.getElementById('modal').style.display='flex'}function closeM(){document.getElementById('modal').style.display='none'}
+document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')closeM()};
+document.getElementById('sellBtn').onclick=()=>{S.tool='sell';refresh()};
+document.getElementById('next').onclick=endQuarter;
+document.getElementById('srcBtn').onclick=()=>{const L={S:'Sourced',D:'Derived',A:'Game assumption'};document.getElementById('mbox').innerHTML=`<h2>📚 Sources & assumptions</h2><p>Every number in the game. <span class="tag S">Sourced</span> = printed by a named source. <span class="tag D">Derived</span> = arithmetic on sourced numbers. <span class="tag A">Game assumption</span> = balance value, <b>not a real fact</b>.</p><table><tr><th>Type</th><th>Value</th><th>Source / date</th></tr>${SRC.map(s=>`<tr><td><span class="tag ${s.k}">${L[s.k]}</span></td><td>${s.v}</td><td>${s.s}</td></tr>`).join('')}</table><p><button onclick="closeM()">Close</button></p>`;openM()};
+const HELP=`<h2>❓ How to play</h2><ol><li>You're Elon. Each turn is one quarter, from Q4 2026 to Q4 2028.</li><li>Pick a building on the left, then click a tile. Cash is spent right away; it comes online after its lead time (⏳).</li><li>Compute online = the smallest of rack demand, firm power, shell capacity and cooling. Power, cooling and racks all link to their nearest datacenter shell.</li><li>Rack halls need a <b>CoWoS + HBM slot</b>. You get 2 a quarter and can outbid rivals for up to 3 more at $3bn each. Halls without a slot pulse red (<b>starved</b>). Idle power pulses amber (<b>backed up</b>).</li><li>Heavy turbines are cheap but take 4 quarters. Aero turbines are fast but expensive. The grid hookup is 1 GW but takes 7 quarters, so order it on day one.</li><li>Goals: 1 GW online, then <b>13 GW by Q4 2027</b>. Funding grows with GW online.</li><li>📚 Sources lists every number and whether it's sourced, derived or a game assumption.</li></ol><button onclick="closeM();newGame('empty')">Empty site (hard)</button> <button id="realBtn" onclick="closeM();newGame('real')">Elon's real start (~2.5 GW online)</button>`;
+document.getElementById('helpBtn').onclick=()=>{document.getElementById('mbox').innerHTML=HELP;openM()};
+newGame();S.thisQ={};S.slotsLeft=2;refresh();draw();document.getElementById('mbox').innerHTML=HELP;openM();
+window.__G={get S(){return S},stats,place,endQuarter,buySlot,newGame};
+</script></body></html>
