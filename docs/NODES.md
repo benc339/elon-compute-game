@@ -83,3 +83,17 @@ Manual grid lines are gone. All finished turbines feed **one global power pool**
 **Planned later node: the real grid chokepoint** (interconnection queues, large power transformers and switchgear, nodes 24–25). It will be a **timer/permit** (queue wait before new MW counts), not wiring. Sources so far: Berkeley Lab "Queued Up" 2024 for queues; the transformer lead times still need sourcing.
 
 **Market pricing (v10, Bence):** price = base × ((your orders + non-AI baseline + China) ÷ supply)^1. Your demand is open orders plus a 6-month decaying order rate. The non-AI baseline grows slowly (0.4%/mo; China 0.8%/mo). Supply is fixed and small: 1.2 turbines/mo, 2 blade sets/mo. In-house output adds to supply and eases the price. The panel shows "Your buildout drives X% of demand". All of these numbers are assumptions; context: GE Vernova backlog, few casters.
+
+## v11: no money — throughput, external supply, tech tree
+
+Bence: the player is the whole West, so prices are pointless. Removed: cash, income, prices, building costs, the outbid/sell buttons and market pricing.
+
+- **Throughput:** buildings cost only build time. Industrial inputs flow in at a fixed rate from the inputs yard (commodity source, not bought).
+- **External supply (fixed-rate deliveries):** world gas-turbine output reaches the West AI buildout at **1 per 8 months**, and blade & vane sets at **1 per 2 months** (after single-crystal research). Both rates are game assumptions; context: GE Vernova backlog, EPRI 5+ years. Making them in-house (assembly, foundry) is how you grow faster.
+- **Shortages** show as starved buildings, power-limited buildings and delivery countdowns, not prices.
+- **Tech tree (R&D lab, 2 MW, 1 research-month per month):**
+  - Siemens process (4) → Fused-quartz crucibles (3) → Czochralski 300 mm (5)
+  - → Rhenium superalloys (8) → Single-crystal casting (12, needs 20 t superalloy)
+  - → Wafer slicing (16, needs 5,000 ingots) → EUV (later layer)
+  - All research times and thresholds are game assumptions.
+- **Goals (10):** turbine → MG-Si → research Siemens → poly → crucibles → first ingot → third turbine → first blade set → in-house turbine → research wafer slicing.
