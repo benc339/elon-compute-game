@@ -137,7 +137,7 @@ const SRC=[
 ['S','Hot-section blade/vane casting is the limiting step; PCC and Howmet ~80% of high-end single-crystal casting (one expert interview)','Musk Jan & Aug 2026; In Practise; Turbomachinery Magazine'],
 ['S','Rhenium: ~81 t world mine output 2025; ~80% of US use in superalloys; metal ~$2,600/kg (2025)','USGS MCS 2026'],
 ['A','Recipes: superalloy 1 t inputs + 3% rhenium (30 kg, typical 2nd-gen single-crystal alloy level, not verified per alloy); 0.5 t alloy per blade set; 1 blade set + 200 t forgings/casings/generator (industrial inputs) per turbine','Game assumption'],
-['A','Markets: world supply, rival demand growth, price elasticity and the outbid premium are game assumptions. You are the whole West AI build-out; rivals are utilities & industry, aviation (same castings as jet engines) and China. Shares are assumptions','Game assumption'],
+['A','Markets: price = base × ((your orders + non-AI demand + China) ÷ supply)^1. Your own AI buildout is the main driver; non-AI baseline grows slowly; in-house output adds to supply. Supply, baseline, growth, exponent and outbid premium are game assumptions; supply is fixed and slow because few OEMs/casters exist (backlogs: GE Vernova 55 GW backlog+reservations, Jul 2025). You are the whole West AI build-out; rivals are utilities & industry, aviation (same castings as jet engines) and China. Shares are assumptions','Game assumption'],
 ['A','Global time scale: every build takes real duration × 1/8','Game rule'],
 ...Object.keys(DUR).map(k=>[DUR[k].s?'S':'A',`Build time, ${k}: real ${DUR[k].m} months → game ${(DUR[k].m/8).toFixed(2)} months`,DUR[k].src]),
 ];
@@ -273,16 +273,20 @@ function advance(dm){S.t+=dm;builds(dm);const e=econ();S.rate={};const sold0=S.s
 // Player = the whole West AI build-out. Rival demand = non-AI buyers + China (categories are data).
 // Turbine supply ~3 game turbines/month is an assumption. Demand weights are assumptions; context: utility/IPP orders fill GE Vernova's 55 GW backlog+reservations (Jul 2025); aero engines take most PCC/Howmet casting output (Howmet ~half of revenue is commercial aerospace engines, Howmet 10-K 2024) — shares here are game assumptions.
 const MKT={
- turb:{n:'Gas turbines',unit:'turbine',supply:3,price:.03,el:.8,buyers:[{n:'Utilities & industry',d:2.2,g:.012,c:'#7fd4ff'},{n:'Aviation',d:.2,g:.01,c:'#c9a8ff'},{n:'China',d:.6,g:.02,c:'#ff6b6b'}]},
- blade:{n:'Blade & vane sets',unit:'set',supply:4,price:.008,el:.8,buyers:[{n:'Aviation',d:2.2,g:.012,c:'#c9a8ff'},{n:'Utilities & industry',d:1.4,g:.012,c:'#7fd4ff'},{n:'China',d:.5,g:.02,c:'#ff6b6b'}]}};
+ turb:{n:'Gas turbines',unit:'turbine',supply:1.2,price:.03,el:1,buyers:[{n:'Utilities & industry',d:.65,g:.004,c:'#7fd4ff'},{n:'Aviation',d:.08,g:.004,c:'#c9a8ff'},{n:'China',d:.27,g:.008,c:'#ff6b6b'}]},
+ blade:{n:'Blade & vane sets',unit:'set',supply:2,price:.008,el:1,buyers:[{n:'Aviation',d:.9,g:.004,c:'#c9a8ff'},{n:'Utilities & industry',d:.45,g:.004,c:'#7fd4ff'},{n:'China',d:.2,g:.008,c:'#ff6b6b'}]}};
 function mkInit(){const o={};for(const k in MKT)o[k]={q:0,pq:0,hist:[],alloc:{},pos:0,acc:0};return o}
 const mkDem=(k,t)=>MKT[k].buyers.reduce((a,b)=>a+b.d*Math.pow(1+b.g,t),0);
-function mkPrice(k){const m=MKT[k],st=S.mk[k];const D=mkDem(k,S.t)+st.q+st.pq;return m.price*Math.pow(D/m.supply,m.el)}
+const mkInh=k=>k==='turb'?(S.rate.asm||0):(S.rate.cast||0);// in-house output adds to world supply
+const mkYou=k=>{const st=S.mk[k];return st.q+st.pq+(st.ordR||0)};// your AI buildout demand: open orders + recent order rate
+const mkSup=k=>MKT[k].supply+mkInh(k);
+function mkPrice(k){const m=MKT[k];const D=mkDem(k,S.t)+mkYou(k);return m.price*Math.pow(D/mkSup(k),m.el)}
+const mkShare=k=>{const y=mkYou(k);return y/(y+mkDem(k,S.t))};
 const OUTBID=1.6;
-function mkOrder(k,prio){const st=S.mk[k];const p=mkPrice(k)*(prio?OUTBID:1);if(S.cash<p)return say('b',`Not enough cash: one ${MKT[k].unit} costs ${money(p)}${prio?' with the outbid premium':''}.`);S.cash-=p;bumpCash();if(prio)st.pq++;else st.q++;sync();return say('a',prio?`Outbid: paid ${money(p)} (+${Math.round((OUTBID-1)*100)}%) to jump the queue. Delivery at the front of next month's allocation.`:`Ordered 1 ${MKT[k].unit} at ${money(p)}. You join the line: ~${mkWait(k).toFixed(1)} months.`)}
+function mkOrder(k,prio){const st=S.mk[k];const p=mkPrice(k)*(prio?OUTBID:1);if(S.cash<p)return say('b',`Not enough cash: one ${MKT[k].unit} costs ${money(p)}${prio?' with the outbid premium':''}.`);S.cash-=p;bumpCash();if(prio)st.pq++;else st.q++;st.ordR=(st.ordR||0)+1/6;sync();return say('a',prio?`Outbid: paid ${money(p)} (+${Math.round((OUTBID-1)*100)}%) to jump the queue. Delivery at the front of next month's allocation.`:`Ordered 1 ${MKT[k].unit} at ${money(p)}. You join the line: ~${mkWait(k).toFixed(1)} months.`)}
 // player share of the non-priority allocation is pro rata to its orders; queue wait estimate
 function mkWait(k){const m=MKT[k],st=S.mk[k];const D=mkDem(k,S.t);const rest=Math.max(0,m.supply-st.pq);const share=st.q/(D+st.q)*rest;return st.q?st.q/Math.max(.01,share):0}
-function mkTick(dm){for(const k in MKT){const m=MKT[k],st=S.mk[k];const sup=m.supply*dm;const D=mkDem(k,S.t)*dm;let left=sup;const pr=Math.min(st.pq,left);st.pq-=pr;left-=pr;const qn=st.q*dm;const mine=Math.min(st.q,left*(qn/(D+qn||1)));st.q-=mine;left-=mine;const got=pr+mine;st.acc+=got;const n=Math.floor(st.acc+1e-9);if(n>=1){st.acc-=n;S.stock[k]+=n;pop(k==='turb'?PWRS:SITES.asm,`+${n} ${m.unit} delivered`);if(k==='turb')chat('g',`🚚 ${n} gas turbine delivered. Place it from stock.`)}
+function mkTick(dm){for(const k in MKT){const m=MKT[k],st=S.mk[k];st.ordR=(st.ordR||0)*Math.exp(-dm/6);const sup=m.supply*dm;const D=mkDem(k,S.t)*dm;let left=sup;const pr=Math.min(st.pq,left);st.pq-=pr;left-=pr;const qn=st.q*dm;const mine=Math.min(st.q,left*(qn/(D+qn||1)));st.q-=mine;left-=mine;const got=pr+mine;st.acc+=got;const n=Math.floor(st.acc+1e-9);if(n>=1){st.acc-=n;S.stock[k]+=n;pop(k==='turb'?PWRS:SITES.asm,`+${n} ${m.unit} delivered`);if(k==='turb')chat('g',`🚚 ${n} gas turbine delivered. Place it from stock.`)}
   const al=st.alloc;al['West AI (you)']=(al['West AI (you)']||0)*.95+got/dm*.05;m.buyers.forEach(b=>{const dd=b.d*Math.pow(1+b.g,S.t)*dm;al[b.n]=(al[b.n]||0)*.95+(left*dd/(D||1))/dm*.05});
   st.tick=(st.tick||0)+dm;if(st.tick>=.5){st.tick=0;st.hist.push(mkPrice(k));if(st.hist.length>40)st.hist.shift()}}}
 const AICK={depot:'ind',smelt:'smelt',poly:'poly',hpq:'hpq',cru:'cru',cz:'cz',alloy:'smelt',cast:'cru',asm:'pow'};
@@ -348,7 +352,7 @@ function intro(){if(typeof __NOINTRO!=='undefined')return;const el=document.crea
 
 function spark(h){if(h.length<2)return'';const mx=Math.max(...h),mn=Math.min(...h);return`<svg viewBox="0 0 100 20" style="width:100%;height:18px"><polyline fill="none" stroke="#ffb547" stroke-width="1.5" points="${h.map((v,i)=>`${i*100/(h.length-1)},${18-16*(v-mn)/((mx-mn)||1)}`).join(' ')}"/></svg>`}
 function mkPanel(){let o='';for(const k of['turb','blade']){if(k==='blade'&&!S.unl.asm)continue;const m=MKT[k],st=S.mk[k];const al=st.alloc;const tot=Object.values(al).reduce((a,b)=>a+b,0)||1;const cols={'West AI (you)':'#5fe3a1'};m.buyers.forEach(b=>cols[b.n]=b.c);const keys=['West AI (you)',...m.buyers.map(b=>b.n)];const p=mkPrice(k),h=st.hist;const tr=h.length>1?(p/h[0]-1)*100:0;
- o+=`<div class="mkt"><h3 style="margin:8px 0 4px">World market · ${m.n}</h3><div class="par">Price ${money(p)} / ${m.unit} <b style="color:${tr>0?'#ff8a7a':'#5fe3a1'}">${tr>=0?'▲':'▼'}${Math.abs(tr).toFixed(0)}%</b> · supply ${m.supply}/mo (assumption)</div>${spark(h)}
+ o+=`<div class="mkt"><h3 style="margin:8px 0 4px">World market · ${m.n}</h3><div class="par">Price ${money(p)} / ${m.unit} <b style="color:${tr>0?'#ff8a7a':'#5fe3a1'}">${tr>=0?'▲':'▼'}${Math.abs(tr).toFixed(0)}%</b> </div><div class="par" style="color:#ffb547">⚡ Your buildout drives <b>${Math.round(100*mkShare(k))}%</b> of demand → price</div><div class="par" style="font-size:11px">Supply ${m.supply}/mo from few ${k==='turb'?'OEMs, sold out to ~2028–30':'casters'}${mkInh(k)>.01?` + <b style="color:#5fe3a1">${fk(mkInh(k))}/mo in-house</b>`:''} (assumption)</div>${spark(h)}
  <div style="display:flex;height:9px;border-radius:4px;overflow:hidden;margin:3px 0">${keys.map(n=>`<i title="${n}" style="width:${100*(al[n]||0)/tot}%;background:${cols[n]}"></i>`).join('')}</div>
  <div class="par" style="font-size:11px">${keys.map(n=>`<span style="color:${cols[n]}">■</span> ${n.replace(' (you)','')} ${Math.round(100*(al[n]||0)/tot)}%`).join(' · ')}</div>
  <div class="par">You: ${st.pq>.01?Math.ceil(st.pq-.01)+' priority · ':''}${st.q>.01?Math.ceil(st.q-.01):0} in line${st.q>.01?` · ~${mkWait(k).toFixed(1)} mo`:''} · ${Math.floor(S.stock[k]+1e-6)} in stock</div>

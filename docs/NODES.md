@@ -81,3 +81,5 @@ Framing (Bence, 22 Oct 2026): the player is the **whole West** vs China. Market 
 Manual grid lines are gone. All finished turbines feed **one global power pool**, and every building draws from it. Wiring was annoying and isn't a real chokepoint. Belts stay for material flow but are auto-routed.
 
 **Planned later node: the real grid chokepoint** (interconnection queues, large power transformers and switchgear, nodes 24–25). It will be a **timer/permit** (queue wait before new MW counts), not wiring. Sources so far: Berkeley Lab "Queued Up" 2024 for queues; the transformer lead times still need sourcing.
+
+**Market pricing (v10, Bence):** price = base × ((your orders + non-AI baseline + China) ÷ supply)^1. Your demand is open orders plus a 6-month decaying order rate. The non-AI baseline grows slowly (0.4%/mo; China 0.8%/mo). Supply is fixed and small: 1.2 turbines/mo, 2 blade sets/mo. In-house output adds to supply and eases the price. The panel shows "Your buildout drives X% of demand". All of these numbers are assumptions; context: GE Vernova backlog, few casters.
