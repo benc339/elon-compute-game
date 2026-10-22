@@ -165,7 +165,7 @@ function placeSite(k,x,y,quiet){if(!S.unl[k])return quiet?null:say('a','That is 
  S.cash-=COST[k];bumpCash();SITES[k].x=x;SITES[k].y=y;S.placed[k]=1;S.bt[k]=gm(k);S.bt0=S.bt0||{};S.bt0[k]=gm(k);delete S.newActs[k];recalc();checkGoal();
  const nxt=k==='dc'?' Connect a turbine to it with a <b>grid line</b> (or place a turbine right next to it).':k==='pkg'?' Lay <b>belts</b> from the fab and the HBM fab to it, and from it to the data center.':S.placed.pkg?' Lay a <b>belt</b> to the packaging plant.':'';
  return say('a',`<b>${SITES[k].n}</b> placed. Construction: <b>${gm(k).toFixed(1)} game months</b> (real reference ~${DUR[k].m} months).${nxt}`)}
-function placeWire(x,y,quiet){if(!canWire(x,y))return false;if(S.cash<COST.wire){if(!quiet)say('b','Grid line costs $1M per tile.');return false}S.cash-=COST.wire;S.wire.set(key(x,y),{left:gm('grid'),tot:gm('grid')});recalc();if(!S.seen.grid)setTimeout(()=>showCard('grid'),300);return true}
+function placeWire(x,y,quiet){if(!canWire(x,y))return false;if(S.cash<COST.wire){if(!quiet)say('b','Grid line costs $1M per tile.');return false}S.cash-=COST.wire;S.wire.set(key(x,y),{left:gm('grid'),tot:gm('grid')});recalc();if(!S.seen.grid)S.pendCard='grid';return true}
 function placeBelt(x,y,quiet){if(!canBelt(x,y))return false;if(S.cash<COST.belt){if(!quiet)say('b','Belts cost $1M per tile.');return false}S.cash-=COST.belt;S.belt.set(key(x,y),{left:gm('belt'),tot:gm('belt')});recalc();return true}
 function nearRect(w,h,px,py,adjFn){const c=[];for(let x=0;x<=W-w;x++)for(let y=0;y<=H-h;y++)if(canRect(x,y,w,h)){let adj=0;if(adjFn)for(let i=-1;i<=w;i++)for(let j=-1;j<=h;j++){if((i<0||i>=w)===(j<0||j>=h))continue;if(adjFn(x+i,y+j))adj=1}c.push({x,y,adj,d:Math.hypot(x-px,y-py)})}c.sort((a,b)=>(b.adj-a.adj)||(a.d-b.d));return c[0]}
 function autoTurb(){const dc=S.placed.dc?rectOf('dc'):{x:7,y:11};const c=nearRect(2,2,dc.x-3,dc.y-4,(x,y)=>S.dist.has(key(x,y))||S.placed.dc&&inRect(x,y,rectOf('dc')));if(!c)return say('b','No free spot for a turbine.');const r=placeTurb(c.x,c.y);if(!c.adj&&S.placed.dc)autoPath(S.turbs[S.turbs.length-1],'wire');return r}
@@ -282,7 +282,7 @@ function setMode(m){S.mode=S.mode===m?null:m;lastSig='';sync();if(S.mode)chat('a
 const modeWH=m=>m==='turb'?[2,2]:SITES[m]&&m!=='gt'?SITES[m].sz:[1,1];
 let wireDrag=false;function modeDown(){if(!S.mode||S.hx==null)return;const m=S.mode;const n0=S.turbs.length;if(m==='turb')placeTurb(S.hx,S.hy);else if(SITES[m])placeSite(m,S.hx,S.hy);else{wireDrag=true;(m==='wire'?placeWire:placeBelt)(S.hx,S.hy);sync();return}if(m==='turb'?S.turbs.length>n0:S.placed[m]){S.mode=null;lastSig=''}sync()}
 function modeMove(){if((S.mode==='wire'||S.mode==='belt')&&wireDrag&&S.hx!=null){if((S.mode==='wire'?placeWire:placeBelt)(S.hx,S.hy,true))sync()}}
-addEventListener('pointerup',()=>{wireDrag=false});addEventListener('keydown',e=>{if(e.key==='Escape'){S.mode=null;lastSig='';sync()}});
+addEventListener('pointerup',()=>{wireDrag=false;if(S&&S.pendCard){const k=S.pendCard;S.pendCard=null;setTimeout(()=>showCard(k),300)}});addEventListener('keydown',e=>{if(e.key==='Escape'){S.mode=null;lastSig='';sync()}});
 // ============ RENDER (v3c: isometric 2.5D, procedural art, no external assets) ============
 const cv=document.getElementById('cv'),cx=cv.getContext('2d'),wrap=document.getElementById('cvwrap');let g=cx,tick=0,hov=null,fx=[],VW=1,VH=1,DP=1;
 const TW=64,TH=32,MOB=matchMedia('(max-width:760px)').matches||('ontouchstart' in window&&innerWidth<900);
