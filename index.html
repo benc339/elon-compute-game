@@ -1,33 +1,34 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Colossus Tycoon v2: play as Elon</title>
+<title>Colossus Tycoon v3: visual factory, play as Elon</title>
 <style>
 :root{--bg:#0b0f17;--pan:#131a26;--ln:#24324a;--tx:#dbe6f5;--mut:#8696ad;--ok:#3ddc84;--warn:#ffb020;--bad:#ff4d5e;--acc:#4da3ff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.35 system-ui,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;height:100vh}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.35 system-ui,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;height:100vh;overflow:hidden}
 header{display:flex;gap:14px;align-items:center;padding:6px 12px;background:var(--pan);border-bottom:1px solid var(--ln);flex-wrap:wrap}
 header h1{font-size:15px;margin:0 8px 0 0}.stat{display:flex;flex-direction:column;min-width:84px}.stat b{font-size:16px}.stat span{font-size:10px;color:var(--mut);text-transform:uppercase}
 button,select,input{background:#1d2a40;color:var(--tx);border:1px solid var(--ln);border-radius:5px;padding:4px 8px;cursor:pointer;font:inherit}button:hover{border-color:var(--acc)}button.sel{background:#21436e;border-color:var(--acc)}button:disabled{opacity:.4;cursor:not-allowed}
 input{width:58px;cursor:text}#next{background:#1e5f3a;border-color:#3ddc84;font-weight:600}
-main{flex:1;display:flex;min-height:0}#left{width:255px;padding:8px;overflow:auto;background:var(--pan);border-right:1px solid var(--ln)}#right{width:290px;padding:8px;overflow:auto;background:var(--pan);border-left:1px solid var(--ln)}
-#mid{flex:1;display:flex;flex-direction:column;min-width:0}#cvwrap{position:relative;flex:0 0 auto;display:flex;justify-content:center;background:#0d1320}canvas{width:100%;max-width:1060px;height:auto}
-#orders{flex:1;overflow:auto;padding:6px 10px;border-top:1px solid var(--ln)}
-.pal{display:block;width:100%;text-align:left;margin:3px 0;padding:6px}.pal small{display:block;color:var(--mut);font-size:11px}
+main{flex:1;display:flex;min-height:0}#right{width:280px;padding:8px;overflow:auto;background:var(--pan);border-left:1px solid var(--ln)}
+#mid{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}#cvwrap{position:relative;flex:1;min-height:0;background:#0d1320}#cv{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+#buildbar{display:flex;gap:4px;padding:5px;background:var(--pan);border-top:1px solid var(--ln);overflow-x:auto}
+.bb{display:flex;flex-direction:column;align-items:center;min-width:74px;padding:4px 3px;font-size:10px;line-height:1.15}.bb .ic{font-size:22px}.bb small{color:var(--mut)}.bb.lock{opacity:.45}
+#orders{height:30%;overflow:auto;padding:6px 10px;border-top:1px solid var(--ln);display:block}#orders.hide{display:none}
 h3{font-size:11px;text-transform:uppercase;color:var(--mut);margin:10px 0 5px}.bar{height:7px;background:#0a0e15;border-radius:4px;overflow:hidden;margin:2px 0 6px}.bar i{display:block;height:100%}
 #log div{font-size:12px;padding:3px 0;border-bottom:1px dashed #1f2a3c}.ev{color:var(--warn)}.good{color:var(--ok)}.badc{color:var(--bad)}
 .goal{padding:5px;border:1px solid var(--ln);border-radius:6px;margin:4px 0}.goal.done{border-color:var(--ok)}
 #modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:9}#modal .box{background:var(--pan);border:1px solid var(--ln);border-radius:10px;max-width:1000px;max-height:88vh;overflow:auto;padding:16px 20px}
 table{border-collapse:collapse;width:100%;font-size:12px}td,th{border-bottom:1px solid var(--ln);padding:3px 5px;text-align:left;vertical-align:top}th{color:var(--mut);font-weight:500}
 .tag{font-size:10px;padding:1px 5px;border-radius:8px;white-space:nowrap;font-weight:600}.S{background:#173d2a;color:#7ff0b0}.D{background:#18324f;color:#8cc4ff}.A{background:#4a3410;color:#ffcf7a}.AN{background:#173d2a;color:#7ff0b0}.SP{background:#4a1630;color:#ff9ccc}.MI{background:#3a2a5a;color:#d0b8ff}
-a{color:var(--acc)}#tip{position:absolute;pointer-events:none;background:#000e;border:1px solid var(--ln);padding:6px 8px;border-radius:6px;font-size:12px;display:none;max-width:280px;z-index:5}
+a{color:var(--acc)}#tip{position:absolute;pointer-events:none;background:#000e;border:1px solid var(--ln);padding:6px 8px;border-radius:6px;font-size:12px;display:none;max-width:300px;z-index:5}
 .inv{display:grid;grid-template-columns:1fr auto;gap:1px 8px;font-size:12px}.full{color:var(--ok)}.part{color:var(--warn)}.zero{color:var(--bad)}
+#hud{position:absolute;left:8px;top:8px;background:#000a;border:1px solid var(--ln);border-radius:6px;padding:5px 8px;font-size:11px;color:var(--mut);pointer-events:none}
 </style></head><body>
-<header><h1>⚡ Colossus Tycoon <small style="color:var(--mut);font-weight:400">v2 · play as Elon · <a href="v1/">v1</a></small></h1>
+<header><h1>⚡ Colossus Tycoon <small style="color:var(--mut);font-weight:400">v3 · visual factory · <a href="v2/">v2</a> · <a href="v1/">v1</a></small></h1>
 <div class="stat"><span>Quarter</span><b id="sQ"></b></div><div class="stat"><span>Cash</span><b id="sCash"></b></div>
-<div class="stat"><span>Nameplate compute</span><b id="sGW"></b></div><div class="stat"><span>Power</span><b id="sPow"></b></div>
+<div class="stat"><span>Compute online</span><b id="sGW"></b></div><div class="stat"><span>Power</span><b id="sPow"></b></div>
 <div class="stat"><span>GPUs (est.)</span><b id="sGPU"></b></div>
-<div style="flex:1"></div><button id="srcBtn">📚 Sources</button><button id="techBtn">🧬 Tech tree</button><button id="empBtn">🏛 Empire</button><button id="helpBtn">❓ How to play</button><button id="next">End quarter ▶</button></header>
-<main><div id="left"><h3>Build on site (click, then a tile)</h3><div id="palette"></div><h3>Your yard (delivered, not yet installed)</h3><div id="inv" class="inv"></div><h3>Inbound orders</h3><div id="pipe" style="font-size:12px"></div></div>
-<div id="mid"><div id="cvwrap"><canvas id="cv" width="1060" height="430"></canvas><div id="tip"></div></div><div id="orders"></div></div>
-<div id="right"><h3>Goals</h3><div id="goals"></div><h3>Bottlenecks</h3><div id="bn"></div><h3>News feed</h3><div id="log"></div></div></main>
+<div style="flex:1"></div><button id="ordBtn">📋 Order books</button><button id="srcBtn">📚 Sources</button><button id="techBtn">🧬 Tech tree</button><button id="empBtn">🏛 Empire</button><button id="helpBtn">❓ How to play</button><button id="next">End quarter ▶</button></header>
+<main><div id="mid"><div id="cvwrap"><canvas id="cv"></canvas><div id="hud">🖱 drag = pan · wheel = zoom · click = place · right-click/Esc = cancel · R = rotate view reset</div><div id="tip"></div></div><div id="buildbar"></div><div id="orders"></div></div>
+<div id="right"><h3>Goals</h3><div id="goals"></div><h3>Bottlenecks</h3><div id="bn"></div><h3>Yard (delivered, not installed)</h3><div id="inv" class="inv"></div><h3>Inbound orders</h3><div id="pipe" style="font-size:12px"></div><h3>Actions</h3><div id="acts"></div><h3>News feed</h3><div id="log"></div></div></main>
 <div id="modal"><div class="box" id="mbox"></div></div>
 <script>
 // ============ SOURCES: S = sourced, D = derived (our arithmetic), A = game-balance assumption (not a fact) ============
@@ -116,36 +117,70 @@ const TECH=[
  {id:'starship',n:'Starship rapid reuse',lab:'AN',c:0,t:0,auto:2,fx:'Arrives on its own in Q2 2027 (Musk: weekly flights in H1 2027). Needed for orbital compute'},
  {id:'orbital',n:'Orbital compute',lab:'SP',c:15,t:3,req:'starship',fx:'Launch 100 MW batches ($3bn + 0.1 GW GPUs), solar-powered in orbit, max 4/qtr. Speculative'},
 ];
+// ============ v3 additions: map buildings (all sizes, rates and new building effects are GAME ASSUMPTIONS) ============
+SRC.push(['A','v3 map buildings: casting shop +50 blade sets/qtr each (3 shops = the v2 tech\'s 150); turbine assembly hall assembles up to 1 GW of turbine plants per quarter; inference box factory up to 2 fleets/qtr; Starship pad up to 2 orbital batches/qtr; building costs, footprints and lead times','Game balance (v3), not sourced']);
+SRC.push(['A','One turbine assembly hall is pre-placed next to Southaven; supplier "import docks" on the map edge are a visual stand-in for the order books','Game design (v3)']);
+Object.assign(B.shell,{sz:[3,3],ins:[]});Object.assign(B.cool,{sz:[2,2],ins:['cdu']});Object.assign(B.hall,{n:'Data center hall (racks)',sz:[2,2],ins:['gpu']});
+Object.assign(B.turb,{n:'Gas turbine power plant',sz:[3,2],ins:['turbine'],d:'290 MW · uses 0.29 GW of cores + 10 blade sets, assembled in a turbine assembly hall'});
+Object.assign(B.sub,{n:'Transformer yard / substation',sz:[2,2],ins:['xf']});Object.assign(B.solar,{sz:[3,3],ins:['mega']});
+Object.assign(B.col,{sz:[5,4],ins:['gpu']});Object.assign(B.sth,{sz:[4,3],ins:['blade']});
+B.asm={n:'Turbine assembly hall',ic:'⚙️',c:.5,lead:1,sz:[3,2],ins:['core','blade'],col:'#e0a060',d:'Joins turbine cores with blade & vane sets. Assembles up to 1 GW of turbine plants per quarter (assumption)'};
+B.cast={n:'Blade & vane casting shop',ic:'🪶',c:1.3,lead:1,sz:[3,2],ins:[],tech:'casting',col:'#d9b38c',d:'In-house single-crystal casting: +50 blade sets/qtr (assumption). Musk: "we\'re casting the blades and vanes"'};
+B.boxfab={n:'Inference box factory',ic:'📦',c:2,lead:1,sz:[3,2],ins:['gpu','mega'],tech:'boxes',col:'#b48cff',d:'Builds modular inference boxes with power + cooling built in. Up to 2 fleets/qtr (100 MW each). Musk idea, no product announced'};
+B.pad={n:'Starship launch pad',ic:'🚀',c:2,lead:1,sz:[3,3],ins:['gpu'],tech:'orbital',col:'#ff9ccc',d:'Launches 100 MW orbital compute batches, up to 2/qtr per pad. Speculative'};
 const LABN={AN:'ANNOUNCED',SP:'SPECULATIVE',MI:'MUSK IDEA (quoted)'};
-const COLS=12,ROWS=8,T=52,GX=432,GY=6;
+const ORDER=['shell','hall','cool','turb','asm','cast','sub','solar','boxfab','pad'];
+const W=44,H=28,TS=32;
+// import docks: item, label, supplier ids, position
+const DOCKS=[
+ {it:'gpu',n:'NVIDIA racks',sup:['nv'],x:0,y:3,ic:'🟩',col:'#3ddc84'},
+ {it:'chip',n:'TSMC N3 + CoWoS',sup:['tsmc'],x:0,y:6,ic:'🧠',col:'#7fd1ff'},
+ {it:'hbm',n:'HBM: SK hynix · Samsung · Micron',sup:['skh','sam','mu'],x:0,y:9,ic:'💾',col:'#9a8cff'},
+ {it:'core',n:'Turbine cores: GE Vernova · Siemens · MHI · aero',sup:['gev','sie','mhi','aero'],x:0,y:12,ic:'🔥',col:'#ff8a3d'},
+ {it:'blade',n:'Howmet / PCC blades & vanes',sup:['how'],x:0,y:15,ic:'🪶',col:'#ffd0a0'},
+ {it:'xf',n:'Transformers (new + spot)',sup:['xf','xfs'],x:0,y:18,ic:'🗼',col:'#b28dff'},
+ {it:'cdu',n:'Cooling makers (CDUs)',sup:['cool'],x:0,y:21,ic:'❄️',col:'#5fe0ff'},
+ {it:'mega',n:'Tesla Megapack (Lathrop · Shanghai · Giga Texas)',sup:[],x:20,y:0,ic:'🔋',col:'#ffd84d',top:1},
+];
+DOCKS.forEach(d=>{d.w=d.top?3:3;d.h=2});
+const EXPORT={x:W-3,y:12,w:3,h:3};
+const ITC={gpu:'#3ddc84',chip:'#7fd1ff',hbm:'#9a8cff',core:'#ff8a3d',blade:'#ffd0a0',xf:'#b28dff',cdu:'#5fe0ff',mega:'#ffd84d',turbine:'#ff6a2a',box:'#b48cff'};
+const ITI={gpu:'🟩',chip:'🧠',hbm:'💾',core:'🔥',blade:'🪶',xf:'🗼',cdu:'❄️',mega:'🔋',turbine:'⚙️',box:'📦'};
+
 let S;
 function rnd(){S.seed=(S.seed*1103515245+12345)&0x7fffffff;return S.seed/0x7fffffff}
-function newGame(){S={q:0,cash:77.5,grid:Array(COLS*ROWS).fill(null),tool:null,inv:{gpu:0,chip:0,hbm:0,core:0,blade:0,xf:0,cdu:0,mega:0},pipe:[],req:{},pri:{},book:null,tech:{},res:{},
- log:[],won:null,over:false,seed:20261020,mod:{cowos:1,hbm:1},raised:false,boxes:0,orbital:0,orbQ:0,buildQ:{},g1:null};
- S.grid[0]={t:'col',left:0};S.grid[1]={t:'sth',left:0,bl:0};
+function newGame(){S={q:0,cash:77.5,blds:[],tool:null,inv:{gpu:0,chip:0,hbm:0,core:0,blade:0,xf:0,cdu:0,mega:0},pipe:[],req:{},pri:{},book:null,tech:{},res:{},
+ log:[],won:null,over:false,seed:20261020,mod:{cowos:1,hbm:1},raised:false,boxes:0,orbital:0,orbQ:0,boxQ:0,asmUsed:0,g1:null,lastDel:{}};
+ S.blds.push({t:'col',x:8,y:4,left:0});S.blds.push({t:'sth',x:8,y:12,left:0,bl:0});S.blds.push({t:'asm',x:5,y:16,left:0});
  S.pipe.push({it:'blade',qty:41,q:2,from:'OEM blades for Southaven'});
  addLog('Oct 2026. You run SpaceX/xAI with ~2.2 GW of compute online. The plan is 13 GW by end-2027.','good');
  addLog('Musk: blades and vanes are "12 to 18 months behind the rest of the turbine." Your Southaven cores are waiting on them.','ev');refresh()}
 function addLog(t,c=''){S.log.unshift({t:`[${QS[S.q]||'end'}] `+t,c});S.log=S.log.slice(0,50)}
 const has=t=>S.tech[t]===true;
+const live=t=>S.blds.filter(b=>b.t===t&&b.left<=0);
 // ============ SIM ============
-function stats(){let pow=0,cap=0,cool=0,mw=0,gpus=0;S.grid.forEach(b=>{if(!b||b.left>0)return;const d=B[b.t];
+function stats(){let pow=0,cap=0,cool=0,mw=0;S.blds.forEach(b=>{if(b.left>0)return;const d=B[b.t];
   if(d.pow&&!(d.needBlades&&b.bl<d.needBlades))pow+=d.pow;if(d.cap)cap+=d.cap;if(d.cool)cool+=d.cool*(1-(S.derate||0));if(d.mw)mw+=d.mw});
  const site=Math.min(mw,pow,cap,cool);const extra=(S.boxes+S.orbital)*100;const online=site+extra;
- gpus=Math.min(site,2200)*410+Math.max(0,site-2200)*270+extra*270; // per MW: 410/270 GPUs (derived)
+ const gpus=Math.min(site,2200)*410+Math.max(0,site-2200)*270+extra*270; // per MW: 410/270 GPUs (derived)
  const lim=site<mw?(site===pow?'power':site===cap?'shell space':'cooling'):null;
- return{pow,cap,cool,mw,site,online,gpus:gpus*1000/1000,lim}}
-function canBuild(t){const d=B[t];if(S.over)return'Game over';if(S.cash-d.c<-60)return'Credit line maxed';
- if(d.need)for(const k in d.need)if(S.inv[k]+1e-9<d.need[k])return'Need '+d.need[k]+' '+k+' in yard';return null}
-function place(i,t){const e=canBuild(t);if(e)return flash(e);const d=B[t];S.cash-=d.c;if(d.need)for(const k in d.need)S.inv[k]-=d.need[k];
- let lead=d.lead;if(has('optimus')&&(t==='shell'||t==='solar'))lead=Math.max(1,lead-1);S.grid[i]={t,left:lead};refresh()}
+ return{pow,cap,cool,mw,site,online,gpus,lim}}
+const asmCap=()=>live('asm').length*1000;
+function canBuild(t){const d=B[t];if(S.over)return'Game over';if(d.tech&&!has(d.tech))return'Research '+TECH.find(x=>x.id===d.tech).n;if(S.cash-d.c<-60)return'Credit line maxed';
+ if(d.need)for(const k in d.need)if(S.inv[k]+1e-9<d.need[k])return'Need '+d.need[k]+' '+k+' at the dock';
+ if(t==='turb'&&asmCap()-S.asmUsed<290)return'No turbine assembly capacity left (1 GW/qtr per hall)';return null}
+function fits(t,x,y){const[w,h]=B[t].sz;if(x<4||y<3||x+w>W-4||y+h>H-1)return false;
+ return !S.blds.some(b=>{const[bw,bh]=B[b.t].sz;return x<b.x+bw&&x+w>b.x&&y<b.y+bh&&y+h>b.y})}
+function place(t,x,y){const e=canBuild(t);if(e)return flash(e);if(!fits(t,x,y))return flash('Blocked: overlaps or off the buildable area');const d=B[t];S.cash-=d.c;
+ if(d.need)for(const k in d.need)S.inv[k]-=d.need[k];if(t==='turb')S.asmUsed+=290;
+ let lead=d.lead;if(has('optimus')&&(t==='shell'||t==='solar'))lead=Math.max(1,lead-1);const b={t,x,y,left:lead};S.blds.push(b);refresh();return b}
+function findSpot(t){const[w,h]=B[t].sz;for(let x=12;x<W-4;x++)for(let y=3;y<H-1;y++)if(fits(t,x,y))return[x,y];return null}
 function rivalReq(s){const o={};for(const r in RIV)o[r]=+(s.rd(r)*(S.mod.r||1)).toFixed(3);return o}
 function resolveOrders(){const book=[];
  SUP.forEach(s=>{const open=s.cap(S.q)*s.open;const rv=rivalReq(s);const me=Math.max(0,+(S.req[s.id]||0));const w=[1,1.6,2.4][S.pri[s.id]||0];
   const reqs=Object.entries(rv).map(([k,v])=>({k,v,w:1}));reqs.push({k:'You',v:me,w});
   const tot=reqs.reduce((a,r)=>a+r.v,0),wt=reqs.reduce((a,r)=>a+r.v*r.w,0);
   reqs.forEach(r=>{r.a=tot<=open?r.v:Math.min(r.v,open*r.v*r.w/wt)});
-  // redistribute leftovers once
   let left=open-reqs.reduce((a,r)=>a+r.a,0);if(left>1e-6){const un=reqs.filter(r=>r.a<r.v);const uw=un.reduce((a,r)=>a+r.v*r.w,0);un.forEach(r=>{r.a=Math.min(r.v,r.a+left*r.v*r.w/uw)})}
   const mine=reqs.find(r=>r.k==='You');const cost=mine.a*s.price(S.q)*[1,1.1,1.25][S.pri[s.id]||0];
   let got=S.cash<-60?0:mine.a;
@@ -153,23 +188,18 @@ function resolveOrders(){const book=[];
   book.push({s,open,tot,reqs,got,me,blocked:S.cash<-60&&me>0})});
  S.book=book;S.lastQ=S.q}
 function endQuarter(){if(S.over)return;resolveOrders();
- // own production
- if(has('casting'))S.inv.blade+=150;S.inv.mega+=27.5*(has('mega')?.6:.25);if(has('terafab')&&S.q>=7)S.inv.chip+=1;
- // construction & research
- S.grid.forEach(b=>{if(b&&b.left>0)b.left--});
+ const nCast=live('cast').length;if(nCast)S.inv.blade+=50*nCast;S.inv.mega+=27.5*(has('mega')?.6:.25);if(has('terafab')&&S.q>=7)S.inv.chip+=1;
+ S.blds.forEach(b=>{if(b.left>0)b.left--});
  for(const t in S.res){S.res[t]--;if(S.res[t]<=0){S.tech[t]=true;delete S.res[t];addLog('🧬 Tech done: '+TECH.find(x=>x.id===t).n,'good')}}
- for(const t in S.buildQ){} 
- S.q++;
- // deliveries
- S.pipe=S.pipe.filter(p=>{if(p.q<=S.q){S.inv[p.it]+=p.qty;S.cash-=p.cost||0;addLog(`📦 Delivered: ${fmtQ(p.it,p.qty)} from ${p.from}`);return false}return true});
- const ch=Math.min(S.inv.chip,S.inv.hbm);if(ch>0){S.inv.chip-=ch;S.inv.hbm-=ch;S.inv.gpu+=ch;addLog(`🧠 ${ch.toFixed(2)} GW of own chips paired with HBM and ready`,'good')}
- // Southaven blades
- S.grid.forEach(b=>{if(b&&b.t==='sth'&&b.bl<41){const n=Math.min(41-b.bl,Math.floor(S.inv.blade));b.bl+=n;S.inv.blade-=n;if(b.bl>=41)addLog('🔥 Southaven turbines have blades and are running (+1.2 GW)','good')}});
+ S.q++;S.lastDel={};
+ S.pipe=S.pipe.filter(p=>{if(p.q<=S.q){S.inv[p.it]+=p.qty;S.lastDel[p.it]=1;S.cash-=p.cost||0;addLog(`📦 Delivered: ${fmtQ(p.it,p.qty)} from ${p.from}`);return false}return true});
+ const ch=Math.min(S.inv.chip,S.inv.hbm);if(ch>0){S.inv.chip-=ch;S.inv.hbm-=ch;S.inv.gpu+=ch;S.lastDel.gpu=1;addLog(`🧠 ${ch.toFixed(2)} GW of own chips paired with HBM and ready`,'good')}
+ S.blds.forEach(b=>{if(b.t==='sth'&&b.bl<41){const n=Math.min(41-b.bl,Math.floor(S.inv.blade));b.bl+=n;S.inv.blade-=n;if(b.bl>=41)addLog('🔥 Southaven turbines have blades and are running (+1.2 GW)','good')}});
  if(S.q===2&&!S.tech.starship){S.tech.starship=true;addLog('🚀 Starship is flying weekly. Orbital compute can now be researched','good')}
  const st=stats();
  if(st.online>=13000&&S.q-1<=GOALQ&&!S.won){S.won=QS[S.q-1];addLog('🎉 13 GW reached!','good')}
  if(S.q-1===GOALQ&&!S.won)addLog('End-2027 passed under 13 GW. Musk would be "surprised". You can keep playing to Q4 2028.','badc');
- S.cash+=37.5+10*st.online/1000;S.raised=false;S.req={};S.pri={};S.orbQ=0;S.mod={cowos:1,hbm:1,r:1};S.derate=0;S.castSlip=false;
+ S.cash+=37.5+10*st.online/1000;S.raised=false;S.req={};S.pri={};S.orbQ=0;S.boxQ=0;S.asmUsed=0;S.mod={cowos:1,hbm:1,r:1};S.derate=0;S.castSlip=false;
  if(S.won&&!S.shownWin){S.shownWin=1;refresh();return end(true)}
  if(S.q>=QS.length){S.q=QS.length-1;S.over=true;refresh();return end(!!S.won)}
  events();refresh()}
@@ -183,72 +213,146 @@ function events(){const r=rnd();let e;
  else e='Quiet quarter. Order books clear as normal.';
  addLog('📰 '+e+' (fictional event)','ev')}
 function startTech(id){const t=TECH.find(x=>x.id===id);if(S.tech[id]||S.res[id]!==undefined)return;if(t.req&&!has(t.req))return flash('Requires '+t.req);if(t.auto!==undefined)return flash('This tech arrives on its own');
- if(S.cash<t.c)return flash('Not enough cash');S.cash-=t.c;S.res[id]=t.t;addLog('🧬 Researching: '+t.n);showTech();refresh()}
-function deployBox(){if(!has('boxes'))return;if(S.inv.gpu<.1||S.inv.mega<.4||S.cash-1<-60)return flash('A box fleet needs 0.1 GW GPUs + 0.4 GWh Megapack + $1bn');S.inv.gpu-=.1;S.inv.mega-=.4;S.cash-=1;S.boxes++;addLog('📦 A 100 MW inference box fleet is deployed somewhere in the world','good');refresh()}
-function launchOrb(){if(!has('orbital'))return;if(S.orbQ>=4||S.inv.gpu<.1||S.cash-3<-60)return flash('An orbital batch needs 0.1 GW GPUs + $3bn (max 4/qtr)');S.inv.gpu-=.1;S.cash-=3;S.orbital++;S.orbQ++;addLog('🛰 100 MW of orbital compute launched','good');refresh()}
+ if(S.cash<t.c)return flash('Not enough cash');S.cash-=t.c;S.res[id]=t.t;addLog('🧬 Researching: '+t.n);if(document.getElementById('modal').style.display==='flex')showTech();refresh()}
+function deployBox(){if(!has('boxes'))return;const n=live('boxfab').length;if(S.boxQ>=2*n)return flash('Build an inference box factory (2 fleets/qtr each)');
+ if(S.inv.gpu<.1||S.inv.mega<.4||S.cash-1<-60)return flash('A box fleet needs 0.1 GW GPUs + 0.4 GWh Megapack + $1bn');S.inv.gpu-=.1;S.inv.mega-=.4;S.cash-=1;S.boxes++;S.boxQ++;fx.push({k:'box',t:0});addLog('📦 A 100 MW inference box fleet ships out to the world','good');refresh()}
+function launchOrb(){if(!has('orbital'))return;const n=live('pad').length;if(S.orbQ>=Math.min(4,2*n))return flash('Needs a Starship pad (2 launches/qtr each, max 4)');
+ if(S.inv.gpu<.1||S.cash-3<-60)return flash('An orbital batch needs 0.1 GW GPUs + $3bn');S.inv.gpu-=.1;S.cash-=3;S.orbital++;S.orbQ++;fx.push({k:'rocket',t:0,b:live('pad')[0]});addLog('🛰 100 MW of orbital compute launched','good');refresh()}
 function raise(){if(S.raised||S.over)return;S.raised=true;S.cash+=40;S.debt=(S.debt||0)+40;addLog('💵 Raised $40bn of debt/equity (counts against your score)');refresh()}
 function end(win){const st=stats();document.getElementById('mbox').innerHTML=`<h2>${win?'🚀 13 GW: plan delivered':'💥 Game over'}</h2>
  <p>${win?`You reached 13 GW of compute in ${S.won}. Musk's floor for end-2027 is met.`:`You finished at <b>${(st.online/1000).toFixed(2)} GW</b>. The target was 13 GW by Q4 2027.`}</p>
  <p>Compute ${(st.online/1000).toFixed(2)} GW (${(S.boxes*.1).toFixed(1)} GW in inference boxes, ${(S.orbital*.1).toFixed(1)} GW in orbit) · power ${(st.pow/1000).toFixed(2)} GW · cash $${S.cash.toFixed(0)}bn · raised $${S.debt||0}bn</p>
  <p style="color:var(--mut)">The outcome depends on game-balance assumptions; it is not a forecast.</p><button onclick="closeM();newGame()">Play again</button> <button onclick="closeM()">Keep looking</button>`;openM()}
+// ============ STATE PER BUILDING ============
+function bState(b,st){const d=B[b.t];if(b.left>0)return'build';
+ if(d.needBlades&&b.bl<d.needBlades)return'starved';
+ if(d.mw&&st.site<st.mw)return'starved';
+ if(b.t==='asm')return S.inv.core<.29||S.inv.blade<10?(S.asmUsed>0?'ok':'idle'):'ok';
+ if(b.t==='boxfab')return S.inv.gpu<.1||S.inv.mega<.4?'starved':'ok';
+ if(b.t==='pad')return S.inv.gpu<.1?'starved':'ok';
+ if(d.pow&&st.pow>st.mw)return'backed';if((d.cap||d.cool)&&st.site<Math.min(d.cap?st.cap:st.cool,1e9)&&st.site===st.mw)return'backed';return'ok'}
+function bThru(b,st){const d=B[b.t];if(b.left>0)return'⏳ '+b.left+'q';
+ if(b.t==='sth')return b.bl<41?`blades ${b.bl}/41`:'1.2 GW';if(b.t==='col')return'2.2 GW';
+ if(b.t==='hall')return Math.round(500*Math.min(1,st.site/Math.max(st.mw,1)))+'/500 MW';
+ if(b.t==='turb')return'290 MW';if(b.t==='sub')return'1 GW';if(b.t==='solar')return'150 MW firm';if(b.t==='shell')return'500 MW space';if(b.t==='cool')return'500 MW cool';
+ if(b.t==='asm')return`${Math.round(Math.max(0,1000-S.asmUsed/Math.max(1,live('asm').length)))} MW free/q`;if(b.t==='cast')return'+50 sets/q';
+ if(b.t==='boxfab')return`${S.boxQ}/${2*live('boxfab').length} fleets/q`;if(b.t==='pad')return`${S.orbQ} launched/q`;return''}
+// ============ BELTS / LINES (auto-routed) ============
+const ctr=b=>{const[w,h]=B[b.t].sz;return[b.x+w/2,b.y+h/2]};
+function dockOut(d){return d.top?[d.x+1.5,d.y+2]:[d.x+3,d.y+1]}
+function nearest(list,p){let best=null,bd=1e9;list.forEach(o=>{const c=o.x!==undefined&&o.t?ctr(o):[o.x+1.5,o.y+1];const dd=Math.abs(c[0]-p[0])+Math.abs(c[1]-p[1]);if(dd<bd){bd=dd;best=o}});return best}
+function route(a,bb,lane){// L/Z-shaped manhattan path
+ const[ax,ay]=a,[bx,by]=bb;const mx=Math.max(ax+.5,bx-.6)-(lane||0)*.25;return[[ax,ay],[mx,ay],[mx,by],[bx,by]]}
+function links(st){const L=[];
+ S.blds.forEach(b=>{const d=B[b.t];const[w,h]=d.sz;const st8=bState(b,st);const tgt=[b.x,b.y+h/2];
+  d.ins.forEach((it,li)=>{let src=null,from;
+   if(it==='turbine'){const a=nearest(live('asm').length?live('asm'):S.blds.filter(x=>x.t==='asm'),ctr(b));if(!a)return;src=[a.x+B.asm.sz[0],a.y+1];from='Turbine assembly'}
+   else if(it==='blade'&&live('cast').length&&b.t!=='sth'){const c=nearest(live('cast'),ctr(b));src=[c.x+3,c.y+1];from='Your casting shop'}
+   else{const dk=DOCKS.find(x=>x.it===it);src=dockOut(dk);from=dk.n}
+   const tt=[b.x,b.y+(li+1)*h/(d.ins.length+1)];
+   const flow=st8==='build'||st8==='ok'||st8==='backed'||(b.t==='sth'&&S.inv.blade>=1)||(b.t==='asm'&&S.inv[it]>0);
+   const stall=st8==='starved'&&!flow;
+   L.push({k:'belt',it,pts:route(src,tt,li),flow,stall,from,to:d.n})});
+  if(b.t==='cast'){const a=nearest(S.blds.filter(x=>x.t==='asm'),ctr(b));if(a)L.push({k:'belt',it:'blade',pts:route([b.x+3,b.y+1],[a.x,a.y+1.3],1),flow:b.left<=0,from:d.n,to:'Turbine assembly'})}
+  if(b.t==='boxfab'&&b.left<=0)L.push({k:'belt',it:'box',pts:route([b.x+3,b.y+1],[EXPORT.x,EXPORT.y+1.5],0),flow:S.boxes>0,from:d.n,to:'The world (box fleets)'});
+ });
+ // power lines: each consumer (hall/col) <- nearest power source
+ const srcs=S.blds.filter(b=>B[b.t].pow&&b.left<=0&&!(B[b.t].needBlades&&b.bl<41));
+ S.blds.filter(b=>B[b.t].mw).forEach(b=>{if(!srcs.length)return;const p=nearest(srcs,ctr(b));if(p===b)return;L.push({k:'power',a:ctr(p),b:ctr(b),ok:st.pow>=st.mw,on:b.left<=0})});
+ srcs.forEach(p=>{const h=nearest(S.blds.filter(b=>B[b.t].mw),ctr(p));if(h&&h!==p)L.push({k:'power',a:ctr(p),b:ctr(h),ok:st.pow>=st.mw,on:true})});
+ const cools=S.blds.filter(b=>B[b.t].cool&&b.t==='cool');S.blds.filter(b=>b.t==='hall').forEach(b=>{if(!cools.length)return;const c=nearest(cools,ctr(b));L.push({k:'pipe',a:ctr(c),b:ctr(b),ok:st.cool>=st.mw})});
+ return L}
 // ============ RENDER ============
-const cv=document.getElementById('cv'),cx=cv.getContext('2d');let tick=0,hover=-1,hoverSup=-1;
-const SUPN=[['nv','NVIDIA',['tsmc','skh','sam','mu'],'gpu'],['tsmc','TSMC N3+CoWoS',[],'chip'],['skh','SK hynix',[],'hbm'],['sam','Samsung',[],'hbm'],['mu','Micron',[],'hbm'],['gev','GE Vernova',['how'],'core'],['sie','Siemens Energy',['how'],'core'],['mhi','MHI',['how'],'core'],['aero','Aero turbines',['how'],'core'],['how','Howmet/PCC',[],'blade'],['xf','Transformers',[],'xf'],['cool','Cooling (CDUs)',[],'cdu']];
-function supPos(i){return[16+(i<5?0:i<10?140:280)+(i===0||i===5||i===10?0:0),20+((i<5?i:i<10?i-5:i-10))*82]}
-function draw(){tick++;cx.fillStyle='#0d1320';cx.fillRect(0,0,cv.width,cv.height);
- // supplier graph
- cx.fillStyle='#8696ad';cx.font='11px system-ui';cx.textAlign='left';cx.fillText('SUPPLIERS: order books shared with rivals',16,12);
- const yard=[400,215];
- SUPN.forEach(([id,n,ups,it],i)=>{const[x,y]=supPos(i);const bk=S.book&&S.book.find(b=>b.s.id===id);
-  const mine=S.pipe.some(p=>p.from===SUP.find(s=>s.id===id).n);const over=bk&&bk.tot>bk.open;
-  // link to yard
-  cx.strokeStyle=mine?'#4da3ff88':'#33415555';cx.lineWidth=2;cx.beginPath();cx.moveTo(x+120,y+22);cx.lineTo(yard[0],yard[1]);cx.stroke();
-  if(mine){for(let k=0;k<3;k++){const f=((tick/120)+k/3)%1;cx.fillStyle='#4da3ff';cx.beginPath();cx.arc(x+120+(yard[0]-x-120)*f,y+22+(yard[1]-y-22)*f,3,0,7);cx.fill()}}
-  const locked=SUP.find(s=>s.id===id).tech&&!has('ownchip');
-  cx.fillStyle=locked?'#151b26':'#1a2436';cx.fillRect(x,y,120,46);const pulse=.5+.5*Math.sin(tick/9);
-  cx.strokeStyle=over?`rgba(255,77,94,${.4+.6*pulse})`:'#2c3d5c';cx.lineWidth=over?2.5:1;cx.strokeRect(x,y,120,46);
-  cx.fillStyle=locked?'#556':'#dbe6f5';cx.font='bold 11px system-ui';cx.fillText(n,x+6,y+15);
-  const s=SUP.find(s=>s.id===id);const cap=s.cap(S.q)*s.open;cx.font='10px system-ui';cx.fillStyle='#8696ad';
-  cx.fillText(`open ${fmtN(cap)} ${s.u.split(' ')[0]==='blade'?'sets':'GW'}/q · ${s.lead}q lead`,x+6,y+29);
-  if(bk){const r=Math.min(1,bk.open/Math.max(bk.tot,1e-9));cx.fillStyle='#0a0e15';cx.fillRect(x+6,y+35,108,6);cx.fillStyle=r<1?'#ff4d5e':'#3ddc84';cx.fillRect(x+6,y+35,108*Math.min(1,bk.tot/Math.max(bk.open,1e-9)),6)}
-  if(locked){cx.fillStyle='#ff9ccc';cx.fillText('🔒 needs own-chip tech',x+6,y+42)}});
- // yard node
- cx.fillStyle='#24324a';cx.beginPath();cx.arc(yard[0],yard[1],18,0,7);cx.fill();cx.font='18px serif';cx.textAlign='center';cx.fillText('📦',yard[0],yard[1]+6);
- cx.strokeStyle='#4da3ff66';cx.lineWidth=3;cx.beginPath();cx.moveTo(yard[0]+18,yard[1]);cx.lineTo(GX,yard[1]);cx.stroke();
- // site grid
- cx.textAlign='left';cx.fillStyle='#8696ad';cx.font='11px system-ui';cx.fillText('YOUR SITE (Memphis / Southaven)',GX+4,GY+6);
- for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){cx.strokeStyle='#18233a';cx.strokeRect(GX+x*T+.5,GY+12+y*T+.5,T-1,T-1)}
- const st=stats();const ratio=st.mw?st.site/st.mw:1;
- S.grid.forEach((b,i)=>{if(!b)return;const d=B[b.t];const x=GX+(i%COLS)*T,y=GY+12+Math.floor(i/COLS)*T;
-  let state='ok';if(b.left>0)state='build';else if(d.mw&&ratio<1)state='starved';else if(d.needBlades&&b.bl<d.needBlades)state='starved';else if(d.pow&&st.pow>st.mw)state='backed';
-  cx.fillStyle=d.col+(b.left>0?'33':'cc');cx.fillRect(x+4,y+4,T-8,T-8);const pulse=.5+.5*Math.sin(tick/8);
-  if(state==='starved'){cx.strokeStyle=`rgba(255,77,94,${.4+.6*pulse})`;cx.lineWidth=3;cx.strokeRect(x+3,y+3,T-6,T-6)}
-  if(state==='backed'){cx.strokeStyle=`rgba(255,176,32,${.25+.4*pulse})`;cx.lineWidth=2;cx.strokeRect(x+3,y+3,T-6,T-6)}
-  cx.font='20px serif';cx.textAlign='center';cx.fillText(d.ic,x+T/2,y+T/2+6);cx.font='bold 9px system-ui';cx.fillStyle='#fff';
-  if(b.left>0)cx.fillText('⏳'+b.left+'q',x+T/2,y+T-6);else if(d.needBlades&&b.bl<d.needBlades)cx.fillText(`blades ${b.bl}/41`,x+T/2,y+T-6);else if(d.mw>500)cx.fillText('2.2 GW',x+T/2,y+T-6)});
- // flow dots from yard to buildings under/over
- if(hover>=0&&S.tool){const x=GX+(hover%COLS)*T,y=GY+12+Math.floor(hover/COLS)*T;cx.strokeStyle=S.grid[hover]?'#ff4d5e':'#4da3ff';cx.lineWidth=2;cx.strokeRect(x+2,y+2,T-4,T-4)}
- // world counters
- cx.textAlign='left';cx.fillStyle='#d0b8ff';cx.font='12px system-ui';cx.fillText(`🌍 Inference box fleets: ${S.boxes} (${(S.boxes*.1).toFixed(1)} GW)   🛰 Orbital: ${S.orbital} (${(S.orbital*.1).toFixed(1)} GW)`,GX,GY+12+ROWS*T+14);
+const cv=document.getElementById('cv'),cx=cv.getContext('2d'),wrap=document.getElementById('cvwrap');let tick=0,hov=null,fx=[];
+const cam={x:-20,y:-10,z:1};
+function resize(){const r=wrap.getBoundingClientRect(),dp=window.devicePixelRatio||1;cv.width=Math.max(10,r.width*dp);cv.height=Math.max(10,r.height*dp);cx.setTransform(dp,0,0,dp,0,0)}
+window.addEventListener('resize',resize);
+const w2s=(x,y)=>[(x*TS-cam.x)*cam.z,(y*TS-cam.y)*cam.z];
+const s2w=(sx,sy)=>[(sx/cam.z+cam.x)/TS,(sy/cam.z+cam.y)/TS];
+function pathLen(p){let l=0;for(let i=1;i<p.length;i++)l+=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]);return l}
+function along(p,t){let l=pathLen(p)*t;for(let i=1;i<p.length;i++){const s=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]);if(l<=s||i===p.length-1){const f=s?Math.min(1,l/s):0;return[p[i-1][0]+(p[i][0]-p[i-1][0])*f,p[i-1][1]+(p[i][1]-p[i-1][1])*f]}l-=s}return p[p.length-1]}
+function rr(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath()}
+function draw(){tick++;const r=wrap.getBoundingClientRect();const dp=devicePixelRatio||1;if(Math.abs(cv.width-r.width*dp)>2||Math.abs(cv.height-r.height*dp)>2)resize();cx.save();cx.setTransform(1,0,0,1,0,0);cx.clearRect(0,0,cv.width,cv.height);cx.restore();
+ const z=cam.z;cx.fillStyle='#0a0f18';cx.fillRect(0,0,r.width,r.height);
+ // ground
+ const[g0x,g0y]=w2s(0,0);cx.fillStyle='#14201a';cx.fillRect(g0x,g0y,W*TS*z,H*TS*z);
+ const[bx0,by0]=w2s(4,3);cx.fillStyle='#172619';cx.fillRect(bx0,by0,(W-8)*TS*z,(H-4)*TS*z);
+ cx.strokeStyle='#1e2f22';cx.lineWidth=1;cx.beginPath();for(let x=0;x<=W;x++){const[a,b]=w2s(x,0);cx.moveTo(a,b);cx.lineTo(a,b+H*TS*z)}for(let y=0;y<=H;y++){const[a,b]=w2s(0,y);cx.moveTo(a,b);cx.lineTo(a+W*TS*z,b)}cx.stroke();
+ cx.fillStyle='#5f7a66';cx.font=`bold ${Math.max(9,12*z)}px system-ui`;cx.textAlign='left';const[lx,ly]=w2s(4.2,2.6);cx.fillText('MEMPHIS / SOUTHAVEN SITE: buildable area',lx,ly);
+ const st=stats();const L=links(st);
+ // pipes & power under belts
+ L.filter(l=>l.k==='pipe').forEach(l=>{const[a,b]=w2s(...l.a),[c,d]=w2s(...l.b);cx.strokeStyle=l.ok?'#2a7f9a':'#a33';cx.lineWidth=3*z;cx.setLineDash([]);cx.beginPath();cx.moveTo(a,b);cx.lineTo(a,d);cx.lineTo(c,d);cx.stroke()});
+ // belts
+ L.filter(l=>l.k==='belt').forEach(l=>{const p=l.pts.map(q=>w2s(...q));cx.lineJoin='round';
+  cx.strokeStyle=l.stall?'#4a1a20':'#2b3342';cx.lineWidth=9*z;cx.beginPath();p.forEach((q,i)=>i?cx.lineTo(...q):cx.moveTo(...q));cx.stroke();
+  cx.strokeStyle=l.stall?'#ff4d5e88':'#4b5568';cx.lineWidth=1.2;cx.setLineDash([4*z,4*z]);cx.lineDashOffset=l.flow?-tick*.6*z:0;cx.beginPath();p.forEach((q,i)=>i?cx.lineTo(...q):cx.moveTo(...q));cx.stroke();cx.setLineDash([]);
+  const len=pathLen(l.pts);const n=Math.max(2,Math.floor(len/1.3));
+  for(let k=0;k<n;k++){const t=l.flow?((tick/(60*len/2))+k/n)%1:(k/n);if(!l.flow&&!l.stall)continue;const[wx,wy]=along(l.pts,t);const[sx,sy]=w2s(wx,wy);
+   if(l.stall&&k%3)continue;cx.fillStyle=ITC[l.it]||'#fff';if(z>1.25){cx.font=`${10*z}px serif`;cx.textAlign='center';cx.fillText(ITI[l.it],sx,sy+3.5*z)}else{cx.fillRect(sx-3*z,sy-3*z,6*z,6*z)}}});
+ // power lines with sparks
+ L.filter(l=>l.k==='power').forEach(l=>{const[a,b]=w2s(...l.a),[c,d]=w2s(...l.b);cx.strokeStyle=l.ok?'#e8c23a':'#ff4d5e';cx.lineWidth=2*z;cx.setLineDash([6*z,3*z]);cx.lineDashOffset=-tick*z;cx.beginPath();cx.moveTo(a,b);cx.lineTo(c,d);cx.stroke();cx.setLineDash([]);
+  if(l.on){for(let k=0;k<3;k++){const f=((tick/90)+k/3)%1;cx.fillStyle=l.ok?'#fff3a0':'#ff8890';cx.beginPath();cx.arc(a+(c-a)*f,b+(d-b)*f,2.6*z,0,7);cx.fill()}
+   if(z>1.1){cx.fillStyle='#fff3a0';cx.font=`${8*z}px system-ui`;cx.textAlign='center';cx.fillText('MW',(a+c)/2,(b+d)/2-3*z)}}});
+ // docks
+ DOCKS.forEach(dk=>{const[x,y]=w2s(dk.x,dk.y);const w=dk.w*TS*z,h=dk.h*TS*z;const locked=['chip','hbm'].includes(dk.it)&&!has('ownchip');
+  const inbound=S.pipe.some(p=>p.it===dk.it);const bk=S.book&&dk.sup.map(id=>S.book.find(b=>b.s.id===id)).filter(Boolean);const over=bk&&bk.some(b=>b.tot>b.open);
+  cx.fillStyle=locked?'#151b26':'#1b2638';rr(x+2,y+2,w-4,h-4,5*z);cx.fill();const pulse=.5+.5*Math.sin(tick/9);
+  cx.strokeStyle=over?`rgba(255,77,94,${.4+.6*pulse})`:inbound?'#4da3ff':'#33415a';cx.lineWidth=over?2.5:1.5;cx.stroke();
+  cx.font=`${14*z}px serif`;cx.textAlign='left';cx.fillText(dk.ic,x+5*z,y+19*z);cx.fillStyle=locked?'#667':'#dbe6f5';cx.font=`bold ${7.5*z}px system-ui`;
+  cx.fillText('IMPORT',x+24*z,y+11*z);cx.font=`${7*z}px system-ui`;cx.fillStyle='#9ab';cx.fillText(dk.n.split(':')[0].slice(0,18),x+24*z,y+21*z);
+  cx.fillStyle=ITC[dk.it];cx.font=`bold ${8*z}px system-ui`;cx.fillText(locked?'🔒 own-chip tech':fmtQ(dk.it,S.inv[dk.it]).replace(/ GW .*/,' GW'),x+5*z,y+h-7*z);
+  if(inbound&&!locked){for(let k=0;k<3;k++){const f=((tick/80)+k/3)%1;cx.fillStyle='#4da3ff';const px=dk.top?x+w/2:x-12*z+f*14*z,py=dk.top?y-12*z+f*14*z:y+h/2;cx.beginPath();cx.arc(px,py,2.5*z,0,7);cx.fill()}}});
+ {const[x,y]=w2s(EXPORT.x,EXPORT.y);cx.fillStyle='#22183a';rr(x+2,y+2,EXPORT.w*TS*z-4,EXPORT.h*TS*z-4,5*z);cx.fill();cx.strokeStyle='#7a5ab8';cx.stroke();cx.font=`${18*z}px serif`;cx.textAlign='center';cx.fillText('🌍',x+EXPORT.w*TS*z/2,y+38*z);cx.font=`${7.5*z}px system-ui`;cx.fillStyle='#d0b8ff';cx.fillText(`World: ${S.boxes} box fleets`,x+EXPORT.w*TS*z/2,y+58*z);cx.fillText(`Orbit: ${S.orbital} batches`,x+EXPORT.w*TS*z/2,y+70*z)}
+ // buildings
+ S.blds.forEach(b=>{const d=B[b.t];const[w,h]=d.sz;const[x,y]=w2s(b.x,b.y);const pw=w*TS*z,ph=h*TS*z;const s8=bState(b,st);const pulse=.5+.5*Math.sin(tick/8);
+  cx.fillStyle='#0008';rr(x+5*z,y+6*z,pw-6*z,ph-6*z,6*z);cx.fill();
+  cx.fillStyle=d.col+(b.left>0?'44':'dd');rr(x+3*z,y+3*z,pw-6*z,ph-6*z,6*z);cx.fill();
+  if(b.left>0){cx.strokeStyle='#ffd84d';cx.setLineDash([5*z,4*z]);cx.lineWidth=2;rr(x+3*z,y+3*z,pw-6*z,ph-6*z,6*z);cx.stroke();cx.setLineDash([])}
+  // roof detail
+  cx.fillStyle='#0003';for(let i=1;i<w*2;i++)cx.fillRect(x+i*TS*z/2,y+6*z,1,ph-12*z);
+  if(s8==='starved'){cx.strokeStyle=`rgba(255,77,94,${.4+.6*pulse})`;cx.lineWidth=3;rr(x+2*z,y+2*z,pw-4*z,ph-4*z,6*z);cx.stroke()}
+  if(s8==='backed'){cx.strokeStyle=`rgba(255,176,32,${.25+.4*pulse})`;cx.lineWidth=2;rr(x+2*z,y+2*z,pw-4*z,ph-4*z,6*z);cx.stroke()}
+  if(s8==='ok'&&(b.t==='turb'||b.t==='sth'||b.t==='asm'||b.t==='cast')){for(let k=0;k<2;k++){const f=((tick/70)+k/2)%1;cx.fillStyle=`rgba(200,200,210,${.5*(1-f)})`;cx.beginPath();cx.arc(x+pw*(.3+.4*k),y+4*z-f*18*z,(3+6*f)*z,0,7);cx.fill()}}
+  if(b.t==='hall'||b.t==='col'){const on=s8!=='build';for(let i=0;i<w*3;i++)for(let j=0;j<h*2;j++){cx.fillStyle=on&&((i*7+j*3+(tick>>4))%5)?(s8==='starved'&&(i+j)%2?'#552':'#7fffb0'):'#244';cx.fillRect(x+(8+i*9)*z,y+(ph/z-16-j*9)*z,4*z,3*z)}}
+  cx.font=`${Math.min(pw,ph)*.42}px serif`;cx.textAlign='center';cx.fillText(d.ic,x+pw/2,y+ph/2+Math.min(pw,ph)*.08);
+  cx.fillStyle='#000a';rr(x+4*z,y+ph-17*z,pw-8*z,13*z,3*z);cx.fill();cx.fillStyle=s8==='starved'?'#ff9aa4':s8==='build'?'#ffd84d':'#e8f2ff';cx.font=`bold ${8*z}px system-ui`;cx.fillText(bThru(b,st),x+pw/2,y+ph-7.5*z);
+  if(z>.9){cx.fillStyle='#fffc';cx.font=`${7*z}px system-ui`;cx.fillText(d.n.length>24?d.n.slice(0,22)+'…':d.n,x+pw/2,y+11*z)}});
+ // fx
+ fx=fx.filter(f=>{f.t++;if(f.k==='rocket'&&f.b){const[cx0,cy0]=w2s(...ctr(f.b));cx.font=`${18*z}px serif`;cx.textAlign='center';cx.fillText('🚀',cx0,cy0-f.t*3*z);return f.t<120}
+  if(f.k==='box'){const[ex,ey]=w2s(EXPORT.x+1.5,EXPORT.y+1.5);cx.font=`${14*z}px serif`;cx.fillText('📦',ex,ey-f.t*.6*z);return f.t<60}return false});
+ // ghost
+ if(S.tool&&S.tool!=='sell'&&hov){const d=B[S.tool];const[w,h]=d.sz;const gx=Math.floor(hov[0]-w/2+.5),gy=Math.floor(hov[1]-h/2+.5);const ok=fits(S.tool,gx,gy)&&!canBuild(S.tool);const[x,y]=w2s(gx,gy);
+  cx.fillStyle=ok?'#4da3ff33':'#ff4d5e33';cx.fillRect(x,y,w*TS*z,h*TS*z);cx.strokeStyle=ok?'#4da3ff':'#ff4d5e';cx.lineWidth=2;cx.strokeRect(x,y,w*TS*z,h*TS*z);cx.font=`${16*z}px serif`;cx.textAlign='center';cx.fillText(d.ic,x+w*TS*z/2,y+h*TS*z/2+6*z)}
  requestAnimationFrame(draw)}
-const tip=document.getElementById('tip');
-cv.addEventListener('mousemove',e=>{const r=cv.getBoundingClientRect();const mx=(e.clientX-r.left)*cv.width/r.width,my=(e.clientY-r.top)*cv.height/r.height;
- const gx=Math.floor((mx-GX)/T),gy=Math.floor((my-GY-12)/T);hover=(gx>=0&&gx<COLS&&gy>=0&&gy<ROWS)?gy*COLS+gx:-1;
- let html='';if(hover>=0&&S.grid[hover]){const b=S.grid[hover],d=B[b.t];html=`<b>${d.ic} ${d.n}</b><br>${d.d}<br>${b.left>0?'Under construction: '+b.left+' qtr':'Operational'}`}
- SUPN.forEach(([id],i)=>{const[x,y]=supPos(i);if(mx>=x&&mx<=x+120&&my>=y&&my<=y+46){const s=SUP.find(s=>s.id===id);const bk=S.book&&S.book.find(b=>b.s.id===id);
-  html=`<b>${s.n}</b><br>Market cap: ${fmtN(s.cap(S.q))} ${s.u}/qtr · open to new orders: ${Math.round(s.open*100)}%<br>Lead ${s.lead} qtr · $${fmtN(s.price(S.q))}bn per unit${s.note?'<br>'+s.note:''}${bk?`<br>Last quarter: asked ${fmtN(bk.tot)} vs ${fmtN(bk.open)} open; you got ${fmtN(bk.got)} of ${fmtN(bk.me)}`:''}`}});
- if(html){tip.style.display='block';tip.style.left=Math.min(e.offsetX+14,r.width-290)+'px';tip.style.top=(e.offsetY+14)+'px';tip.innerHTML=html}else tip.style.display='none'});
-cv.addEventListener('mouseleave',()=>{hover=-1;tip.style.display='none'});
-cv.addEventListener('click',()=>{if(hover<0)return;if(S.tool==='sell'){const b=S.grid[hover];if(b&&!B[b.t].hide){S.grid[hover]=null;refresh()}return}if(!S.tool)return;if(S.grid[hover])return flash('Tile occupied');place(hover,S.tool)});
+// ============ INPUT ============
+const tip=document.getElementById('tip');let drag=null;
+function hit(wx,wy){const b=S.blds.slice().reverse().find(b=>{const[w,h]=B[b.t].sz;return wx>=b.x&&wx<b.x+w&&wy>=b.y&&wy<b.y+h});if(b)return{b};
+ const dk=DOCKS.find(d=>wx>=d.x&&wx<d.x+d.w&&wy>=d.y&&wy<d.y+d.h);if(dk)return{dk};if(wx>=EXPORT.x&&wx<EXPORT.x+EXPORT.w&&wy>=EXPORT.y&&wy<EXPORT.y+EXPORT.h)return{ex:1};return null}
+function tipFor(h){const st=stats();if(h.b){const b=h.b,d=B[b.t];const s8=bState(b,st);
+  const ST={build:'🚧 Under construction: '+b.left+' qtr',starved:'🔴 Starved: '+(d.needBlades&&b.bl<41?`waiting for blade sets (${b.bl}/41)`:d.mw?'site limited by '+st.lim:'missing inputs at the dock'),backed:'🟠 Backed up: output exceeds what the site can use',ok:'🟢 Running',idle:'⚪ Idle: no cores + blades to assemble'};
+  return`<b>${d.ic} ${d.n}</b><br>${d.d}<br><b>${bThru(b,st)}</b><br>${ST[s8]}${d.ins.length?'<br>Inputs: '+d.ins.map(i=>ITI[i]+' '+i).join(', '):''}${d.hide?'':'<br><small style="color:var(--mut)">Sizes, costs and rates are game assumptions unless in 📚 Sources</small>'}`}
+ if(h.dk){const dk=h.dk;return`<b>${dk.ic} Import dock: ${dk.n}</b><br>At the dock now: ${fmtQ(dk.it,S.inv[dk.it])}<br>`+(dk.sup.length?dk.sup.map(id=>{const s=SUP.find(x=>x.id===id);const bk=S.book&&S.book.find(b=>b.s.id===id);return`${s.n}: open ${fmtN(s.cap(S.q)*s.open)} ${s.u}/qtr, lead ${s.lead}q, $${fmtN(s.price(S.q))}bn/unit${bk?` · last qtr book ${fmtN(bk.tot)}/${fmtN(bk.open)}, you got ${fmtN(bk.got)}`:''}`}).join('<br>'):`Tesla Megapack: you get ${has('mega')?60:25}% of 110 GWh/yr = ${(27.5*(has('mega')?.6:.25)).toFixed(1)} GWh/qtr (share is an assumption)`)+'<br><small>Order in 📋 Order books</small>'}
+ if(h.ex)return`<b>🌍 Export</b><br>Inference box fleets ship to the world; Starship takes orbital batches up.<br>${S.boxes} fleets (${(S.boxes*.1).toFixed(1)} GW) · ${S.orbital} orbital batches`}
+cv.addEventListener('mousedown',e=>{if(e.button===0)drag={x:e.offsetX,y:e.offsetY,cx:cam.x,cy:cam.y,m:0}});
+cv.addEventListener('contextmenu',e=>{e.preventDefault();S.tool=null;refresh()});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){S.tool=null;refresh()}if(e.key==='r'||e.key==='R'){fitView()}});
+cv.addEventListener('mousemove',e=>{if(drag){const dx=e.offsetX-drag.x,dy=e.offsetY-drag.y;if(Math.abs(dx)+Math.abs(dy)>5)drag.m=1;if(drag.m){cam.x=drag.cx-dx/cam.z;cam.y=drag.cy-dy/cam.z}}
+ hov=s2w(e.offsetX,e.offsetY);const h=hit(...hov);if(h&&!drag?.m){tip.style.display='block';tip.innerHTML=tipFor(h);const r=cv.getBoundingClientRect();tip.style.left=Math.min(e.offsetX+14,r.width-310)+'px';tip.style.top=Math.min(e.offsetY+14,r.height-150)+'px'}else tip.style.display='none'});
+cv.addEventListener('mouseup',e=>{if(drag&&!drag.m)clickAt(...s2w(e.offsetX,e.offsetY));drag=null});
+cv.addEventListener('mouseleave',()=>{hov=null;drag=null;tip.style.display='none'});
+cv.addEventListener('wheel',e=>{e.preventDefault();const[wx,wy]=s2w(e.offsetX,e.offsetY);cam.z=Math.min(3,Math.max(.35,cam.z*(e.deltaY<0?1.12:1/1.12)));cam.x=wx*TS-e.offsetX/cam.z;cam.y=wy*TS-e.offsetY/cam.z},{passive:false});
+function clickAt(wx,wy){if(S.tool==='sell'){const h=hit(wx,wy);if(h&&h.b&&!B[h.b.t].hide){S.blds.splice(S.blds.indexOf(h.b),1);refresh()}return}
+ if(!S.tool)return;const[w,h]=B[S.tool].sz;place(S.tool,Math.floor(wx-w/2+.5),Math.floor(wy-h/2+.5))}
+function fitView(){const r=wrap.getBoundingClientRect();cam.z=Math.min(r.width/(W*TS),r.height/(H*TS))*.98;cam.x=-(r.width/cam.z-W*TS)/2;cam.y=-(r.height/cam.z-H*TS)/2}
 // ============ UI ============
 function fmtN(n){return n>=100?Math.round(n).toString():n>=10?n.toFixed(1):n.toFixed(2)}
-function fmtQ(it,q){return it==='blade'?Math.round(q)+' blade sets':it==='mega'?q.toFixed(1)+' GWh':q.toFixed(2)+' GW '+({gpu:'GPU racks',chip:'own chips',hbm:'HBM',core:'turbine cores',xf:'transformers',cdu:'CDUs'}[it])}
+function fmtQ(it,q){return it==='blade'?Math.floor(q)+' blade sets':it==='mega'?q.toFixed(1)+' GWh':q.toFixed(2)+' GW '+({gpu:'GPU racks',chip:'own chips',hbm:'HBM',core:'turbine cores',xf:'transformers',cdu:'CDUs'}[it])}
 function fmt(n){return n>=1000?(n/1000).toFixed(2)+' GW':Math.round(n)+' MW'}
-function flash(t){addLog('⚠ '+t,'badc');refresh()}
+function flash(t){addLog('⚠ '+t,'badc');refresh();return null}
 function setReq(id,v){S.req[id]=Math.max(0,+v||0);estCost()}function setPri(id,v){S.pri[id]=+v;estCost()}
-function estCost(){let c=0;SUP.forEach(s=>{c+=(S.req[s.id]||0)*s.price(S.q)*[1,1.1,1.25][S.pri[s.id]||0]});document.getElementById('estc').textContent='$'+c.toFixed(1)+'bn max (you pay only for what you are allocated)'}
+function estCost(){let c=0;SUP.forEach(s=>{c+=(S.req[s.id]||0)*s.price(S.q)*[1,1.1,1.25][S.pri[s.id]||0]});const e=document.getElementById('estc');if(e)e.textContent='$'+c.toFixed(1)+'bn max (you pay only for what you are allocated)'}
 function renderOrders(){const lastQ=S.book?QS[S.lastQ]:null;
- let h=`<div style="display:flex;justify-content:space-between;align-items:center"><b>📋 Order books for ${QS[S.q]}</b><span style="font-size:12px;color:var(--mut)">Orders clear when you end the quarter; you pay on delivery (credit line down to −$60bn). If a book is oversubscribed, it is split pro-rata; priority raises your weight (1×/1.6×/2.4×) and your price (+0/10/25%). <span id="estc"></span></span></div>
+ let h=`<div style="display:flex;justify-content:space-between;align-items:center"><b>📋 Order books for ${QS[S.q]}: deliveries land at the import docks on the map edge</b><span style="font-size:12px;color:var(--mut)">Orders clear at end of quarter; pay on delivery (credit to −$60bn). Oversubscribed books split pro-rata; priority 1×/1.6×/2.4× weight for +0/10/25% price. <span id="estc"></span></span></div>
  <table><tr><th>Supplier</th><th>Open/qtr</th><th>Rivals asking</th><th>Lead</th><th>Price</th><th>Your order</th><th>Priority</th><th>Last quarter's result${lastQ?' ('+lastQ+')':''}</th></tr>`;
  SUP.forEach(s=>{const locked=s.tech&&!has(s.tech);const rv=rivalReq(s);const rt=Object.values(rv).reduce((a,b)=>a+b,0);const bk=S.book&&S.book.find(b=>b.s.id===s.id);
   const top=Object.entries(rv).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>k+' '+fmtN(v)).join(', ');
@@ -257,22 +361,24 @@ function renderOrders(){const lastQ=S.book?QS[S.lastQ]:null;
   <td>${locked?'':`<select onchange="setPri('${s.id}',this.value)"><option value=0>normal</option><option value=1 ${S.pri[s.id]==1?'selected':''}>+10% price</option><option value=2 ${S.pri[s.id]==2?'selected':''}>+25% price</option></select>`}</td>
   <td>${bk?(bk.me>0?`<span class="${bk.got>=bk.me-1e-6?'full':bk.got>0?'part':'zero'}">got ${fmtN(bk.got)} / ${fmtN(bk.me)}${bk.blocked?' (credit maxed)':''}</span>`:'<span style="color:var(--mut)">no order</span>')+` <small style="color:var(--mut)">(book ${fmtN(bk.tot)}/${fmtN(bk.open)})</small>`:'-'}</td></tr>`});
  document.getElementById('orders').innerHTML=h+'</table>';estCost()}
+const LB={AN:'ANNOUNCED',MI:'MUSK IDEA',SP:'SPECULATIVE'};
 function refresh(){const st=stats();const $=id=>document.getElementById(id);
  $('sQ').textContent=QS[S.q];$('sCash').textContent='$'+S.cash.toFixed(1)+'bn';$('sGW').textContent=fmt(st.online);$('sPow').textContent=fmt(st.pow+S.boxes*100+S.orbital*100);$('sGPU').textContent=(st.gpus/1e6).toFixed(2)+'M';
- let p=Object.entries(B).filter(([k,d])=>!d.hide).map(([k,d])=>{const e=canBuild(k);return`<button class="pal ${S.tool===k?'sel':''}" onclick="S.tool='${k}';refresh()">${d.ic} ${d.n}: $${d.c}bn · ${d.lead}q<small>${d.d}${e?' · ⛔ '+e:''}</small></button>`}).join('');
- p+=`<button class="pal ${S.tool==='sell'?'sel':''}" onclick="S.tool='sell';refresh()">🗑 Demolish<small>no refund</small></button>`;
- if(has('boxes'))p+=`<button class="pal" onclick="deployBox()">📦 Deploy inference box fleet <span class="tag MI">MUSK IDEA</span><small>100 MW worldwide · 0.1 GW GPUs + 0.4 GWh Megapack + $1bn</small></button>`;
- if(has('orbital'))p+=`<button class="pal" onclick="launchOrb()">🛰 Launch orbital compute <span class="tag SP">SPECULATIVE</span><small>100 MW · 0.1 GW GPUs + $3bn · ${4-S.orbQ} left this quarter</small></button>`;
- p+=`<button class="pal" onclick="raise()" ${S.raised?'disabled':''}>💵 Raise $40bn<small>debt/equity, once per quarter</small></button>`;$('palette').innerHTML=p;
- $('inv').innerHTML=[['gpu','🟩 GPU racks'],['chip','🧠 own chips (unpaired)'],['hbm','💾 HBM'],['core','🔥 turbine cores'],['blade','🪶 blade sets'],['xf','🗼 transformers'],['cdu','❄️ CDUs'],['mega','🔋 Megapack']].map(([k,n])=>`<span>${n}</span><b>${k==='blade'?Math.floor(S.inv[k]):k==='mega'?S.inv[k].toFixed(1)+' GWh':S.inv[k].toFixed(2)+' GW'}</b>`).join('');
- $('pipe').innerHTML=S.pipe.length?S.pipe.slice().sort((a,b)=>a.q-b.q).map(x=>`<div>${QS[x.q]||'2029+'}: ${fmtQ(x.it,x.qty)} <span style="color:var(--mut)">(${x.from})</span></div>`).join(''):'<span style="color:var(--mut)">None. Order from the order books below the map.</span>';
+ $('buildbar').innerHTML=ORDER.map(k=>{const d=B[k];const e=canBuild(k);const tl=d.tech?TECH.find(x=>x.id===d.tech):null;const lk=d.tech&&!has(d.tech);
+  return`<button class="bb ${S.tool===k?'sel':''} ${lk?'lock':''}" title="${d.n}: ${d.d}${e?' · ⛔ '+e:''}" onclick="S.tool='${k}';refresh()"><span class="ic">${d.ic}</span>${d.n.replace(/ \(.*\)/,'').replace('Transformer yard / substation','Transformer yard').replace('Blade & vane casting shop','Casting shop')}<small>$${d.c}bn · ${d.lead}q · ${d.sz[0]}×${d.sz[1]}</small>${tl?`<span class="tag ${tl.lab}">${lk?'🔒 ':''}${LB[tl.lab]}</span>`:''}${e&&!lk?'<small style="color:var(--bad)">⛔</small>':''}</button>`}).join('')+`<button class="bb ${S.tool==='sell'?'sel':''}" onclick="S.tool='sell';refresh()"><span class="ic">🗑</span>Demolish<small>no refund</small></button>`;
+ let a='';if(has('boxes'))a+=`<button style="width:100%;margin:2px 0" onclick="deployBox()">📦 Ship inference box fleet <span class="tag MI">MUSK IDEA</span><br><small>100 MW · 0.1 GW GPUs + 0.4 GWh Megapack + $1bn · ${2*live('boxfab').length-S.boxQ} left this qtr</small></button>`;
+ if(has('orbital'))a+=`<button style="width:100%;margin:2px 0" onclick="launchOrb()">🛰 Launch orbital batch <span class="tag SP">SPECULATIVE</span><br><small>100 MW · 0.1 GW GPUs + $3bn · ${Math.min(4,2*live('pad').length)-S.orbQ} left this qtr</small></button>`;
+ a+=`<button style="width:100%;margin:2px 0" onclick="raise()" ${S.raised?'disabled':''}>💵 Raise $40bn <small>(once per quarter)</small></button>`;$('acts').innerHTML=a;
+ $('inv').innerHTML=DOCKS.map(d=>`<span>${d.ic} ${d.it==='chip'?'own chips (unpaired)':d.it==='gpu'?'GPU racks':d.it}</span><b>${fmtQ(d.it,S.inv[d.it]).replace(/ GW .*/,' GW')}</b>`).join('');
+ $('pipe').innerHTML=S.pipe.length?S.pipe.slice().sort((a,b)=>a.q-b.q).map(x=>`<div>${QS[x.q]||'2029+'}: ${fmtQ(x.it,x.qty)} <span style="color:var(--mut)">(${x.from})</span></div>`).join(''):'<span style="color:var(--mut)">None. Open 📋 Order books.</span>';
  const g=(t,v,tgt,done)=>`<div class="goal ${done?'done':''}">${done?'✅':'🎯'} ${t}<div class="bar"><i style="width:${Math.min(100,v/tgt*100)}%;background:${done?'var(--ok)':'var(--acc)'}"></i></div><small>${fmt(v)} / ${fmt(tgt)}${done?' · done '+done:''}</small></div>`;
  $('goals').innerHTML=g('13 GW of compute by end-2027 (Musk floor)',st.online,13000,S.won)+g('Stretch: 23 GW ("small possibility")',st.online,23000,st.online>=23000?QS[S.q]:null)+`<small style="color:var(--mut)">${Math.max(0,GOALQ-S.q+1)} quarters left until end-2027</small>`;
  const row=(n,v,mx,c)=>`<div style="font-size:12px">${n}: ${fmt(v)}</div><div class="bar"><i style="width:${mx?Math.min(100,v/mx*100):0}%;background:${c}"></i></div>`;const mx=Math.max(st.mw,st.pow,st.cap,st.cool,1);
- $('bn').innerHTML=row('Racks installed',st.mw,mx,'#3ddc84')+row('Power',st.pow,mx,'#ffb020')+row('Shell space',st.cap,mx,'#7aa7d9')+row('Cooling',st.cool,mx,'#5fe0ff')+(st.lim?`<div class="badc">Binding constraint: <b>${st.lim}</b></div>`:'<div class="good">The site is balanced. Add racks, and supply to feed them</div>');
+ $('bn').innerHTML=row('Racks installed',st.mw,mx,'#3ddc84')+row('Power',st.pow,mx,'#ffb020')+row('Shell space',st.cap,mx,'#7aa7d9')+row('Cooling',st.cool,mx,'#5fe0ff')+`<div style="font-size:12px">Turbine assembly: ${fmt(Math.max(0,asmCap()-S.asmUsed))} free this qtr</div>`+(st.lim?`<div class="badc">Binding constraint: <b>${st.lim}</b></div>`:'<div class="good">The site is balanced. Add racks, and supply to feed them</div>');
  $('log').innerHTML=S.log.map(l=>`<div class="${l.c}">${l.t}</div>`).join('');$('next').disabled=S.over;renderOrders()}
 function openM(){document.getElementById('modal').style.display='flex'}function closeM(){document.getElementById('modal').style.display='none'}
 document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')closeM()};document.getElementById('next').onclick=endQuarter;
+document.getElementById('ordBtn').onclick=()=>{document.getElementById('orders').classList.toggle('hide');setTimeout(resize,0)};
 document.getElementById('srcBtn').onclick=()=>{const L={S:'Sourced',D:'Derived',A:'Game assumption'};document.getElementById('mbox').innerHTML=`<h2>📚 Sources and assumptions</h2><p><span class="tag S">Sourced</span> means a named source printed it. <span class="tag D">Derived</span> means our arithmetic on sourced figures. <span class="tag A">Game assumption</span> means a balance value, <b>not a real fact</b>. Factory files: plan/decompose/BREAKDOWN-SPACEX-13GW.md, SOURCES-SPACEX-13GW.md, QUEUED-ROOT-*-GW.md.</p><table><tr><th>Type</th><th>Value</th><th>Source / date</th></tr>${SRC.map(([k,v,s])=>`<tr><td><span class="tag ${k}">${L[k]}</span></td><td>${v}</td><td>${s}</td></tr>`).join('')}</table><p><button onclick="closeM()">Close</button></p>`;openM()};
 function showTech(){document.getElementById('mbox').innerHTML=`<h2>🧬 Tech tree</h2><p><span class="tag AN">ANNOUNCED</span> Musk/SpaceX/Tesla have said this publicly. <span class="tag MI">MUSK IDEA</span> was floated on a call, with no product announced. <span class="tag SP">SPECULATIVE</span> is game fiction. Every effect size is a game assumption.</p><table><tr><th>Tech</th><th>Label</th><th>Cost / time</th><th>Effect</th><th></th></tr>${TECH.map(t=>`<tr><td><b>${t.n}</b></td><td><span class="tag ${t.lab}">${LABN[t.lab]}</span></td><td>${t.auto!==undefined?'Q2 2027':'$'+t.c+'bn · '+t.t+'q'}</td><td>${t.fx}</td><td>${S.tech[t.id]?'✅':S.res[t.id]!==undefined?'⏳ '+S.res[t.id]+'q':t.auto!==undefined?'':`<button onclick="startTech('${t.id}')" ${t.req&&!has(t.req)?'disabled':''}>Research</button>`}</td></tr>`).join('')}</table><p><button onclick="closeM()">Close</button></p>`;openM()}
 document.getElementById('techBtn').onclick=showTech;
@@ -280,14 +386,17 @@ document.getElementById('empBtn').onclick=()=>{document.getElementById('mbox').i
 <h3>xAI / SpaceX Super Intelligence</h3><p>~2.2 GW nameplate at end-Oct 2026 (CFO), aiming for 2.5–3 GW by end-Q4. Colossus I/II in Memphis/Southaven. Southaven permit: 41 turbines ≈ 1.2 GW (MDEQ, 10 Mar 2026). ~200k GB300 a month, then mostly Vera Rubin in 2027; 440k-VR training cluster by end-Q2 2027. Q4 capex guide $35–40bn. <i>SPCX Q3 call, 20 Oct 2026.</i></p>
 <h3>SpaceX launch and Starlink</h3><p>Starship Flight 14 reached orbit and deployed Starlink V3. Flight 15 ("next month") will try to catch both stages. Weekly flights targeted for H1 2027. 90% of global mass to orbit. Starlink: 13.6M consumer subscribers. Terafab: test chip mid-2027, volume by Q3 2028. <i>SPCX Q3 call, 20 Oct 2026.</i></p>
 <h3>Tesla factories (installed annual capacity)</h3><table><tr><th>Site</th><th>Capacity</th></tr><tr><td>Giga Texas</td><td>Model Y >375k · Cybertruck >125k · Cybercab >125k · Megapack 50 GWh (Megafactory TX started) · Optimus: construction</td></tr><tr><td>Giga Nevada</td><td>Tesla Semi 25k · Powerwall >6 GWh · LFP cells for Megapack</td></tr><tr><td>Giga Shanghai</td><td>Model 3/Y >950k · Megapack 20 GWh</td></tr><tr><td>Giga Berlin</td><td>Model Y >375k</td></tr><tr><td>Fremont / Lathrop (CA)</td><td>Model 3/Y >550k · Megapack 40 GWh · Optimus: early ramp</td></tr></table><p><i>Tesla Q3 2026 Update, 21 Oct 2026.</i> In the game, Megapacks feed solar farms and inference boxes, and Optimus can speed up builds (speculative).</p><button onclick="closeM()">Close</button>`;openM()};
-const HELP=`<h2>❓ How to play: Colossus Tycoon v2</h2><ol>
-<li>It's <b>Oct 2026</b>. You're Elon, with ~2.2 GW of xAI compute online and Southaven's 41 turbines waiting for blades. Musk's floor is <b>13 GW by end-2027</b>.</li>
-<li><b>Order supply</b> in the order books below the map: NVIDIA racks, turbines from GE Vernova, Siemens, MHI or aero makers, blade and vane sets from Howmet/PCC, transformers, and CDUs. Rivals (OpenAI, Oracle, AWS, Anthropic, Google, Meta, Microsoft, CoreWeave, others) order every quarter based on their real GW plans. Oversubscribed books are split pro-rata, and paying a premium raises your share.</li>
-<li>Deliveries arrive in your <b>yard</b> after the lead time. Then <b>build</b> on the site: rack halls use GPUs, turbine plants use cores plus 10 blade sets, substations use transformers, and cooling plants use CDUs. You also need shells.</li>
-<li>Compute online is the lowest of racks, power, shell space and cooling. Starved buildings pulse red; oversubscribed suppliers pulse red on the left.</li>
-<li>Open 🧬 <b>Tech</b> for your own casting shop (announced), Megapack priority, Optimus builders, your own chip and Terafab, Musk's modular inference boxes, and orbital compute. Each one is labelled announced, Musk idea or speculative.</li>
-<li>📚 <b>Sources</b> lists every number with its tag: sourced, derived or game assumption.</li></ol><button onclick="closeM()">Let's build</button>`;
+TECH.find(t=>t.id==='casting').fx='Unlocks the 🪶 casting shop building: +50 blade sets/qtr per shop (assumption). Musk: "we\'re casting the blades and vanes"';
+TECH.find(t=>t.id==='boxes').fx='Unlocks the 📦 inference box factory: fleets of 100 MW with power and cooling built in (0.1 GW GPUs + 0.4 GWh Megapack), 2/qtr per factory. No shell, grid or turbines needed. Musk idea on the 20 Oct call; no product announced';
+TECH.find(t=>t.id==='orbital').fx='Unlocks the 🚀 Starship pad: 100 MW orbital batches ($3bn + 0.1 GW GPUs), 2/qtr per pad, max 4/qtr. Speculative';
+const HELP=`<h2>❓ How to play: Colossus Tycoon v3 (visual factory)</h2><ol>
+<li>It's <b>Oct 2026</b>. You're Elon, with ~2.2 GW of xAI compute online (Colossus 1+2) and Southaven's 41 turbines waiting for blades. Musk's floor is <b>13 GW by end-2027</b>.</li>
+<li>The map is your site. Supplier <b>import docks</b> sit on the left edge (NVIDIA, TSMC, HBM makers, turbine OEMs, Howmet/PCC, transformers, CDUs) and Tesla Megapack on the top. Order in <b>📋 Order books</b>: rivals with real GW plans bid on the same supply.</li>
+<li>Pick a building in the <b>build bar</b> and click the map. Belts auto-route from docks to buildings and animate the items they carry; yellow power lines carry MW to data halls, blue pipes carry coolant.</li>
+<li>Gas turbine plants need cores + blade sets <i>assembled</i> in a ⚙️ turbine assembly hall (1 GW/qtr each). Research the casting tech to build your own 🪶 blade & vane shops.</li>
+<li>Compute online = the lowest of racks, power, shell space and cooling. <span class="badc">Red pulsing</span> = starved, <span class="ev">orange</span> = backed up, <span style="color:#ffd84d">dashed yellow</span> = under construction.</li>
+<li>🖱 Drag to pan, wheel to zoom, right-click / Esc to cancel, R to fit the view. 📚 Sources tags every number as sourced, derived or game assumption.</li></ol><button onclick="closeM()">Let's build</button>`;
 document.getElementById('helpBtn').onclick=()=>{document.getElementById('mbox').innerHTML=HELP;openM()};
-newGame();draw();document.getElementById('mbox').innerHTML=HELP;openM();
-window.__G={get S(){return S},stats,place,endQuarter,startTech,setReq,setPri,deployBox,launchOrb,raise,newGame,B};
+resize();newGame();fitView();draw();if(!location.hash.includes('nohelp')){document.getElementById('mbox').innerHTML=HELP;openM()}
+window.__G={get S(){return S},stats,place,findSpot,endQuarter,startTech,setReq,setPri,deployBox,launchOrb,raise,newGame,B,cam,fitView,canBuild,live};
 </script></body></html>

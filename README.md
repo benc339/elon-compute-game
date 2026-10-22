@@ -1,4 +1,2 @@
-# Colossus Tycoon (play as Elon), v1
-
-A static browser game where you build compute and energy from Q4 2026 to Q4 2028. Open `index.html`; there's no build step.
-Every number is listed in the in-game 📚 Sources panel and tagged Sourced, Derived or Game assumption.
+# Colossus Tycoon
+Play as Elon (Oct 2026 start). v3 (root) = visual factory map; v2 at /v2/, v1 at /v1/. Single-file HTML, no build. Numbers tagged Sourced / Derived / Game assumption in the Sources panel.
