@@ -75,3 +75,9 @@ Framing (Bence, 22 Oct 2026): the player is the **whole West** vs China. Market 
 **Opening choice:** the first 2 turbines are **pre-delivered** (ordered before the game starts, assumption). Layer 1 needs 48 MW = 2 × 25 MW, so the opening stays DSP-simple. More turbines come from the **world turbine market** (queue or outbid). The cast-blade chain unlocks after the 3rd turbine, as the next layer.
 
 **Market mechanic (generic, buyer list is data in `MKT`):** each part (turbines, blade & vane sets) has world supply/month and rival demand categories (Utilities & industry, Aviation, China) with growth rates. Price = base × (total demand / supply)^0.8. Each month supply goes first to outbid orders (+60% premium), then pro rata between your line orders and rival demand. The panel shows price, trend, allocation split (West AI / Aviation / Utilities & industry / China), your place in line and the estimated wait. Supply, demand weights, growth, elasticity and premium are **game assumptions**.
+
+## v10: no wiring
+
+Manual grid lines are gone. All finished turbines feed **one global power pool**, and every building draws from it. Wiring was annoying and isn't a real chokepoint. Belts stay for material flow but are auto-routed.
+
+**Planned later node: the real grid chokepoint** (interconnection queues, large power transformers and switchgear, nodes 24–25). It will be a **timer/permit** (queue wait before new MW counts), not wiring. Sources so far: Berkeley Lab "Queued Up" 2024 for queues; the transformer lead times still need sourcing.
