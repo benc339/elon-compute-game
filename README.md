@@ -1,5 +1,7 @@
 # Race to SI — The Race to Superintelligence
-Root = v6: start 30 Nov 2022 (ChatGPT release). Cars and rocket launches earn money; cars sell into markets (US open at start; Europe and China opened by paying a showroom + approval cost). Real-time with pause/1×/2×/4×, assistant panel with a local command parser. xAI, research and rival labs are coming later.
+A learn-while-playing game about the AI ecosystem (Dyson Sphere Program feel). Root = v7.
+- Layer 1: gas turbines → grid line → AI data center → cash.
+- Layer 2: foundry fab (logic die, TSMC-style) + HBM fab (SK hynix-style) → CoWoS packaging plant → belts carry accelerators to the data center.
+Each building has a sourced "what this is in the real world" card. Game numbers are labelled assumptions in the Sources panel.
 
-Older builds: /v5/ (v5 MVP), /v4/ (start Jan 2015), /v3/ (Oct-2026 Colossus Tycoon), /v2/, /v1/.
-Single-file HTML, no build step. The in-game Sources panel tags every figure as Sourced (with date and source) or Game assumption.
+Older builds: /v6/ (cars + rockets MVP), /v5/, /v4/ (2015 start), /v3/ (Colossus Tycoon), /v2/, /v1/. Single-file HTML, no build step.
