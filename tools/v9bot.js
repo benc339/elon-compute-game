@@ -1,0 +1,20 @@
+const {chromium}=require('playwright');(async()=>{const [url,out,tag]=process.argv.slice(2);const b=await chromium.launch();const p=await b.newPage({viewport:{width:1440,height:860}});const errs=[];p.on('pageerror',e=>errs.push(e.message));await p.goto(url);await p.waitForTimeout(1500);
+const G=f=>p.evaluate(f);const C=()=>G(()=>__G.closeCard());await C();
+const at=async(x,y)=>{const[sx,sy]=await p.evaluate(([x,y])=>__G.scr(x,y),[x,y]);return[sx,sy]};
+const btn=async id=>{await p.click(`#actbar .act[data-id="${id}"]`)};
+await btn('gt');let [sx,sy]=await at(5,7);await p.mouse.move(sx,sy);await p.waitForTimeout(300);await p.screenshot({path:`${out}/v9${tag}-1-ghost.png`});await p.mouse.click(sx,sy);
+console.log('turbs',await G(()=>__G.S.turbs.map(t=>[t.x,t.y])));
+await C();await btn('dc');[sx,sy]=await at(11.5,8);await p.mouse.move(sx,sy);await p.waitForTimeout(300);await p.screenshot({path:`${out}/v9${tag}-2-dcghost.png`});
+[sx,sy]=await at(6,8);await p.mouse.move(sx,sy);await p.waitForTimeout(200);await p.screenshot({path:`${out}/v9${tag}-2b-dcred.png`});
+[sx,sy]=await at(11.5,8);await p.mouse.click(sx,sy);console.log('dc',await G(()=>[__G.S.placed.dc,'x',0]));
+await G(()=>{__G.step(4)});await C();await G(()=>__G.closeCard());
+console.log('UNCONNECTED check: turbine built?',await G(()=>__G.S.turbs.map(t=>[t.left,t.conn])),'dc built',await G(()=>!!__G.S.b.dc),'MW',await G(()=>__G.MW()),'powered',await G(()=>__G.econ().on));
+await p.waitForTimeout(400);await p.screenshot({path:`${out}/v9${tag}-3-unconn.png`});
+await btn('wire');const a1=await at(6.5,7.5),a2=await at(7.5,7.5);await p.mouse.move(...a1);await p.mouse.down();await p.mouse.move(...a2,{steps:5});await p.mouse.up();await G(()=>{__G.S.mode=null});
+console.log('wire',await G(()=>[...__G.S.wire.keys()]));await G(()=>__G.step(5));await C();console.log('after wire MW',await G(()=>__G.MW()),'goal',await G(()=>__G.S.goal));
+await p.waitForTimeout(500);await p.screenshot({path:`${out}/v9${tag}-4-connected.png`});
+for(let m=0;m<90;m++){await G(()=>{const S=__G.S;__G.closeCard();const e=__G.econ();if(e.lim==='power'&&!S.turbs.some(t=>t.left))__G.command('build turbine');for(const k of['fab','hbm','pkg'])if(S.unl[k]&&!S.placed[k])__G.command('build '+({pkg:'packaging',fab:'fab',hbm:'hbm'})[k]);if(S.unl.belt&&!(S.link.wafer&&S.link.hbm&&S.link.chip)&&S.b.pkg)__G.command('lay belts');if(S.unl.hall&&S.acc>=S.slots*.9&&!S.hall.length)__G.command('expand data hall');if(S.b.pkg&&S.lineQ.length<2){if(e.plim==='HBM')__G.command('add hbm line');else if(e.plim==='logic dies')__G.command('add fab line');else if(e.plim==='packaging')__G.command('add packaging line')}__G.step(1)});if(m===30){await C();await p.waitForTimeout(400);await p.screenshot({path:`${out}/v9${tag}-5-mid.png`})}}
+await C();await p.waitForTimeout(600);await p.screenshot({path:`${out}/v9${tag}-6-late.png`});
+console.log(await G(()=>{const S=__G.S;return{unconn:S.turbs.filter(t=>!t.left&&!t.conn).map(t=>[t.x,t.y]),t:S.t,cash:S.cash,acc:S.acc,slots:S.slots,made:S.made,goal:S.goal,turbs:S.turbs.length,MW:__G.MW(),link:S.link,fabL:S.fabL,hbmL:S.hbmL,pkgL:S.pkgL,done:S.done.map(d=>d.n+'@'+d.at)}}));
+const fps=await p.evaluate(()=>new Promise(r=>{let n=0;const t0=performance.now();(function f(){n++;if(performance.now()-t0<3000)requestAnimationFrame(f);else r(n/3)})()}));console.log('fps',fps,'errs',errs);
+await G(()=>__G.showCard('pkg'));await p.waitForTimeout(800);await p.screenshot({path:`${out}/v9${tag}-7-card.png`});await b.close()})();
