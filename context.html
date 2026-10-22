@@ -1,0 +1,539 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Colossus Tycoon context pack</title><style>body{font:15px/1.5 system-ui,sans-serif;max-width:1000px;margin:auto;padding:16px;background:#0e1117;color:#dde}a{color:#7ab8ff}table{border-collapse:collapse;width:100%;font-size:13px;display:block;overflow-x:auto}td,th{border:1px solid #333;padding:4px 6px;vertical-align:top}th{background:#1b2130}blockquote{border-left:3px solid #7ab8ff;margin:0;padding-left:12px;color:#bcd}code{background:#1b2130;padding:1px 4px}</style></head><body><p><a href="./">▶ Play the game</a> · <a href="https://github.com/benc339/elon-compute-game/blob/main/GAME-CONTEXT.md">Markdown source</a></p><h1>Colossus Tycoon: game design context pack</h1>
+<p>Last updated 22 Oct 2026 (ET). This is a public context pack for building the "play as Elon" compute-empire game. It covers the vision, the real-world starting data with sources, the current game state, and the 3D-globe plan.</p>
+<p><strong>Number rules.</strong> Every figure has a period and a source. Tags:
+- <strong>Sourced</strong>: a named public source printed it.
+- <strong>Derived</strong>: our own arithmetic on sourced inputs. It is never a source figure.
+- <strong>Game assumption</strong>: a balance or design value. It is not a real-world fact.</p>
+<p>Live game: https://benc339.github.io/elon-compute-game/ (v3). Older versions are at /v2/ and /v1/. Repo: https://github.com/benc339/elon-compute-game</p>
+<hr />
+<h2>1. Vision (the brief)</h2>
+<ul>
+<li>The game should play like <strong>Dyson Sphere Program</strong>, in <strong>3D</strong>, across <strong>the whole Earth</strong>.</li>
+<li><strong>You play as Elon</strong>, starting in <strong>October 2026</strong> with the real state of the world:</li>
+<li>Tesla's factories</li>
+<li>SpaceX's capabilities (Starship, Starlink, launch share)</li>
+<li>the <strong>13 GW data-center compute plan for end-2027</strong></li>
+<li>in-house <strong>turbine blade and vane casting</strong></li>
+<li>You <strong>compete with rivals</strong> (OpenAI/Stargate, Oracle, Meta, Microsoft, AWS, Anthropic, Google, CoreWeave) for chip-ecosystem supply.</li>
+<li>You <strong>order from the real suppliers</strong>: NVIDIA, TSMC CoWoS, SK hynix, Samsung and Micron HBM, GE Vernova, Siemens Energy, MHI, aero/industrial turbine makers, Howmet/PCC castings, transformer makers and cooling makers.</li>
+<li>The <strong>tech tree is creative</strong>: in-house blades and vanes, <strong>modular inference boxes</strong>, an own chip, Terafab, Optimus builders, orbital compute, and more.</li>
+</ul>
+<p><strong>Agreed design direction:</strong>
+- A <strong>3D globe is the strategy layer</strong>. Sites sit at their real lat/lon, for example Colossus in Memphis/Southaven, Giga Texas, TSMC in Tainan, HBM fabs in Icheon and Pyeongtaek, turbine and transformer plants, and the Bastrop casting foundry. Animated great-circle shipping lanes run between them, and rival bids appear as events on the globe.
+- Zooming into a site cross-fades into a <strong>close-up factory view</strong> for that site. This is today's top-down v3 factory map, with belts, docks, turbine plants and data-center halls. Zooming back out returns to the globe.
+- Close-ups stay flat and top-down for now. Fully 3D close-ups are possible, but they are a much bigger build.</p>
+<h2>2. Musk's modular inference-box quote (Sourced)</h2>
+<blockquote>
+<p>"We think there's also a lot of opportunity for inference compute if you manufacture modular inference compute at the factory level and then such that it's -- the power and cooling are built in at the factory and then you distribute modular inference compute clusters all over the country, if not all over the world. That's about as much as I should say about scaling power and cooling."</p>
+</blockquote>
+<p>Source: Elon Musk, SpaceX (SPCX) Q3 2026 earnings call, 20 Oct 2026, from the Motley Fool transcript: https://www.fool.com/earnings/call-transcripts/2026/10/20/spacex-spcx-q3-2026-earnings-call-transcript/</p>
+<p>This was an idea mentioned on the call. No product, size or date was announced.</p>
+<h2>3. SpaceX/xAI headline facts (SPCX Q3 2026 call, 20 Oct 2026, and Q3 release)</h2>
+<ul>
+<li><strong>Nameplate compute:</strong></li>
+<li>1.7 GW at 30 Sep 2026; 1.4 GW at Q2 2026; 0.6 GW at Q3 2025 (SpaceX Q3 2026 results release).</li>
+<li>"nearly 2.2 GW" at end-Oct 2026, and 2.5–3.0 GW by end-Q4 2026 (CFO on the call).</li>
+<li><strong>Plan layers.</strong> These are different layers, not contradictions:</li>
+<li>Musk would be "surprised" by less than <strong>13 GW of compute by end-2027</strong>.</li>
+<li>He is "highly confident" of <strong>10 GW added in 2027</strong>.</li>
+<li>There is a "small possibility" of about 23 GW total.</li>
+<li>There is a <strong>+20 GW power and cooling</strong> plan for 2027, sized "far in excess of what is needed ... to turn the GPUs on".</li>
+<li><strong>GPU pace.</strong> Musk: "roughly 200,000 GB300s online per month for every month for the remainder of this year and continuing that pace next year. With next year being primarily Rubin, Vera Rubin compute."</li>
+<li>A later "20,000 GB300s a month" in the same call is treated as a speaker slip.</li>
+<li>[Derived] Check: +~0.5 GW in about a month at ~2.44 kW per GPU at facility level ≈ 205k GPUs. 20k a month would add only ~0.05 GW.</li>
+<li><strong>Training cluster:</strong> 440,000 Vera Rubin by end-Q2 2027.</li>
+<li><strong>Blades and vanes:</strong> turbine OEMs say blades and vanes run "12 to 18 months behind the rest of the turbine", and "we're casting the blades and vanes for the turbines" (Musk).</li>
+<li><strong>Capex:</strong> Q3 2026 total $19.6bn; Q4 2026 guide $35–40bn (CFO). Space Infrastructure capex was $16,444M in Q3 (release).</li>
+<li><strong>Economics:</strong> new compute has a "payback of less than a year". Pricing is slightly above the high end of $30–50 per watt.</li>
+<li><strong>Other:</strong> Starship Flight 14 reached orbit. Starlink has 13.6M consumer subscribers and 90% of global mass to orbit. Terafab targets a test chip in mid-2027 and volume by Q3 2028 (Fool key-points summary).</li>
+</ul>
+<h2>4. 13 GW breakdown: from gigawatts down to blades and vanes</h2>
+<p>The basis is open: the company doesn't define "nameplate". The October ramp fits a <strong>facility basis</strong> (IT × PUE ~1.3) better than an IT-only basis, so both are shown. The roll-up uses only "13 GW total / 10 GW added in 2027".</p>
+<h3>4a. Per-GW coefficients</h3>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Sourced input (period, source)</th>
+<th>Per GW [Derived]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPUs, GB300</td>
+<td>NVL72 = 72 GPUs, 132–140 kW operating (Supermicro datasheet, 2026); 142 kW max (NVIDIA reference architecture, 2026)</td>
+<td>IT basis 514k–545k GPUs; facility basis at 2.44 kW/GPU (Nodus Partners, 2026) ~410k</td>
+</tr>
+<tr>
+<td>GPUs, Vera Rubin</td>
+<td>VR200 NVL72: Max-Q ~1.8 kW/GPU, ~190 kW/rack; Max-P ~2.3 kW, ~230 kW (Ming-Chi Kuo via CTEE, 7 Jan 2026)</td>
+<td>IT 313k–379k packages; facility (PUE 1.3) 241k–292k</td>
+</tr>
+<tr>
+<td>Rubin Ultra</td>
+<td>3.6 kW/package; Kyber rack 144 packages, ~600 kW (Tom's Hardware; Nodus, citing GTC 2025)</td>
+<td>IT ~240k packages</td>
+</tr>
+<tr>
+<td>HBM</td>
+<td>GB300 288 GB HBM3e (Supermicro); Rubin 288 GB HBM4, 8 stacks (Tom's Hardware); Rubin Ultra 1 TB HBM4E (Tom's Hardware / GTC 2025)</td>
+<td>GB300 IT 148k–157k TB; Rubin IT 90k–109k TB (0.72–0.87bn Gb)</td>
+</tr>
+<tr>
+<td>Other DRAM</td>
+<td>960 GB LPDDR5X per 4-GPU GB300 tray (Supermicro)</td>
+<td>GB300 IT ~123k–131k TB</td>
+</tr>
+<tr>
+<td>CoWoS</td>
+<td>Rubin = CoWoS-L, 2 compute + 2 I/O dies + 8 HBM (Tom's Hardware). Packages per wafer are <strong>not sourced</strong></td>
+<td>OPEN</td>
+</tr>
+<tr>
+<td>NICs</td>
+<td>GB300: 4× ConnectX-8 800G per 4 GPUs (Supermicro); Rubin uses CX-9 1.6T (Tom's Hardware), count not sourced</td>
+<td>GB300 IT 514k–545k 800G NICs</td>
+</tr>
+<tr>
+<td>Turbines</td>
+<td>Southaven permit: 17 Solar Titan 130 + 16 Titan 350 + 8 ProEnergy 6000PE = 41 units, ~1.2 GW (MDEQ PSD permit 10 Mar 2026 via Compute Atlas); SMT-130 ~16 MW (Tom's Hardware, 2025)</td>
+<td>~34 turbines/GW for this mix (~29 MW/unit)</td>
+</tr>
+<tr>
+<td>Blades/vanes</td>
+<td>GE LM6000 HPT stage 1: 80 blades + 23 two-vane nozzle segments (46 vanes); stage 2: 74 blades + 24 segments (48 vanes) (GE LM6000 PC/PD/PG/PH technical details deck). GE 7HA.03 is a 4-stage turbine, counts not printed (GE Vernova whitepaper)</td>
+<td>154 HPT blades + 94 vanes per LM6000-class turbine. Titan 130/350 counts OPEN</td>
+</tr>
+<tr>
+<td>Transformers</td>
+<td>Illustrative 1.42 MVA firm per MW IT; N+1 3×75 MVA per 100 MW (J. R. Sterling, 2026); HV units typically 50–100 MVA, &gt;12-month lead (SemiAnalysis, 2024)</td>
+<td>1.42 GVA firm / 2.25 GVA installed per GW ≈ 19–30 HV units at 75 MVA</td>
+</tr>
+<tr>
+<td>Cooling</td>
+<td>GB300 ~90% liquid / 10% air (Lenovo via Nodus); in-row CDU up to 1.8 MW per 8 racks (Supermicro); 1 MW = 284.3 refrigeration tons</td>
+<td>~284k tons of heat; ~556 in-row CDUs per GW IT</td>
+</tr>
+<tr>
+<td>$/GW</td>
+<td>SpaceX capex above; SemiAnalysis ~$50bn/GW (7 Aug 2026); NVIDIA content ~$40bn/GW Vera Rubin, ~$25bn/GW Grace Blackwell (Jensen Huang, NVDA Q2 FY27 call, Aug 2026)</td>
+<td>$27–50bn per GW added (whole-company capex, an upper bound)</td>
+</tr>
+</tbody>
+</table>
+<h3>4b. What 10 GW added in 2027 implies (all Derived)</h3>
+<p>These bounds treat the whole 10 GW as VR200 NVL72 ("primarily Vera Rubin").
+- <strong>Rubin packages:</strong> 3.1–3.8M on an IT basis, or 2.4–2.9M on a facility basis. Cross-check: 200k/month × 12 = 2.4M.
+- <strong>HBM4:</strong> 0.69–1.09 EB ≈ 5.5–8.8bn Gb in 2027, about 7–18% of our 48.6–75.2bn Gb modelled 2027 HBM demand.
+- <strong>NVIDIA content:</strong> ~$400bn.
+- <strong>All-in capex:</strong> ~$270–500bn.
+- <strong>Gas turbines:</strong> ~340 units if all power were on-site gas at the Southaven mix, which Musk says it won't be ("not just gas turbines"). That means ~52k HPT blades and ~32k vanes. This is an upper-bound illustration, not a forecast.
+- <strong>HV transformers:</strong> 14.2 GVA firm / 22.5 GVA installed ≈ 190–300 units at 75 MVA.
+- <strong>Cooling:</strong> ~2.8M refrigeration tons; ~5.6k in-row CDUs (GB300-class sizing).</p>
+<h3>4c. Tensions</h3>
+<ul>
+<li><strong>KGI (15 Sep 2026)</strong> expects 5.89M Rubin + 2.85M Rubin Ultra in CY2027. xAI's 10 GW alone would be 2.4–3.8M Rubin packages, <strong>41–65% of KGI's Rubin</strong>, before any other customer.</li>
+<li>This is a tension, not a contradiction: it isn't confirmed whether KGI counts dies or packages.</li>
+<li><strong>$/GW:</strong> $40bn/GW of NVIDIA content would leave only ~$0–10bn/GW for everything else. That is implausible against power and shell costs, and probably reflects IT-basis GW vs nameplate GW.</li>
+<li><strong>Still unsourced:</strong></li>
+<li>CoWoS-L packages per wafer</li>
+<li>Titan 130/350 blade counts</li>
+<li>whether the ProEnergy 6000PE shares the LM6000 lineage</li>
+<li>Rubin NICs and transceivers per GPU</li>
+<li>Rubin CDU sizing</li>
+<li>SpaceX's GB300/Rubin mix</li>
+<li>the non-gas share of power</li>
+<li>OEM slot allocations</li>
+<li>xAI's actual transformer sizing</li>
+</ul>
+<h2>5. Turbine and casting supply (the blades-and-vanes bottleneck)</h2>
+<p><strong>Howmet (HWM):</strong>
+- Gas Turbines end-market revenue was <strong>$944M in FY2025</strong> (10-K, 12 Feb 2026).
+- It was <strong>$284M in Q1 2026, +39% y/y</strong> (Q1 deck, 7 May 2026), and <strong>$321M in Q2 2026, +38% y/y</strong> vs $233M (10-Q, 6 Aug 2026).
+- The company targets going from ~$1B (2025) to $2B+ in 3–5 years (Tech &amp; Markets Day, 10 Mar 2026).
+- On the Q2 2026 call (6 Aug 2026, secondary transcript), it claimed <strong>more than 50% of the global industrial gas turbine (IGT) blade market</strong> and said <strong>~24 months</strong> pass from committing a new casting machine to its earliest output.</p>
+<p><strong>GE Vernova:</strong>
+- Gas turbine run rate is <strong>20 GW/yr in Q3 2026</strong>, rising to <strong>24 GW/yr in 2028</strong>, with "castings and forgings arriving in '27" (2Q26 call, 22 Jul 2026). It is "mostly sold out through '30".</p>
+<p><strong>Siemens Energy:</strong>
+- Company-compiled consensus for <strong>Gas Services FY2027 revenue is €16,723m</strong> (17 estimates, as of 17 Jul 2026, published 29 Jul 2026). Orders are €32,315m and the margin before special items is 18.3%.
+- FY2025 Gas Services revenue was 66% service and 34% new units (Annual Report 2025).
+- New units have <strong>"~€400m per GW"</strong> of revenue potential (CMD, 20 Nov 2025), and capacity is ~22 GW/yr across all frames (FY2025–27 average, same CMD).
+- <strong>Blades and vanes are its biggest limit.</strong>
+- [Derived] €16,723m × 34% ÷ €400m/GW ≈ 14 GW of new units (≈21 GW at a 50% share). This fits inside the 22 GW/yr capacity.</p>
+<p><strong>Other casting supply:</strong>
+- SpaceX's in-house <strong>blades-and-vanes foundry in Bastrop, TX</strong> was reported at <strong>$280M</strong> (1 Sep 2026, secondary).
+- Doncasters IGT revenue was $351M in FY2025, and an industry forecast puts IGT airfoil casting orders at +9%/yr over 2024–2035 (S-1, 15 Jun 2026).
+- MHI targets +30% gas turbine shipments by FY2028 and has started precision-casting capex (27 May 2026).
+- GE Aerospace agreed to acquire CPP for $11.75bn (8 Sep 2026).
+- Wood Mackenzie names single-crystal hot-section blades the industry's critical bottleneck. It puts global gas turbine capacity at ~60–70 GW/yr and the large power transformer lead time at 18–36 months.</p>
+<p><strong>Game hook.</strong> Howmet's ~24-month furnace lead means its 2027 capacity was largely fixed by mid-2025 orders. Your own casting shop, the Bastrop analogue, is the way around the OEMs' 12–18-month blade lag.</p>
+<h2>6. Rival gigawatt plans (Sourced, Oct 2026 unless noted)</h2>
+<table>
+<thead>
+<tr>
+<th>Rival</th>
+<th>Figures (source, period)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenAI Stargate</td>
+<td>7 US sites &gt;9 GW planned: Abilene 1.2, Shackelford 2.0, Milam 1.2, New Mexico 2.2, Wisconsin 1.3, Michigan 1.4, Ohio &lt;0.3 GW. Abilene ~0.3 GW was operational in Apr 2026 (Epoch AI, 2026). Original commitment 10 GW / $500B (OpenAI). Non-US sites not sourced</td>
+</tr>
+<tr>
+<td>Oracle</td>
+<td>&gt;10 GW of power/DC capacity secured, coming online over 3 years; &gt;400 MW delivered in Q3 FY26 (DCD / Oracle CEO blog, Mar 2026). Bloom fuel cells up to 2.8 GW, 1.2 GW contracted (Bloomberg, 13 Apr 2026). Overlaps Stargate</td>
+</tr>
+<tr>
+<td>Meta</td>
+<td>Prometheus (New Albany, OH): ~471 MW operating, 1 GW by Q3 2028 (Engineering at Meta, 19 Oct 2026; BlockWest). Hyperion (LA): 1.632 GW by Q1 2028, 2 GW by 2030, ~5 GW by ~2032 (BlockWest; Epoch); $50B Louisiana investment (CNBC, 13 Jul 2026)</td>
+</tr>
+<tr>
+<td>Microsoft</td>
+<td>Fairwater Wisconsin: 369 MW operating, 2.263 GW by Q2 2028 (BlockWest, Oct 2026). Fleet GW not sourced. Maia 300 "potentially more than a million" units next year (Reuters, 12 Oct 2026)</td>
+</tr>
+<tr>
+<td>AWS</td>
+<td>~3.8–3.9 GW of power added in the trailing 12 months; plans to double capacity by end-2027; 2026 capex ~$200B (The Register, 6 Feb 2026; DCD; CRN)</td>
+</tr>
+<tr>
+<td>Anthropic</td>
+<td>≥14.8 GW of disclosed commitments (SEDaily, 7 Sep 2026): Amazon up to 5 GW; Google/Broadcom TPU ~3.5 GW arriving 2027 + ~1 GW in 2026; AMD up to 2 GW (first GW H1 2027); Azure $30B with no GW given. Overlaps AWS/Google</td>
+</tr>
+<tr>
+<td>Google</td>
+<td>2026 capex guide $195–205B (Alphabet Q2 call, 22 Jul 2026). No fleet GW disclosed</td>
+</tr>
+<tr>
+<td>CoreWeave</td>
+<td>1.5 GW active at end-Q2 2026; ~3.7 → ~4.2 GW contracted (Q2 2026 results, 11 Aug 2026)</td>
+</tr>
+</tbody>
+</table>
+<p>Tesla (Tesla Q3 2026 update, 21 Oct 2026):
+- Installed vehicle capacity: Shanghai &gt;950k, Fremont &gt;550k, Berlin &gt;375k Model Y, Texas &gt;375k Model Y + &gt;125k Cybertruck + &gt;125k Cybercab, Nevada Semi 25k.
+- Megapack: 40 GWh (CA) + 50 GWh (TX) + 20 GWh (Shanghai).
+- Optimus: early ramp in Fremont, under construction in Texas.</p>
+<h2>7. Every number in the game's Sources panel (v3b)</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Value</th>
+<th>Source / date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sourced</td>
+<td>Inference boxes, Musk verbatim: "We think there's also a lot of opportunity for inference compute if you manufacture modular inference compute at the factory level and then such that it's -- the power and cooling are built in at the factory and then you distribute modular inference compute clusters all over the country, if not all over the world. That's about as much as I should say about scaling power and cooling."</td>
+<td>Motley Fool transcript, SpaceX (SPCX) Q3 2026 call, 20 Oct 2026 (an idea on the call; no product, size or date announced)</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>Nameplate compute "nearly 2.2 gigawatts … at the end of this month alone in October"; 2.5–3 GW by end-Q4 2026 (CFO)</td>
+<td>Motley Fool transcript, SpaceX (SPCX) Q3 2026 call, 20 Oct 2026</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>"surprised" if less than 13 GW of compute by end-2027; "highly confident of 10 gigawatts" added in 2027; +20 GW power/cooling plan for 2027</td>
+<td>Motley Fool transcript, SpaceX (SPCX) Q3 2026 call, 20 Oct 2026</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>"roughly 200,000 GB300s online per month … next year being primarily Rubin, Vera Rubin" (a later "20,000" on the same call is treated as a slip)</td>
+<td>Motley Fool transcript, SpaceX (SPCX) Q3 2026 call, 20 Oct 2026</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>440,000 Vera Rubin training cluster by end-Q2 2027</td>
+<td>Motley Fool transcript, SpaceX (SPCX) Q3 2026 call, 20 Oct 2026</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>Blades/vanes "12 to 18 months behind the rest of the turbine"; "we're casting the blades and vanes for the turbines"</td>
+<td>Motley Fool transcript, SpaceX (SPCX) Q3 2026 call, 20 Oct 2026</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>Q4 2026 capex guide $35–40bn; Q3 capex $19.6bn</td>
+<td>Motley Fool transcript, SpaceX (SPCX) Q3 2026 call, 20 Oct 2026</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>New compute "payback of less than a year"; pricing slightly above the high end of $30–50 per watt</td>
+<td>Motley Fool transcript, SpaceX (SPCX) Q3 2026 call, 20 Oct 2026</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>Starship Flight 14 reached orbit and deployed Starlink V3; Flight 15 "next month" will try to catch both stages; weekly flights "at some point in the first half next year"</td>
+<td>Motley Fool transcript, SpaceX (SPCX) Q3 2026 call, 20 Oct 2026</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>Starlink 13.6M consumer subscribers; 90% share of global mass to orbit</td>
+<td>Motley Fool transcript, SpaceX (SPCX) Q3 2026 call, 20 Oct 2026</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>Terafab roadmap: test chip mid-2027, volume production by Q3 2028</td>
+<td>Motley Fool transcript, SpaceX (SPCX) Q3 2026 call, 20 Oct 2026 (Fool key-points summary)</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>Southaven permit: 41 turbines (17 Titan 130 + 16 Titan 350 + 8 ProEnergy 6000PE) ≈ 1.2 GW, MDEQ PSD 10 Mar 2026</td>
+<td>Compute Atlas; MDEQ PSD permit</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>GE LM6000 HPT: 154 blades + 94 vanes per turbine</td>
+<td>GE LM6000 tech-details deck</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>GE Vernova: 20 GW/yr gas turbines (3Q26) → 24 GW (2028); "mostly sold out through '30"</td>
+<td>GE Vernova Q2 call, 22 Jul 2026</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>Siemens Energy ~50 large gas turbines/yr from FY27</td>
+<td>Siemens Energy Q3 FY26 deck / pre-close call, 2026</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>Global gas turbine capacity ~60–70 GW/yr</td>
+<td>Wood Mackenzie</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>Large power transformer lead time 18–36 months</td>
+<td>Wood Mackenzie (as compiled 3 Oct 2026)</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>NVIDIA content ~$40bn/GW Vera Rubin, ~$25bn/GW Grace Blackwell</td>
+<td>Jensen Huang, NVDA Q2 FY27 call</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>KGI CY2027: 5.89M Rubin + 2.85M Rubin Ultra</td>
+<td>KGI, 15 Sep 2026</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>TSMC CoWoS ~140k wafers/month end-2026 → ~220k end-2027</td>
+<td>Institutional estimate, SECONDARY</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>2027 HBM demand 48.6–75.2bn Gb; Rubin 288 GB HBM4</td>
+<td>Our 2027 HBM demand model range (derived); Tom's Hardware</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>Tesla installed capacity: Shanghai &gt;950k, Fremont &gt;550k, Berlin &gt;375k Model Y, Texas &gt;375k Model Y + &gt;125k Cybertruck + &gt;125k Cybercab, Nevada Semi 25k; Megapack 40 GWh (CA) + 50 GWh (TX) + 20 GWh (Shanghai); Optimus: early ramp (Fremont), construction (Texas)</td>
+<td>Tesla Q3 2026 Update deck, 21 Oct 2026</td>
+</tr>
+<tr>
+<td>Sourced</td>
+<td>Rival plans: OpenAI Stargate &gt;9 GW across 7 US sites (~0.3 GW Abilene live); Oracle &gt;10 GW over 3 yrs; Meta Prometheus 1 GW by Q3 2028 + Hyperion 1.632 GW by Q1 2028; Microsoft Fairwater WI 2.263 GW by Q2 2028 (fleet not sourced); AWS +3.8–3.9 GW TTM, doubling by end-2027; Anthropic ≥14.8 GW commitments (overlaps AWS/Google); Google 2026 capex $195–205bn (no GW given); CoreWeave 4.2 GW contracted / 1.5 GW active</td>
+<td>(Epoch, DCD, BlockWest, SEDaily, Alphabet, CoreWeave, Oct 2026)</td>
+</tr>
+<tr>
+<td>Derived</td>
+<td>~34 turbines/GW → ~29 MW per unit (Southaven mix); 10 blade sets per 290 MW plant</td>
+<td>1.2 GW ÷ 41</td>
+</tr>
+<tr>
+<td>Derived</td>
+<td>GPUs per GW: GB300 ~410k, Vera Rubin ~270k (facility basis, PUE 1.3)</td>
+<td>13 GW breakdown (this doc, §4) (Supermicro, Nodus, Kuo)</td>
+</tr>
+<tr>
+<td>Derived</td>
+<td>HV transformers ~19–30 per GW (game uses 25); in-row CDUs ~556 per GW</td>
+<td>13 GW breakdown (this doc, §4)</td>
+</tr>
+<tr>
+<td>Derived</td>
+<td>NVIDIA 2027 output ≈ 34 GW/yr ≈ 8.5 GW per quarter</td>
+<td>KGI units ÷ packages/GW (unit basis not confirmed)</td>
+</tr>
+<tr>
+<td>Derived</td>
+<td>GE Vernova ≈ 5 GW per quarter; transformer lead 6 quarters (low end of 18–36 months); Howmet/PCC blade lag 5 quarters (middle of 12–18 months)</td>
+<td>Arithmetic on the figures above</td>
+</tr>
+<tr>
+<td>Derived</td>
+<td>Revenue ≈ $10bn per GW online per quarter</td>
+<td>&lt;1-year payback on ~$40bn/GW</td>
+</tr>
+<tr>
+<td>Derived</td>
+<td>Rival demand per quarter = remaining GW in plan ÷ quarters to target date (OpenAI ~1.1, Oracle ~0.8, AWS ~1.0, Anthropic ~1.2, Meta ~0.36, Microsoft ~0.27, CoreWeave ~0.34 GW/qtr); Google ~1 GW/qtr = $200bn capex ÷ $50bn/GW (upper-bound method)</td>
+<td>Rival plans above</td>
+</tr>
+<tr>
+<td>Game assumption</td>
+<td>Pay on delivery; new orders blocked below −$60bn cash</td>
+<td>Game balance</td>
+</tr>
+<tr>
+<td>Game assumption</td>
+<td>Starting cash $77.5bn ($40bn + the Q4 capex budget); funding $37.5bn/qtr (midpoint of capex guide) + revenue; optional raise of $40bn/qtr</td>
+<td>Game balance</td>
+</tr>
+<tr>
+<td>Game assumption</td>
+<td>Share of each supplier's output open to new orders (GE Vernova 10%, Siemens/MHI 15%, aero 50% (v3b; was 35%), others 100%); OEM lead times; MHI 3 GW/qtr; Siemens 300 MW/unit; aero/industrial 2 GW/qtr</td>
+<td>Game balance (real slot allocations unsourced)</td>
+</tr>
+<tr>
+<td>Game assumption</td>
+<td>CoWoS and HBM GW-equivalents (packages per wafer unsourced); SK hynix/Samsung/Micron 55/25/20 split; NVIDIA uses 65% of CoWoS and 60% of HBM</td>
+<td>Game balance</td>
+</tr>
+<tr>
+<td>Game assumption</td>
+<td>Howmet/PCC 300 blade sets/qtr; transformer makers 7 GW-eq/qtr (spot 0.6 GW, 3 qtr, 3× price); cooling makers 9 GW-eq/qtr, 2 qtr lead</td>
+<td>Game balance</td>
+</tr>
+<tr>
+<td>Game assumption</td>
+<td>All non-NVIDIA prices (turbines, shells, cooling, transformers, solar, techs), build times, and "Others" demand of 1.5 GW/qtr</td>
+<td>Game balance</td>
+</tr>
+<tr>
+<td>Game assumption</td>
+<td>Southaven turbine cores are on site and OEM blades arrive Q2 2027; the existing 2.2 GW is self-sufficient in power, cooling and transformers</td>
+<td>Game assumption (real status unsourced)</td>
+</tr>
+<tr>
+<td>Game assumption</td>
+<td>Megapack share for xAI 25% (60% with tech); solar farm = 500 MW + 2 GWh Megapack → 150 MW firm</td>
+<td>Game balance</td>
+</tr>
+<tr>
+<td>Game assumption</td>
+<td>All tech-tree effects; inference box = 100 MW per fleet; orbital = 100 MW per launch batch</td>
+<td>Game design. SPECULATIVE items are not real plans</td>
+</tr>
+<tr>
+<td>Game assumption</td>
+<td>All news events are fictional scenarios inspired by real constraints</td>
+<td>Game design</td>
+</tr>
+<tr>
+<td>Game assumption</td>
+<td>v3 map buildings: casting shop +50 blade sets/qtr each (3 shops = the v2 tech's 150); turbine assembly hall assembles up to 1 GW of turbine plants per quarter; inference box factory up to 2 fleets/qtr; Starship pad up to 2 orbital batches/qtr; building costs, footprints and lead times</td>
+<td>Game balance (v3), not sourced</td>
+</tr>
+<tr>
+<td>Game assumption</td>
+<td>v3b tuning (bot playtests showed a sensible strategy topped out near 6 GW by end-2027 once boxes needed power): (1) inference boxes must carry their own power: gas genset (0.1 GW cores + 3 blade sets + 0.4 GWh Megapack) or solar+storage (1.9 GWh Megapack), $1.5bn (was 0.4 GWh, $1bn, no power); (2) pre-booked turbine slots: 1.25 GW of cores per quarter arrive Q1–Q4 2027, paid at $1.5bn/GW, standing in for orders placed before Oct 2026 behind the sourced +20 GW 2027 power plan; (3) aero/industrial turbine share open to you 50% (was 35%); (4) casting-shop tech takes 1 quarter (was 2); (5) map enlarged to 64×40. No sourced or derived number was changed. Result: best bot strategy reaches 12.7–13.2 GW by end-2027 (wins on 4 of 5 event seeds, incl. the default; the miss ends at 12.7 GW)</td>
+<td>Game balance (v3b), not sourced</td>
+</tr>
+<tr>
+<td>Game assumption</td>
+<td>One turbine assembly hall is pre-placed next to Southaven; supplier "import docks" on the map edge are a visual stand-in for the order books</td>
+<td>Game design (v3)</td>
+</tr>
+</tbody>
+</table>
+<h2>8. Current game state</h2>
+<ul>
+<li><strong>v1 (/v1/):</strong> compute and energy prototype with a sources panel.</li>
+<li><strong>v2 (/v2/):</strong></li>
+<li>real October 2026 start state</li>
+<li>supplier order books that rivals bid against</li>
+<li>a labelled tech tree (ANNOUNCED / SPECULATIVE / MUSK IDEA)</li>
+<li>the Musk inference-box quote</li>
+<li>quarterly turns from Q4 2026 to Q4 2028, with the goal of 13 GW by Q4 2027</li>
+<li><strong>v3 (root):</strong></li>
+<li>A visual top-down factory map (64×40 tiles) that you can pan and zoom.</li>
+<li>Supplier "import docks" on the map edge.</li>
+<li>Auto-routed animated belts carrying GPUs, HBM, cores, blades, transformers and CDUs.</li>
+<li>Power lines and coolant pipes that turn red when they run short, and buildings that pulse when starved.</li>
+<li>Buildings: data-center shell, rack hall, cooling plant, gas turbine plant, turbine assembly hall, blade &amp; vane casting shop, transformer yard, solar + Megapack farm, inference box factory, Starship pad. The pre-placed Colossus 1+2 complex and Southaven turbine plant are there from the start.</li>
+<li><strong>v3b balance changes.</strong> All are game assumptions; no sourced or derived number was changed.</li>
+<li>Inference boxes carry their own power: a gas genset (0.1 GW of cores + 3 blade sets + 0.4 GWh Megapack) or solar + storage (1.9 GWh), at $1.5bn each.</li>
+<li>1.25 GW of turbine cores per quarter arrives Q1–Q4 2027. This stands in for orders placed before Oct 2026 behind the +20 GW 2027 power plan, and it is the biggest assumption.</li>
+<li>The share of aero/industrial turbine supply open to you rises from 35% to 50%.</li>
+<li>The casting tech takes 1 quarter instead of 2.</li>
+<li>The map is enlarged to 64×40.</li>
+<li>UI changes: readable dock labels, a single-line header, a Fit button and WASD panning.</li>
+<li><strong>Bot playtests:</strong></li>
+<li>v3 test bot: ~11.3 GW by late 2028, with long stretches in debt.</li>
+<li>Before v3b, once boxes needed power, a sensible strategy topped out near 6 GW by end-2027.</li>
+<li>After v3b, the smart bot reaches <strong>12.7–13.2 GW by end-2027</strong> and wins on 4 of 5 event seeds. The miss ends at 12.7 GW.</li>
+<li>Bottlenecks, in order: blades → shells and cooling → NVIDIA GPU supply.</li>
+<li>Tools: <code>tools/smart-bot.js</code>, <code>tools/header-check.js</code>.</li>
+<li>Screenshots are in <code>shots/</code>.</li>
+</ul>
+<h2>9. 3D tech choice, plan and pitfalls</h2>
+<p><strong>Search result.</strong> There is no open-source Dyson Sphere Program clone or factory-on-a-globe game to fork.</p>
+<p><strong>Shortlist:</strong>
+- <strong>three.js:</strong> https://github.com/mrdoob/three.js (recommended base)
+- <strong>three-globe:</strong> https://github.com/vasturiano/three-globe, and globe.gl https://github.com/vasturiano/globe.gl, to bootstrap a working Earth quickly and eject later
+- <strong>NASA Blue Marble:</strong> https://visibleearth.nasa.gov/collection/1484/blue-marble. Public-domain Earth textures, with no token and no quota.
+- <strong>Rejected:</strong>
+  - CesiumJS (https://github.com/CesiumGS/cesium): heavy, with terrain/tile streaming and an Ion token.
+  - deck.gl (https://github.com/visgl/deck.gl): awkward for pickable game objects.
+  - MapLibre (https://github.com/maplibre/maplibre-gl-js): tile-first, with custom 3D bolted on.
+  - Godot and Unity WebGL: 10–40 MB of wasm, poor on phones.</p>
+<p><strong>Recommended architecture (agreed in a second-opinion review):</strong>
+- <strong>Sim core:</strong>
+  - Extract the existing tick loop into a pure JS module with no DOM or three.js references.
+  - Run it in a Web Worker at a fixed timestep (~10 Hz), with a seeded RNG so the headless bot tests keep working.
+  - Post snapshots as pre-allocated <code>Float32Array</code>s.
+- <strong>Globe = strategy layer:</strong>
+  - Sites at real lat/lon in one <code>InstancedMesh</code>.
+  - Lanes as great-circle arcs baked into one BufferGeometry with a per-vertex <code>t</code> attribute, animated by a time uniform in the shader. This gives DSP-style flowing belts at near-zero CPU.
+- <strong>Site close-up = the current 2D map,</strong> cross-faded in as the camera closes on a site. This is the single biggest decision.
+- <strong>Rendering details:</strong>
+  - Labels are a DOM overlay positioned by lat/lon → screen projection.
+  - Build with Vite and deploy the bundle to Pages, dropping the single-file constraint.
+  - Target 60 fps on an iPhone from the first globe build, with touch controls designed from scratch.</p>
+<p><strong>Pitfalls:</strong>
+1. <strong>Labels:</strong> cull by camera-facing dot product and distance; cap visible labels at ~40.
+2. <strong>Per-frame allocation:</strong> pre-allocate everything and mutate typed arrays.
+3. <strong>Texture memory:</strong> use 2k textures as the baseline (KTX2/Basis), with hi-res as an opt-in. 8k textures run older iPhones out of memory.
+4. <strong>Shader scope creep:</strong> one Fresnel atmosphere shell is enough.
+5. <strong>Geo traps:</strong> slerp arcs rather than lerp them, handle the antimeridian wrap, and expect flaky picking near the limb.
+6. <strong>Token-gated basemaps</strong> (Mapbox, Cesium Ion): avoid them entirely.
+7. <strong>Losing the bot tests:</strong> split the sim from the renderer <em>first</em>.</p>
+<p><strong>Staged plan:</strong>
+- <strong>S1, headless split (1–2 weeks):</strong>
+  - Extract the sim core.
+  - Add real coordinates and lane definitions.
+  - Keep the 2D renderer wired to the new core, with bot tests green.
+- <strong>S2, globe shell:</strong>
+  - three.js globe, instanced sites and shader arcs.
+  - Clicking a site opens the 2D view.
+  - Deploy to Pages and test on a phone right away.
+- <strong>S3, legible logistics:</strong>
+  - Shipment packets and lane congestion colours.
+  - Rival-bid events on the globe, a power/grid overlay, and a day/night terminator driven by the game clock.
+- <strong>S4, depth:</strong> the tech tree on the globe layer (in-house blades and vanes, inference boxes, supplier contention).
+- <strong>S5, polish:</strong>
+  - KTX2 textures, label culling and an instancing audit.
+  - Camera tours.
+  - Touch controls: one-finger orbit, pinch zoom, tap to select.</p>
+<h2>10. Main public sources</h2>
+<ul>
+<li>SpaceX Q3 2026 call transcript (Motley Fool, 20 Oct 2026): https://www.fool.com/earnings/call-transcripts/2026/10/20/spacex-spcx-q3-2026-earnings-call-transcript/</li>
+<li>SpaceX Q3 2026 results: https://s21.q4cdn.com/184289198/files/content_files/SpaceX-Reports-Third-Quarter-2026-Results.pdf</li>
+<li>Supermicro GB300 NVL72 datasheet: https://www.supermicro.com/datasheet/datasheet_SuperCluster_GB300_NVL72.pdf</li>
+<li>NVIDIA NVL72 reference architecture: https://docs.nvidia.com/enterprise-reference-architectures/nvl72-ai-factory/latest/components.html</li>
+<li>Nodus Partners, AI rack power: https://nodus.partners/insights/ai-rack-power</li>
+<li>CTEE / Kuo, VR200: https://www.ctee.com.tw/news/20260107701081-430704</li>
+<li>Tom's Hardware, Vera Rubin in depth: https://www.tomshardware.com/pc-components/gpus/nvidias-vera-rubin-platform-in-depth-inside-nvidias-most-complex-ai-and-hpc-platform-to-date</li>
+<li>Compute Atlas, Colossus 2 power station: https://www.compute-atlas.com/facilities/xai-colossus-2-power-station-southaven-ms</li>
+<li>Tom's Hardware, xAI turbines: https://www.tomshardware.com/tech-industry/xai-pushes-power-strategy-towards-1gw-ai-factory</li>
+<li>J. R. Sterling, substation MVA: https://julianrsterling.com/articles/data-centre-substation-size-mva/</li>
+<li>SemiAnalysis, Datacenter Anatomy part 1: https://newsletter.semianalysis.com/p/datacenter-anatomy-part-1-electrical</li>
+<li>Epoch AI, Stargate sites: https://epoch.ai/publications/openai-stargate-where-the-us-sites-stand</li>
+<li>Engineering at Meta, Prometheus: https://engineering.fb.com/2026/10/19/data-center-engineering/inside-prometheus-meta-gigawatt-scale-supercluster/</li>
+<li>Plus the filings and calls named inline: Howmet 10-K/10-Q/calls, GE Vernova 2Q26, Siemens Energy CMD/consensus/AR, Tesla Q3 2026 update, KGI, CoreWeave, Oracle, AWS and Alphabet.</li>
+</ul></body></html>
