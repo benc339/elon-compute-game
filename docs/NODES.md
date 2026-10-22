@@ -59,3 +59,19 @@ The game price is $150/t, which is an assumption.
 - **First capstone goal:** **Pull your first 300 mm ingot**, followed by 1,000 ingots.
 - **Wafer slicing** opens the next layer.
 - **Ratios used in-game:** sourced per-tonne energy for the smelter (12 MWh/t) and poly (60 kWh/kg). The other ratios and capacities are labelled assumptions in the in-game Sources panel.
+
+## Gas turbine sub-chain (v9)
+
+Framing (Bence, 22 Oct 2026): the player is the **whole West** vs China. Market rivals are non-AI demand plus China, not Western firms.
+
+| # | Layer | Node | Criteria | Real examples | Status · source |
+|---|---|---|---|---|---|
+| 29 | Power | Superalloy vacuum melt (Ni/Co + **rhenium**) | 1,2 | PCC Special Metals, Cannon-Muskegon, Howmet | built v9 · S: USGS MCS 2026 rhenium (~81 t world mine output 2025, ~80% of use in superalloys, ~$2,600/kg). Rhenium is a bought input with a per-kg cash cost, not its own node (Opus agreed) |
+| 30 | Power | **Blade & vane foundry** (single-crystal investment casting, ceramic cores) — CHOKEPOINT | 1,2,3,4 | PCC Airfoils, Howmet, Doncasters; SpaceX Bastrop (planned) | built v9 · S: Musk Jan 2026 ("only three casting companies… massively backlogged"); Musk on X Aug 2026 via TechCrunch/BI (Bastrop foundry, "up to 18 months"); In Practise (PCC+Howmet ~80%, one interviewee). Bastrop $280M **disputed**: FMT Sept 2026 vs Texas Governor 12 Mar 2025 (semiconductor/packaging) |
+| 31 | Power | Turbine assembly (blades + rotor forgings, casings, generator) | 1,3 | GE Vernova, Siemens Energy, Mitsubishi Power | built v9 · S: GE Vernova Q2 2025 (29 GW backlog + 25 GW reservations); Bloomberg 23 Apr 2025 (2028 deliveries, 2030 talks); EPRI via Reuters 21 Jul 2025 (5+ yrs large units) |
+| 32 | Power | Large rotor/disc forgings & heavy presses | 1,2 | heavy-press operators (Opus suggestion) | **folded into industrial inputs for now**; candidate node, no source gathered yet |
+| 33 | Power | Ceramic cores/core dies, TBC coatings, cooling-hole drilling, VIM/SX furnaces | 1 | (Opus suggestions) | folded into the foundry; candidate sub-nodes, unsourced |
+
+**Opening choice:** the first 2 turbines are **pre-delivered** (ordered before the game starts, assumption). Layer 1 needs 48 MW = 2 × 25 MW, so the opening stays DSP-simple. More turbines come from the **world turbine market** (queue or outbid). The cast-blade chain unlocks after the 3rd turbine, as the next layer.
+
+**Market mechanic (generic, buyer list is data in `MKT`):** each part (turbines, blade & vane sets) has world supply/month and rival demand categories (Utilities & industry, Aviation, China) with growth rates. Price = base × (total demand / supply)^0.8. Each month supply goes first to outbid orders (+60% premium), then pro rata between your line orders and rival demand. The panel shows price, trend, allocation split (West AI / Aviation / Utilities & industry / China), your place in line and the estimated wait. Supply, demand weights, growth, elasticity and premium are **game assumptions**.
