@@ -1,35 +1,74 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Colossus Tycoon v3: visual factory, play as Elon</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Colossus Tycoon: play as Elon</title><meta name="theme-color" content="#06090f">
 <style>
-:root{--bg:#0b0f17;--pan:#131a26;--ln:#24324a;--tx:#dbe6f5;--mut:#8696ad;--ok:#3ddc84;--warn:#ffb020;--bad:#ff4d5e;--acc:#4da3ff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.35 system-ui,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;height:100vh;overflow:hidden}
-header{display:flex;gap:10px;align-items:center;padding:5px 10px;flex-wrap:nowrap!important;white-space:nowrap;background:var(--pan);border-bottom:1px solid var(--ln);flex-wrap:wrap}
-header h1{font-size:14px;margin:0 4px 0 0}header button{padding:4px 7px;font-size:12px}.stat{display:flex;flex-direction:column;min-width:66px}@media(max-width:1650px){.hdsub{display:none}}@media(max-width:1250px){.stat span{display:none}}.stat b{font-size:16px}.stat span{font-size:10px;color:var(--mut);text-transform:uppercase}
-button,select,input{background:#1d2a40;color:var(--tx);border:1px solid var(--ln);border-radius:5px;padding:4px 8px;cursor:pointer;font:inherit}button:hover{border-color:var(--acc)}button.sel{background:#21436e;border-color:var(--acc)}button:disabled{opacity:.4;cursor:not-allowed}
-input{width:58px;cursor:text}#next{background:#1e5f3a;border-color:#3ddc84;font-weight:600}
-main{flex:1;display:flex;min-height:0}#right{width:280px;padding:8px;overflow:auto;background:var(--pan);border-left:1px solid var(--ln)}
-#mid{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}#cvwrap{position:relative;flex:1;min-height:0;background:#0d1320}#cv{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
-#buildbar{display:flex;gap:4px;padding:5px;background:var(--pan);border-top:1px solid var(--ln);overflow-x:auto}
-.bb{display:flex;flex-direction:column;align-items:center;min-width:74px;padding:4px 3px;font-size:10px;line-height:1.15}.bb .ic{font-size:22px}.bb small{color:var(--mut)}.bb.lock{opacity:.45}
-#orders{height:30%;overflow:auto;padding:6px 10px;border-top:1px solid var(--ln);display:block}#orders.hide{display:none}
-h3{font-size:11px;text-transform:uppercase;color:var(--mut);margin:10px 0 5px}.bar{height:7px;background:#0a0e15;border-radius:4px;overflow:hidden;margin:2px 0 6px}.bar i{display:block;height:100%}
-#log div{font-size:12px;padding:3px 0;border-bottom:1px dashed #1f2a3c}.ev{color:var(--warn)}.good{color:var(--ok)}.badc{color:var(--bad)}
-.goal{padding:5px;border:1px solid var(--ln);border-radius:6px;margin:4px 0}.goal.done{border-color:var(--ok)}
-#modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:9}#modal .box{background:var(--pan);border:1px solid var(--ln);border-radius:10px;max-width:1000px;max-height:88vh;overflow:auto;padding:16px 20px}
-table{border-collapse:collapse;width:100%;font-size:12px}td,th{border-bottom:1px solid var(--ln);padding:3px 5px;text-align:left;vertical-align:top}th{color:var(--mut);font-weight:500}
-.tag{font-size:10px;padding:1px 5px;border-radius:8px;white-space:nowrap;font-weight:600}.S{background:#173d2a;color:#7ff0b0}.D{background:#18324f;color:#8cc4ff}.A{background:#4a3410;color:#ffcf7a}.AN{background:#173d2a;color:#7ff0b0}.SP{background:#4a1630;color:#ff9ccc}.MI{background:#3a2a5a;color:#d0b8ff}
-a{color:var(--acc)}#tip{position:absolute;pointer-events:none;background:#000e;border:1px solid var(--ln);padding:6px 8px;border-radius:6px;font-size:12px;display:none;max-width:300px;z-index:5}
-.inv{display:grid;grid-template-columns:1fr auto;gap:1px 8px;font-size:12px}.full{color:var(--ok)}.part{color:var(--warn)}.zero{color:var(--bad)}
-#hud{position:absolute;left:8px;top:8px;background:#000a;border:1px solid var(--ln);border-radius:6px;padding:5px 8px;font-size:11px;color:var(--mut);pointer-events:none}
+:root{--bg:#05080d;--glass:rgba(12,18,30,.72);--glass2:rgba(18,26,42,.82);--ln:rgba(130,170,230,.14);--ln2:rgba(130,170,230,.28);--tx:#e3ecf8;--mut:#7f8ea6;--ok:#4ef0a0;--warn:#ffb547;--bad:#ff5a6a;--acc:#53c6ff;--amb:#ffb547;--r:12px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font:13px/1.4 ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-feature-settings:"tnum" 1;letter-spacing:.005em}
+#cvwrap{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 40%,#0c1422 0%,#05080d 70%)}#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.glass{background:var(--glass);border:1px solid var(--ln);border-radius:var(--r);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);box-shadow:0 10px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.04)}
+header{position:fixed;top:10px;left:10px;right:10px;display:flex;gap:6px;align-items:center;padding:6px 8px 6px 14px;z-index:4;white-space:nowrap}
+.brand{display:flex;flex-direction:column;margin-right:10px;line-height:1.1}.brand b{font-size:14px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;background:linear-gradient(90deg,#fff,#9fd8ff);-webkit-background-clip:text;background-clip:text;color:transparent}.brand small{font-size:10px;color:var(--mut);letter-spacing:.08em}.brand a{color:var(--mut)}
+.stat{display:flex;flex-direction:column;padding:2px 12px;border-left:1px solid var(--ln);min-width:74px}.stat span{font-size:9.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.14em}.stat b{font-size:15px;font-weight:600}
+.stat.hi b{color:var(--acc);text-shadow:0 0 12px rgba(83,198,255,.45)}
+.sp{flex:1}
+button,select,input{font:inherit;color:var(--tx);background:rgba(255,255,255,.04);border:1px solid var(--ln);border-radius:8px;padding:6px 10px;cursor:pointer;transition:.15s}
+button:hover{border-color:var(--ln2);background:rgba(83,198,255,.08)}button:disabled{opacity:.35;cursor:not-allowed}button.sel{border-color:var(--acc);background:rgba(83,198,255,.16);box-shadow:0 0 0 1px rgba(83,198,255,.3),0 0 18px rgba(83,198,255,.25)}
+input{width:62px;cursor:text;background:rgba(0,0,0,.3)}select{background:rgba(0,0,0,.3)}
+.ib{display:inline-flex;align-items:center;gap:6px;font-size:12px}.ib svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+#next{background:linear-gradient(180deg,rgba(78,240,160,.22),rgba(78,240,160,.1));border-color:rgba(78,240,160,.55);color:#d9ffe9;font-weight:600;padding:7px 14px}#next:hover{box-shadow:0 0 22px rgba(78,240,160,.3)}
+#right{position:fixed;top:70px;right:10px;bottom:120px;width:286px;padding:10px 12px;overflow:auto;z-index:3}
+#right::-webkit-scrollbar,#orders::-webkit-scrollbar,#mbox::-webkit-scrollbar{width:6px}#right::-webkit-scrollbar-thumb,#orders::-webkit-scrollbar-thumb,#mbox::-webkit-scrollbar-thumb{background:var(--ln2);border-radius:3px}
+h3{font-size:9.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--mut);margin:14px 0 6px;font-weight:600;display:flex;align-items:center;gap:8px}h3:after{content:"";flex:1;height:1px;background:var(--ln)}h3:first-child{margin-top:2px}
+.bar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin:3px 0 8px}.bar i{display:block;height:100%;border-radius:3px;box-shadow:0 0 10px currentColor}
+.goal{padding:8px 10px;border:1px solid var(--ln);border-radius:10px;margin:5px 0;background:rgba(255,255,255,.02)}.goal.done{border-color:rgba(78,240,160,.5);background:rgba(78,240,160,.06)}.goal small{color:var(--mut)}
+#log div{font-size:11.5px;padding:5px 0;border-bottom:1px solid rgba(130,170,230,.07);color:#b9c6d9}.ev{color:#ffcf85!important}.good{color:#8ff5c3!important}.badc{color:#ff9aa4!important}
+.inv{display:grid;grid-template-columns:1fr auto;gap:3px 10px;font-size:12px;color:#b9c6d9}.inv b{color:var(--tx);font-weight:600}.full{color:var(--ok)}.part{color:var(--warn)}.zero{color:var(--bad)}
+.ico{display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:6px;border-radius:3px}
+#buildbar{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;display:flex;gap:6px;padding:8px;z-index:4;max-width:calc(100vw - 20px);overflow-x:auto;scrollbar-width:none}#buildbar::-webkit-scrollbar{display:none}
+.bb{position:relative;display:flex;flex-direction:column;align-items:center;width:84px;flex:0 0 84px;padding:4px 4px 6px;font-size:10.5px;line-height:1.15;border-radius:10px;background:rgba(255,255,255,.025)}
+.bb img{width:64px;height:50px;image-rendering:auto;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}.bb .nm{font-weight:600;text-align:center;min-height:24px;display:flex;align-items:center}.bb small{color:var(--mut);font-size:9.5px}
+.bb.lock{opacity:.5}.bb.lock img{filter:grayscale(1) brightness(.6)}.bb .tg{position:absolute;top:3px;right:3px;font-size:8px;padding:1px 5px;border-radius:6px;letter-spacing:.06em}.bb.no:not(.lock) .nm{color:#ffb0b8}
+.bb .kbd{position:absolute;top:3px;left:5px;font-size:9px;color:var(--mut)}
+#orders{position:fixed;left:10px;right:306px;bottom:120px;max-height:46vh;overflow:auto;padding:12px 14px;z-index:5}#orders.hide{display:none}
+table{border-collapse:collapse;width:100%;font-size:12px}td,th{border-bottom:1px solid rgba(130,170,230,.08);padding:6px 6px;text-align:left;vertical-align:top}th{color:var(--mut);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.1em}
+.tag{font-size:9px;padding:2px 6px;border-radius:6px;white-space:nowrap;font-weight:700;letter-spacing:.06em}.S,.AN{background:rgba(78,240,160,.14);color:#8ff5c3}.D{background:rgba(83,198,255,.14);color:#9fd8ff}.A{background:rgba(255,181,71,.14);color:#ffcf85}.SP{background:rgba(255,90,170,.14);color:#ff9ccc}.MI{background:rgba(170,130,255,.16);color:#d0b8ff}
+a{color:var(--acc)}
+#tip{position:fixed;pointer-events:none;padding:9px 11px;font-size:12px;display:none;max-width:310px;z-index:8;line-height:1.45}#tip b{font-size:12.5px}
+#hud{position:fixed;left:14px;bottom:128px;font-size:10.5px;color:var(--mut);pointer-events:none;z-index:2;letter-spacing:.04em;opacity:.8}
+#modal{position:fixed;inset:0;background:rgba(2,4,8,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:9}#mbox{max-width:980px;width:calc(100vw - 30px);max-height:86vh;overflow:auto;padding:20px 24px}#mbox h2{margin:0 0 10px;font-size:18px;letter-spacing:.02em}#mbox p,#mbox li{color:#c5d1e2}#mbox li{margin:6px 0}
+#toast{position:fixed;top:74px;left:50%;transform:translateX(-50%);padding:8px 14px;z-index:7;display:none;font-size:12px;color:#ffd0d5;border-color:rgba(255,90,106,.4)}
+#sheetBtn{display:none}
+@media(max-width:1400px){.stat.opt{display:none}}
+@media(max-width:1100px){.ib .lb{display:none}.brand small{display:none}}
+@media(max-width:760px){
+ header{top:6px;left:6px;right:6px;padding:5px 6px 5px 10px;gap:3px;flex-wrap:wrap}.brand{display:none}.stat{padding:1px 7px;min-width:0}.stat b{font-size:13px}.stat span{font-size:8.5px}
+ header .sp{flex-basis:100%;height:0}header button{padding:5px 7px}#next span{display:none}#next{padding:6px 12px}#toast{top:auto;bottom:112px;max-width:90vw;white-space:normal}
+ #right{top:auto;bottom:118px;left:6px;right:6px;width:auto;max-height:46vh;display:none}#right.open{display:block}
+ #sheetBtn{display:inline-flex}#orders{left:6px;right:6px;bottom:118px;max-height:52vh}
+ #buildbar{bottom:6px;left:6px;right:6px;transform:none;max-width:none}.bb{width:72px;flex-basis:72px}.bb img{width:54px;height:42px}.bb small{display:none}
+ #hud{display:none}
+}
 </style></head><body>
-<header><h1>⚡ Colossus Tycoon <small style="color:var(--mut);font-weight:400">v3 <span class="hdsub">· visual factory </span>· <a href="v2/">v2</a> · <a href="v1/">v1</a></small></h1>
+<div id="cvwrap"><canvas id="cv"></canvas></div>
+<header class="glass"><div class="brand"><b>Colossus Tycoon</b><small>PLAY AS ELON · OCT 2026 · <a href="v2/">v2</a> · <a href="v1/">v1</a></small></div>
 <div class="stat"><span>Quarter</span><b id="sQ"></b></div><div class="stat"><span>Cash</span><b id="sCash"></b></div>
-<div class="stat"><span>Compute online</span><b id="sGW"></b></div><div class="stat"><span>Power</span><b id="sPow"></b></div>
-<div class="stat"><span>GPUs (est.)</span><b id="sGPU"></b></div>
-<div style="flex:1"></div><button id="ordBtn">📋 Order books</button><button id="srcBtn">📚 Sources</button><button id="techBtn">🧬 Tech</button><button id="empBtn">🏛 Empire</button><button id="fitBtn" title="Fit map (R)">🔍 Fit</button><button id="helpBtn">❓ Help</button><button id="next">End quarter ▶</button></header>
-<main><div id="mid"><div id="cvwrap"><canvas id="cv"></canvas><div id="hud">🖱 drag = pan · wheel = zoom · click = place · right-click/Esc = cancel · WASD/arrows = pan · R = fit</div><div id="tip"></div></div><div id="buildbar"></div><div id="orders"></div></div>
-<div id="right"><h3>Goals</h3><div id="goals"></div><h3>Bottlenecks</h3><div id="bn"></div><h3>Yard (delivered, not installed)</h3><div id="inv" class="inv"></div><h3>Inbound orders</h3><div id="pipe" style="font-size:12px"></div><h3>Actions</h3><div id="acts"></div><h3>News feed</h3><div id="log"></div></div></main>
-<div id="modal"><div class="box" id="mbox"></div></div>
+<div class="stat hi"><span>Compute</span><b id="sGW"></b></div><div class="stat"><span>Power</span><b id="sPow"></b></div>
+<div class="stat opt"><span>GPUs</span><b id="sGPU"></b></div>
+<div class="sp"></div>
+<button id="ordBtn" class="ib" title="Order books"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span class="lb">Orders</span></button>
+<button id="techBtn" class="ib" title="Tech tree"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M7.5 8l3.5 8M16.5 8L13 16M8.5 6h7"/></svg><span class="lb">Tech</span></button>
+<button id="srcBtn" class="ib" title="Sources"><svg viewBox="0 0 24 24"><path d="M4 5c3-1 5-1 8 1 3-2 5-2 8-1v14c-3-1-5-1-8 1-3-2-5-2-8-1z"/><path d="M12 6v14"/></svg><span class="lb">Sources</span></button>
+<button id="empBtn" class="ib" title="Empire"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V10l7-5 7 5v10M9 20v-6h6v6"/></svg><span class="lb">Empire</span></button>
+<button id="fitBtn" class="ib" title="Fit map (R)"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+<button id="sheetBtn" class="ib" title="Status"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button>
+<button id="helpBtn" class="ib" title="How to play"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"/></svg></button>
+<button id="next" class="ib"><svg viewBox="0 0 24 24"><path d="M6 5l10 7-10 7zM18 5v14"/></svg><span>End quarter</span></button></header>
+<div id="hud">DRAG pan · WHEEL / PINCH zoom · CLICK place · RIGHT-CLICK / ESC cancel · WASD pan · R fit</div>
+<div id="right" class="glass"><h3>Goals</h3><div id="goals"></div><h3>Bottlenecks</h3><div id="bn"></div><h3>Actions</h3><div id="acts"></div><h3>Yard</h3><div id="inv" class="inv"></div><h3>Inbound</h3><div id="pipe" style="font-size:11.5px;color:#b9c6d9"></div><h3>News</h3><div id="log"></div></div>
+<div id="orders" class="glass hide"></div>
+<div id="buildbar" class="glass"></div>
+<div id="tip" class="glass"></div><div id="toast" class="glass"></div>
+<div id="modal"><div class="glass" id="mbox"></div></div>
 <script>
 // ============ SOURCES: S = sourced, D = derived (our arithmetic), A = game-balance assumption (not a fact) ============
 const SPCX='Motley Fool transcript, SpaceX (SPCX) Q3 2026 call, 20 Oct 2026';
@@ -108,7 +147,8 @@ const B={
  sth:{n:'Southaven turbine plant',ic:'🔥',hide:1,c:0,lead:0,pow:1200,needBlades:41,col:'#ff8a3d',d:'41 permitted turbines ≈1.2 GW; waiting for 41 blade sets'},
 };
 const TECH=[
- {id:'casting',n:'Own blade & vane casting shop',lab:'AN',c:4,t:1,fx:'+150 blade sets/qtr from your own shop. Musk: "we\'re casting the blades and vanes"'},
+ {id:'casting',n:'Foundry ramp acceleration (automation + Optimus)',lab:'SP',c:4,t:1,fx:'Bastrop jumps to full output (60 sets/qtr) and every other casting shop casts +10 sets/qtr. Effect sizes are game assumptions'},
+ {id:'alloy',n:'Superalloy & ceramic-core supply deal',lab:'SP',c:3,t:1,fx:'Secures nickel superalloy and ceramic cores: all your casting shops cast 40% more and ignore the superalloy-shortage event (which otherwise cuts own-shop output 30%). Game assumption'},
  {id:'mega',n:'Tesla Megapack priority',lab:'SP',c:1,t:1,fx:'Your Megapack share rises from 25% to 60% of Tesla\'s 110 GWh/yr. The capacity is sourced; the priority deal is speculative'},
  {id:'optimus',n:'Optimus robots as builders',lab:'SP',c:3,t:2,fx:'Shells and solar farms build 1 quarter faster. Optimus production began in Fremont, but this use is speculative'},
  {id:'ownchip',n:'Own AI chip (AI5/AI6/Dojo-class) on TSMC',lab:'SP',c:6,t:2,fx:'Opens the TSMC and HBM order books. A chip arrives once both TSMC and HBM deliver ($16bn + $2bn per GW)'},
@@ -118,7 +158,9 @@ const TECH=[
  {id:'orbital',n:'Orbital compute',lab:'SP',c:15,t:3,req:'starship',fx:'Launch 100 MW batches ($3bn + 0.1 GW GPUs), solar-powered in orbit, max 4/qtr. Speculative'},
 ];
 // ============ v3 additions: map buildings (all sizes, rates and new building effects are GAME ASSUMPTIONS) ============
-SRC.push(['A','v3 map buildings: casting shop +50 blade sets/qtr each (3 shops = the v2 tech\'s 150); turbine assembly hall assembles up to 1 GW of turbine plants per quarter; inference box factory up to 2 fleets/qtr; Starship pad up to 2 orbital batches/qtr; building costs, footprints and lead times','Game balance (v3), not sourced']);
+SRC.push(['S','SpaceX is building a blades-and-vanes investment-casting foundry in Bastrop, TX (nickel-superalloy, equiaxed / DS / single-crystal); Musk on X: in-house casting can "accelerate nat gas turbines coming online by up to 18 months". Reported as a $280M project. Caveat: the Texas Governor\'s release attaches "more than $280 million" to SpaceX\'s Bastrop semiconductor/advanced-packaging expansion, so the $280M attribution to the foundry is disputed. No output figure published','TechCrunch, 30 Aug 2026; Foundry Management & Technology editor\'s note, Sep 2026 ($280M, citing Texas economic-development records); WSJ, Aug 2026; Office of the Texas Governor (TSIF grant release)']);
+SRC.push(['A','v3c: Bastrop foundry exists at start and ramps 0 → 20 → 40 → 60 blade sets/qtr (Q4 2026 → Q3 2027); extra casting shops need no research, cost $1.3bn, build in 2 qtrs, 50 sets/qtr; casting tech now = ramp acceleration (+full Bastrop, +10/shop) and superalloy deal (+40%, immune to shortage)','Game balance (v3c), not sourced']);
+SRC.push(['A','v3 map buildings: casting shop 50 blade sets/qtr each; turbine assembly hall assembles up to 1 GW of turbine plants per quarter; inference box factory up to 2 fleets/qtr; Starship pad up to 2 orbital batches/qtr; building costs, footprints and lead times','Game balance (v3), not sourced']);
 SRC.push(['A','v3b tuning (bot playtests showed a sensible strategy topped out near 6 GW by end-2027 once boxes needed power): (1) inference boxes must carry their own power: gas genset (0.1 GW cores + 3 blade sets + 0.4 GWh Megapack) or solar+storage (1.9 GWh Megapack), $1.5bn (was 0.4 GWh, $1bn, no power); (2) pre-booked turbine slots: 1.25 GW of cores per quarter arrive Q1–Q4 2027, paid at $1.5bn/GW, standing in for orders placed before Oct 2026 behind the sourced +20 GW 2027 power plan; (3) aero/industrial turbine share open to you 50% (was 35%); (4) casting-shop tech takes 1 quarter (was 2); (5) map enlarged to 64×40. No sourced or derived number was changed. Result: best bot strategy reaches 12.7–13.2 GW by end-2027 (wins on 4 of 5 event seeds, incl. the default; the miss ends at 12.7 GW)','Game balance (v3b), not sourced']);
 SRC.push(['A','One turbine assembly hall is pre-placed next to Southaven; supplier "import docks" on the map edge are a visual stand-in for the order books','Game design (v3)']);
 Object.assign(B.shell,{sz:[3,3],ins:[]});Object.assign(B.cool,{sz:[2,2],ins:['cdu']});Object.assign(B.hall,{n:'Data center hall (racks)',sz:[2,2],ins:['gpu']});
@@ -126,7 +168,10 @@ Object.assign(B.turb,{n:'Gas turbine power plant',sz:[3,2],ins:['turbine'],d:'29
 Object.assign(B.sub,{n:'Transformer yard / substation',sz:[2,2],ins:['xf']});Object.assign(B.solar,{sz:[3,3],ins:['mega']});
 Object.assign(B.col,{sz:[5,4],ins:['gpu']});Object.assign(B.sth,{sz:[4,3],ins:['blade']});
 B.asm={n:'Turbine assembly hall',ic:'⚙️',c:.5,lead:1,sz:[3,2],ins:['core','blade'],col:'#e0a060',d:'Joins turbine cores with blade & vane sets. Assembles up to 1 GW of turbine plants per quarter (assumption)'};
-B.cast={n:'Blade & vane casting shop',ic:'🪶',c:1.3,lead:1,sz:[3,2],ins:[],tech:'casting',col:'#d9b38c',d:'In-house single-crystal casting: +50 blade sets/qtr (assumption). Musk: "we\'re casting the blades and vanes"'};
+B.cast={n:'Blade & vane casting shop',ic:'🪶',c:1.3,lead:2,sz:[3,2],ins:[],col:'#d9b38c',d:'Another in-house investment-casting line, like Bastrop: 50 blade sets/qtr once running (assumption). Musk: "we\'re casting the blades and vanes"'};
+const BASTROP_D='SpaceX\'s blades-and-vanes foundry in Bastrop, TX (Musk confirmed it on X, 29 Aug 2026). Already exists at game start, ramping. Ramp: 0 sets in Q4 2026, 20 in Q1 2027, 40 in Q2 2027, 60/qtr from Q3 2027 (game assumption; no output has been published).';
+const BRAMP=[0,20,40,60]; // game assumption: Bastrop sets/qtr by quarter index
+function castOut(b){if(b.left>0)return 0;let o=b.bastrop?(has('casting')?BRAMP[3]:BRAMP[Math.min(S.q,3)]):50;if(has('casting')&&!b.bastrop)o+=10;if(has('alloy'))o*=1.4;else if(S.castSlip)o*=.7;return Math.round(o)}
 B.boxfab={n:'Inference box factory',ic:'📦',c:2,lead:1,sz:[3,2],ins:['gpu','mega'],tech:'boxes',col:'#b48cff',d:'Builds modular inference boxes with power + cooling built in. Up to 2 fleets/qtr (100 MW each). Musk idea, no product announced'};
 B.pad={n:'Starship launch pad',ic:'🚀',c:2,lead:1,sz:[3,3],ins:['gpu'],tech:'orbital',col:'#ff9ccc',d:'Launches 100 MW orbital compute batches, up to 2/qtr per pad. Speculative'};
 const LABN={AN:'ANNOUNCED',SP:'SPECULATIVE',MI:'MUSK IDEA (quoted)'};
@@ -155,7 +200,7 @@ let S;
 function rnd(){S.seed=(S.seed*1103515245+12345)&0x7fffffff;return S.seed/0x7fffffff}
 function newGame(){S={q:0,cash:77.5,blds:[],tool:null,inv:{gpu:0,chip:0,hbm:0,core:0,blade:0,xf:0,cdu:0,mega:0},pipe:[],req:{},pri:{},book:null,tech:{},res:{},
  log:[],won:null,over:false,seed:20261020,mod:{cowos:1,hbm:1},raised:false,boxes:0,orbital:0,orbQ:0,boxQ:0,asmUsed:0,g1:null,lastDel:{}};
- S.blds.push({t:'col',x:8,y:4,left:0});S.blds.push({t:'sth',x:8,y:12,left:0,bl:0});S.blds.push({t:'asm',x:5,y:16,left:0});
+ S.blds.push({t:'col',x:8,y:4,left:0});S.blds.push({t:'sth',x:8,y:12,left:0,bl:0});S.blds.push({t:'asm',x:5,y:16,left:0});S.blds.push({t:'cast',x:5,y:21,left:0,bastrop:1,fixed:1});
  S.pipe.push({it:'blade',qty:41,q:2,from:'OEM blades for Southaven'});
  for(let q=1;q<=4;q++)S.pipe.push({it:'core',qty:BACKLOG,q,from:'Pre-booked turbine slots (assumption)',cost:BACKLOG*1.5});
  addLog('Oct 2026. You run SpaceX/xAI with ~2.2 GW of compute online. The plan is 13 GW by end-2027.','good');
@@ -193,7 +238,7 @@ function resolveOrders(){const book=[];
   book.push({s,open,tot,reqs,got,me,blocked:S.cash<-60&&me>0})});
  S.book=book;S.lastQ=S.q}
 function endQuarter(){if(S.over)return;resolveOrders();
- const nCast=live('cast').length;if(nCast)S.inv.blade+=50*nCast;S.inv.mega+=27.5*(has('mega')?.6:.25);if(has('terafab')&&S.q>=7)S.inv.chip+=1;
+ live('cast').forEach(b=>{S.inv.blade+=castOut(b)});S.inv.mega+=27.5*(has('mega')?.6:.25);if(has('terafab')&&S.q>=7)S.inv.chip+=1;
  S.blds.forEach(b=>{if(b.left>0)b.left--});
  for(const t in S.res){S.res[t]--;if(S.res[t]<=0){S.tech[t]=true;delete S.res[t];addLog('🧬 Tech done: '+TECH.find(x=>x.id===t).n,'good')}}
  S.q++;S.lastDel={};
@@ -209,7 +254,7 @@ function endQuarter(){if(S.over)return;resolveOrders();
  if(S.q>=QS.length){S.q=QS.length-1;S.over=true;refresh();return end(!!S.won)}
  events();refresh()}
 function events(){const r=rnd();let e;
- if(r<.13){S.castSlip=true;e='Casting shops report a nickel-superalloy shortage: Howmet/PCC orders placed this quarter take 1 more quarter.'}
+ if(r<.13){S.castSlip=true;e='Casting shops report a nickel-superalloy shortage: Howmet/PCC orders placed this quarter take 1 more quarter, and your own shops cast 30% less this quarter unless you hold the superalloy deal.'}
  else if(r<.25){S.mod.cowos=.85;e='A CoWoS-L yield problem at TSMC cuts this quarter\'s CoWoS by 15%, so NVIDIA ships less.'}
  else if(r<.36){S.mod.hbm=.85;e='HBM4 qualification slips at one vendor, cutting HBM supply by 15%.'}
  else if(r<.47){S.mod.r=1.3;e='Microsoft and OpenAI announce new gigawatt deals: rivals ask for 30% more from every supplier this quarter.'}
@@ -242,7 +287,7 @@ function bThru(b,st){const d=B[b.t];if(b.left>0)return'⏳ '+b.left+'q';
  if(b.t==='sth')return b.bl<41?`blades ${b.bl}/41`:'1.2 GW';if(b.t==='col')return'2.2 GW';
  if(b.t==='hall')return Math.round(500*Math.min(1,st.site/Math.max(st.mw,1)))+'/500 MW';
  if(b.t==='turb')return'290 MW';if(b.t==='sub')return'1 GW';if(b.t==='solar')return'150 MW firm';if(b.t==='shell')return'500 MW space';if(b.t==='cool')return'500 MW cool';
- if(b.t==='asm')return`${Math.round(Math.max(0,1000-S.asmUsed/Math.max(1,live('asm').length)))} MW free/q`;if(b.t==='cast')return'+50 sets/q';
+ if(b.t==='asm')return`${Math.round(Math.max(0,1000-S.asmUsed/Math.max(1,live('asm').length)))} MW free/q`;if(b.t==='cast')return(b.bastrop?'ramping · ':'')+castOut(b)+' sets/q';
  if(b.t==='boxfab')return`${S.boxQ}/${2*live('boxfab').length} fleets/q`;if(b.t==='pad')return`${S.orbQ} launched/q`;return''}
 // ============ BELTS / LINES (auto-routed) ============
 const ctr=b=>{const[w,h]=B[b.t].sz;return[b.x+w/2,b.y+h/2]};
@@ -269,96 +314,251 @@ function links(st){const L=[];
  srcs.forEach(p=>{const h=nearest(S.blds.filter(b=>B[b.t].mw),ctr(p));if(h&&h!==p)L.push({k:'power',a:ctr(p),b:ctr(h),ok:st.pow>=st.mw,on:true})});
  const cools=S.blds.filter(b=>B[b.t].cool&&b.t==='cool');S.blds.filter(b=>b.t==='hall').forEach(b=>{if(!cools.length)return;const c=nearest(cools,ctr(b));L.push({k:'pipe',a:ctr(c),b:ctr(b),ok:st.cool>=st.mw})});
  return L}
-// ============ RENDER ============
-const cv=document.getElementById('cv'),cx=cv.getContext('2d'),wrap=document.getElementById('cvwrap');let tick=0,hov=null,fx=[];
-const cam={x:-20,y:-10,z:1};
-function resize(){const r=wrap.getBoundingClientRect(),dp=window.devicePixelRatio||1;cv.width=Math.max(10,r.width*dp);cv.height=Math.max(10,r.height*dp);cx.setTransform(dp,0,0,dp,0,0)}
+// ============ RENDER (v3c: isometric 2.5D, procedural art, no external assets) ============
+const cv=document.getElementById('cv'),cx=cv.getContext('2d'),wrap=document.getElementById('cvwrap');let g=cx,tick=0,hov=null,fx=[],VW=1,VH=1,DP=1;
+const TW=64,TH=32,MOB=matchMedia('(max-width:760px)').matches||('ontouchstart' in window&&innerWidth<900);
+const cam={x:0,y:600,z:.5},tcam={x:0,y:600,z:.5};
+function resize(){const r=wrap.getBoundingClientRect();DP=Math.min(window.devicePixelRatio||1,MOB?2:2);VW=r.width;VH=r.height;cv.width=Math.max(10,VW*DP);cv.height=Math.max(10,VH*DP)}
 window.addEventListener('resize',resize);
-const w2s=(x,y)=>[(x*TS-cam.x)*cam.z,(y*TS-cam.y)*cam.z];
-const s2w=(sx,sy)=>[(sx/cam.z+cam.x)/TS,(sy/cam.z+cam.y)/TS];
+const P=(x,y,h=0)=>[(x-y)*TW/2,(x+y)*TH/2-h];
+const w2s=(x,y,h=0)=>{const[X,Y]=P(x,y,h);return[(X-cam.x)*cam.z+VW/2,(Y-cam.y)*cam.z+VH/2]};
+function s2w(sx,sy,c=cam){const X=(sx-VW/2)/c.z+c.x,Y=(sy-VH/2)/c.z+c.y;return[(X/(TW/2)+Y/(TH/2))/2,(Y/(TH/2)-X/(TW/2))/2]}
 function pathLen(p){let l=0;for(let i=1;i<p.length;i++)l+=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]);return l}
 function along(p,t){let l=pathLen(p)*t;for(let i=1;i<p.length;i++){const s=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]);if(l<=s||i===p.length-1){const f=s?Math.min(1,l/s):0;return[p[i-1][0]+(p[i][0]-p[i-1][0])*f,p[i-1][1]+(p[i][1]-p[i-1][1])*f]}l-=s}return p[p.length-1]}
-function rr(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath()}
-function draw(){tick++;const r=wrap.getBoundingClientRect();const dp=devicePixelRatio||1;if(Math.abs(cv.width-r.width*dp)>2||Math.abs(cv.height-r.height*dp)>2)resize();cx.save();cx.setTransform(1,0,0,1,0,0);cx.clearRect(0,0,cv.width,cv.height);cx.restore();
- const z=cam.z;cx.fillStyle='#0a0f18';cx.fillRect(0,0,r.width,r.height);
- // ground
- const[g0x,g0y]=w2s(0,0);cx.fillStyle='#14201a';cx.fillRect(g0x,g0y,W*TS*z,H*TS*z);
- const[bx0,by0]=w2s(4,3);cx.fillStyle='#172619';cx.fillRect(bx0,by0,(W-8)*TS*z,(H-4)*TS*z);
- cx.strokeStyle='#1e2f22';cx.lineWidth=1;cx.beginPath();for(let x=0;x<=W;x++){const[a,b]=w2s(x,0);cx.moveTo(a,b);cx.lineTo(a,b+H*TS*z)}for(let y=0;y<=H;y++){const[a,b]=w2s(0,y);cx.moveTo(a,b);cx.lineTo(a+W*TS*z,b)}cx.stroke();
- cx.fillStyle='#5f7a66';cx.font=`bold ${Math.max(9,12*z)}px system-ui`;cx.textAlign='left';const[lx,ly]=w2s(4.2,2.6);cx.fillText('MEMPHIS / SOUTHAVEN SITE: buildable area',lx,ly);
- const st=stats();const L=links(st);
- // pipes & power under belts
- L.filter(l=>l.k==='pipe').forEach(l=>{const[a,b]=w2s(...l.a),[c,d]=w2s(...l.b);cx.strokeStyle=l.ok?'#2a7f9a':'#a33';cx.lineWidth=3*z;cx.setLineDash([]);cx.beginPath();cx.moveTo(a,b);cx.lineTo(a,d);cx.lineTo(c,d);cx.stroke()});
- // belts
- L.filter(l=>l.k==='belt').forEach(l=>{const p=l.pts.map(q=>w2s(...q));cx.lineJoin='round';
-  cx.strokeStyle=l.stall?'#4a1a20':'#2b3342';cx.lineWidth=9*z;cx.beginPath();p.forEach((q,i)=>i?cx.lineTo(...q):cx.moveTo(...q));cx.stroke();
-  cx.strokeStyle=l.stall?'#ff4d5e88':'#4b5568';cx.lineWidth=1.2;cx.setLineDash([4*z,4*z]);cx.lineDashOffset=l.flow?-tick*.6*z:0;cx.beginPath();p.forEach((q,i)=>i?cx.lineTo(...q):cx.moveTo(...q));cx.stroke();cx.setLineDash([]);
-  const len=pathLen(l.pts);const n=Math.max(2,Math.floor(len/1.3));
-  for(let k=0;k<n;k++){const t=l.flow?((tick/(60*len/2))+k/n)%1:(k/n);if(!l.flow&&!l.stall)continue;const[wx,wy]=along(l.pts,t);const[sx,sy]=w2s(wx,wy);
-   if(l.stall&&k%3)continue;cx.fillStyle=ITC[l.it]||'#fff';if(z>1.25){cx.font=`${10*z}px serif`;cx.textAlign='center';cx.fillText(ITI[l.it],sx,sy+3.5*z)}else{cx.fillRect(sx-3*z,sy-3*z,6*z,6*z)}}});
- // power lines with sparks
- L.filter(l=>l.k==='power').forEach(l=>{const[a,b]=w2s(...l.a),[c,d]=w2s(...l.b);cx.strokeStyle=l.ok?'#e8c23a':'#ff4d5e';cx.lineWidth=2*z;cx.setLineDash([6*z,3*z]);cx.lineDashOffset=-tick*z;cx.beginPath();cx.moveTo(a,b);cx.lineTo(c,d);cx.stroke();cx.setLineDash([]);
-  if(l.on){for(let k=0;k<3;k++){const f=((tick/90)+k/3)%1;cx.fillStyle=l.ok?'#fff3a0':'#ff8890';cx.beginPath();cx.arc(a+(c-a)*f,b+(d-b)*f,2.6*z,0,7);cx.fill()}
-   if(z>1.1){cx.fillStyle='#fff3a0';cx.font=`${8*z}px system-ui`;cx.textAlign='center';cx.fillText('MW',(a+c)/2,(b+d)/2-3*z)}}});
+function rr(x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+// ---- colour helpers ----
+const hx=c=>{c=c.replace('#','');return[parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)]};
+let LIGHT=1,TINT=[0,0,0];
+function sh(c,f,a=1){const[r,gg,b]=typeof c==='string'?hx(c):c;const k=f*LIGHT;return`rgba(${Math.min(255,r*k+TINT[0])|0},${Math.min(255,gg*k+TINT[1])|0},${Math.min(255,b*k+TINT[2])|0},${a})`}
+// ---- primitives (in iso pixel space) ----
+function poly(pts,fill,stroke,lw){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();if(fill){g.fillStyle=fill;g.fill()}if(stroke){g.strokeStyle=stroke;g.lineWidth=lw||1;g.stroke()}}
+function prism(x,y,w,h,z0,z1,col,o={}){const a=P(x,y,z1),b=P(x+w,y,z1),c=P(x+w,y+h,z1),d=P(x,y+h,z1),c0=P(x+w,y+h,z0),d0=P(x,y+h,z0),b0=P(x+w,y,z0);
+ poly([d,c,c0,d0],sh(col,o.l??.5));poly([b,c,c0,b0],sh(col,o.r??.72));poly([a,b,c,d],sh(col,o.t??1));
+ if(o.edge!==false){g.strokeStyle=`rgba(255,255,255,${.07*LIGHT+.02})`;g.lineWidth=1;g.beginPath();g.moveTo(...d);g.lineTo(...c);g.lineTo(...b);g.moveTo(...c);g.lineTo(...c0);g.stroke()}
+ return{a,b,c,d,c0,d0,b0}}
+// draw rect on the front (y+h) face: u along x [0..w], v height
+function faceL(x,y,w,h,u0,u1,z0,z1,fill){poly([P(x+u0,y+h,z1),P(x+u1,y+h,z1),P(x+u1,y+h,z0),P(x+u0,y+h,z0)],fill)}
+function faceR(x,y,w,h,u0,u1,z0,z1,fill){poly([P(x+w,y+u0,z1),P(x+w,y+u1,z1),P(x+w,y+u1,z0),P(x+w,y+u0,z0)],fill)}
+function cyl(x,y,r,z0,z1,col,topCol){const[X,Y0]=P(x,y,z0),[,Y1]=P(x,y,z1);const rx=r*TW*.7,ry=r*TH*.7;
+ const gr=g.createLinearGradient(X-rx,0,X+rx,0);gr.addColorStop(0,sh(col,.45));gr.addColorStop(.6,sh(col,.95));gr.addColorStop(1,sh(col,.6));
+ g.fillStyle=gr;g.beginPath();g.ellipse(X,Y0,rx,ry,0,0,Math.PI);g.lineTo(X-rx,Y1);g.ellipse(X,Y1,rx,ry,0,Math.PI,0,true);g.closePath();g.fill();
+ g.fillStyle=topCol||sh(col,.3);g.beginPath();g.ellipse(X,Y1,rx,ry,0,0,7);g.fill();return[X,Y1]}
+function tower(x,y,r,hgt,col){// hyperboloid cooling tower
+ const[X,Y0]=P(x,y,0),[,Y1]=P(x,y,hgt);const rb=r*TW*.72,rt=rb*.62,rw=rb*.55,ry=.5;
+ const gr=g.createLinearGradient(X-rb,0,X+rb,0);gr.addColorStop(0,sh(col,.42));gr.addColorStop(.55,sh(col,.95));gr.addColorStop(1,sh(col,.55));g.fillStyle=gr;
+ g.beginPath();g.moveTo(X-rb,Y0);g.quadraticCurveTo(X-rw*.9,(Y0+Y1)/2+hgt*.1,X-rt,Y1);g.lineTo(X+rt,Y1);g.quadraticCurveTo(X+rw*.9,(Y0+Y1)/2+hgt*.1,X+rb,Y0);g.ellipse(X,Y0,rb,rb*ry,0,0,Math.PI);g.closePath();g.fill();
+ g.fillStyle=sh('#1a2230',.8);g.beginPath();g.ellipse(X,Y1,rt,rt*ry,0,0,7);g.fill();g.strokeStyle=sh(col,1.1);g.lineWidth=1.2;g.stroke();return[X,Y1]}
+// ---- particles ----
+let parts=[];const PMAX=MOB?160:420;
+function emit(k,X,Y,n=1){for(let i=0;i<n&&parts.length<PMAX;i++){const p={k,x:X+(Math.random()-.5)*4,y:Y,vx:(Math.random()-.5)*.25,vy:-.35-Math.random()*.3,l:0,m:k==='spark'?30+Math.random()*20:90+Math.random()*60,s:k==='spark'?1.2:3+Math.random()*2};
+ if(k==='spark'){p.vx=(Math.random()-.5)*1.6;p.vy=-1-Math.random()*1.4}parts.push(p)}}
+function drawParts(){g.save();parts=parts.filter(p=>{p.l++;p.x+=p.vx+(p.k!=='spark'?.12:0);p.y+=p.vy;if(p.k==='spark')p.vy+=.06;else p.vy*=.995;const f=p.l/p.m;if(f>=1)return false;
+  if(p.k==='spark'){g.globalCompositeOperation='lighter';g.fillStyle=`rgba(255,${170-80*f|0},60,${1-f})`;g.fillRect(p.x,p.y,p.s*1.6,p.s*1.6)}
+  else{g.globalCompositeOperation='source-over';const r=p.s+f*(p.k==='steam'?16:12);const a=(p.k==='steam'?.22:.2)*(1-f)*(f<.1?f*10:1);g.fillStyle=p.k==='steam'?`rgba(225,235,245,${a})`:`rgba(110,110,120,${a})`;g.beginPath();g.arc(p.x,p.y,r,0,7);g.fill()}return true});g.restore()}
+// ---- item sprites (procedural glowing icons) ----
+const SPR={};
+function mkSprite(it){const c=document.createElement('canvas');c.width=c.height=32;const q=c.getContext('2d');const col=ITC[it]||'#fff';
+ const gl=q.createRadialGradient(16,16,1,16,16,15);gl.addColorStop(0,col+'aa');gl.addColorStop(.4,col+'33');gl.addColorStop(1,col+'00');q.fillStyle=gl;q.fillRect(0,0,32,32);
+ q.fillStyle=col;q.strokeStyle='#0b1018';q.lineWidth=1;q.save();q.translate(16,16);
+ const R=(x,y,w,h)=>{q.fillRect(x,y,w,h);q.strokeRect(x,y,w,h)};
+ if(it==='gpu'){R(-6,-4,12,8);q.fillStyle='#0b1018';q.fillRect(-3,-2,6,4)}
+ else if(it==='chip'){R(-4,-4,8,8);q.fillStyle='#0b1018';for(let i=-3;i<=3;i+=3){q.fillRect(-6,i-.5,2,1);q.fillRect(4,i-.5,2,1)}}
+ else if(it==='hbm'){for(let i=0;i<4;i++)R(-5,-5+i*2.6,10,2)}
+ else if(it==='core'){q.beginPath();q.arc(0,0,5.5,0,7);q.fill();q.fillStyle='#0b1018';q.beginPath();q.arc(0,0,2.5,0,7);q.fill()}
+ else if(it==='blade'){q.beginPath();q.moveTo(-5,5);q.quadraticCurveTo(-4,-4,5,-6);q.quadraticCurveTo(0,-1,-2,6);q.closePath();q.fill();q.stroke()}
+ else if(it==='xf'){R(-5,-4,10,8);q.fillStyle='#0b1018';q.fillRect(-5,-1,10,1);q.fillRect(-2,-6,1,2);q.fillRect(1,-6,1,2)}
+ else if(it==='cdu'){q.lineWidth=2;q.strokeStyle=col;for(let a=0;a<3;a++){q.rotate(Math.PI/3);q.beginPath();q.moveTo(-6,0);q.lineTo(6,0);q.stroke()}}
+ else if(it==='mega'){R(-6,-3.5,12,7);q.fillStyle='#0b1018';q.fillRect(-4,-1,3,2);q.fillRect(1,-1,3,2)}
+ else if(it==='turbine'){q.beginPath();for(let a=0;a<8;a++){const t=a/8*Math.PI*2;q.lineTo(Math.cos(t)*6,Math.sin(t)*6);q.lineTo(Math.cos(t+.3)*3,Math.sin(t+.3)*3)}q.closePath();q.fill()}
+ else if(it==='box'){R(-5,-5,10,10);q.fillStyle='#fff8';q.fillRect(-5,-1,10,1)}
+ else{q.beginPath();q.arc(0,0,4,0,7);q.fill()}q.restore();return c}
+const spr=it=>SPR[it]||(SPR[it]=mkSprite(it));
+// ---- terrain ----
+let TEX=null;function mkTex(){const c=document.createElement('canvas');c.width=c.height=256;const q=c.getContext('2d');q.fillStyle='#18212a';q.fillRect(0,0,256,256);
+ let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;for(let i=0;i<2600;i++){const a=r()*.07;q.fillStyle=r()<.5?`rgba(255,255,255,${a*.6})`:`rgba(0,0,0,${a*2})`;const z=r()*3+.5;q.fillRect(r()*256,r()*256,z,z)}
+ for(let i=0;i<40;i++){q.fillStyle=`rgba(${r()<.5?'40,60,45':'50,45,40'},${.12+r()*.1})`;q.beginPath();q.ellipse(r()*256,r()*256,10+r()*40,6+r()*20,r()*3,0,7);q.fill()}return c}
+let DECO=null;function mkDeco(){let s=11;const r=()=>(s=(s*16807)%2147483647)/2147483647;const a=[];for(let i=0;i<520;i++){const x=r()*W,y=r()*H;a.push({x,y,k:r()<.7?0:1,s:.5+r()*.8,c:r()})}return a}
+function occ(x,y){return S.blds.some(b=>{const[w,h]=B[b.t].sz;return x>=b.x-.2&&x<b.x+w+.2&&y>=b.y-.2&&y<b.y+h+.2})||(x<3.8)}
+function drawDeco(){if(!DECO)DECO=mkDeco();if(cam.z<.28)return;DECO.forEach(d=>{if(occ(d.x,d.y))return;const[X,Y]=P(d.x,d.y);if(d.k===0){g.fillStyle=sh(d.c<.5?'#22302a':'#2b3a2f',1);g.beginPath();g.ellipse(X,Y,5*d.s,2.6*d.s,0,0,7);g.fill();g.fillStyle=sh('#3c5040',1);g.beginPath();g.ellipse(X-1,Y-2*d.s,3.4*d.s,1.8*d.s,0,0,7);g.fill()}else{prism(d.x,d.y,.12*d.s,.1*d.s,0,4*d.s,'#4a4f55',{edge:false})}})}
+function drawTerrain(){if(!TEX)TEX=mkTex();const pat=g.createPattern(TEX,'repeat');
+ const c4=[P(0,0),P(W,0),P(W,H),P(0,H)];poly(c4,'#141c24');g.save();g.globalAlpha=.8;poly(c4,pat);g.restore();
+ // edge cliff
+ const d=18;poly([P(0,H),P(W,H),[P(W,H)[0],P(W,H)[1]+d],[P(0,H)[0],P(0,H)[1]+d]],sh('#141b24',.7));poly([P(W,0),P(W,H),[P(W,H)[0],P(W,H)[1]+d],[P(W,0)[0],P(W,0)[1]+d]],sh('#141b24',1));
+ // buildable zone plate
+ poly([P(4,3),P(W-4,3),P(W-4,H-1),P(4,H-1)],`rgba(60,110,150,${.05+.04*LIGHT})`,`rgba(110,180,230,.18)`,1.2);
+ if(cam.z>.25){g.strokeStyle=`rgba(140,190,240,${Math.min(.09,.15*(cam.z-.22))})`;g.lineWidth=1;g.beginPath();for(let x=4;x<=W-4;x++){g.moveTo(...P(x,3));g.lineTo(...P(x,H-1))}for(let y=3;y<=H-1;y++){g.moveTo(...P(4,y));g.lineTo(...P(W-4,y))}g.stroke()}
+ // service road along the dock edge
+ poly([P(3,3),P(3.7,3),P(3.7,H-1),P(3,H-1)],sh('#2a323c',1));g.strokeStyle='rgba(255,210,120,.18)';g.setLineDash([6,8]);g.lineWidth=1;g.beginPath();g.moveTo(...P(3.35,3));g.lineTo(...P(3.35,H-1));g.stroke();g.setLineDash([]);drawDeco()}
+// ---- building art ----
+function bDraw(b,s8,st,ghost){const d=B[b.t];const[w,h]=d.sz;const x=b.x+.12,y=b.y+.12,W2=w-.24,H2=h-.24;const T=tick,bt=b.t,on=s8==='ok'||s8==='backed';
+ const build=b.left>0&&!ghost;const prog=build?Math.max(.25,1-b.left/Math.max(1,d.lead+1)):1;const cx0=b.x+w/2,cy0=b.y+h/2;const ph=(b.x*7+b.y*13)%100;
+ // foundation pad
+ poly([P(b.x+.04,b.y+.04,0),P(b.x+w-.04,b.y+.04,0),P(b.x+w-.04,b.y+h-.04,0),P(b.x+.04,b.y+h-.04,0)],sh('#2b333d',1),'rgba(160,200,240,.08)');
+ const em=[];// emissive callbacks
+ const Hh=k=>k*prog;
+ if(bt==='hall'||bt==='col'){const z=Hh(bt==='col'?44:32);const o=prism(x,y,W2,H2,0,z,bt==='col'?'#5d6b80':'#46566c');
+  // roof units
+  for(let i=0;i<Math.floor(W2*1.5);i++)prism(x+.3+i*.62,y+.3,.4,.4,z,z+5,'#6c7a8e',{edge:false});
+  if(!build)em.push(()=>{const rows=bt==='col'?4:3;for(let r=0;r<rows;r++){const zz=6+r*(z-10)/rows;for(let u=0;u<W2*4-1;u++){const blink=((u*37+r*11+ph+(T>>3))%9);if(blink<1)continue;const c=s8==='starved'?(blink<4?'#ff5a6a':'#402028'):(blink<3?'#a0ffd0':'#3dff9a');g.fillStyle=c;faceL(x,y,W2,H2,.15+u*.25,.15+u*.25+.12,zz,zz+2.2,c)}
+    for(let u=0;u<H2*4-1;u++){const blink=((u*29+r*7+ph+(T>>3))%9);if(blink<1)continue;const c=s8==='starved'?(blink<4?'#ff5a6a':'#402028'):(blink<3?'#9fe8ff':'#3dd8ff');faceR(x,y,W2,H2,.15+u*.25,.15+u*.25+.12,zz,zz+2.2,c)}}});
+  if(bt==='col'){em.push(()=>{const[X,Y]=P(x+W2*.5,y+H2,z*.55);g.font='bold 9px ui-sans-serif,system-ui';g.textAlign='center';g.fillStyle=`rgba(200,230,255,${.55+.2*Math.sin(T/30)})`;})}}
+ else if(bt==='shell'){const z=Hh(52);prism(x,y,W2,H2,0,z,'#7d8796');for(let i=1;i<W2*2;i++){faceL(x,y,W2,H2,i*.5-.03,i*.5+.03,2,z-2,sh('#55606e',1))}for(let i=1;i<H2*2;i++){faceR(x,y,W2,H2,i*.5-.03,i*.5+.03,2,z-2,sh('#5f6a79',1))}
+  prism(x+W2*.6,y+.3,.6,.6,z,z+8,'#56606f');if(!build)em.push(()=>{faceL(x,y,W2,H2,W2*.4,W2*.6,1,5,'rgba(255,220,150,.55)')})}
+ else if(bt==='cool'){prism(x,y,W2,H2,0,Hh(5),'#56606c');const r=Math.min(W2,H2)*.22;const t1=[x+W2*.3,y+H2*.35],t2=[x+W2*.72,y+H2*.7];
+  [t1,t2].forEach((p,i)=>{const top=tower(p[0],p[1],r,Hh(58),'#b7c0cc');if(on&&!build&&Math.random()<(MOB?.18:.4))emit('steam',top[0],top[1]-2)})}
+ else if(bt==='turb'||bt==='sth'){const z=Hh(bt==='sth'?26:22);prism(x,y,W2,H2,0,z,bt==='sth'?'#8a6a52':'#86664e');
+  faceL(x,y,W2,H2,.2,W2-.2,z-6,z-3,sh('#7a5a40',1));const n=bt==='sth'?3:2;
+  for(let i=0;i<n;i++){const sx=x+.45+i*(W2-.9)/(n-1||1),sy=y+.45;const top=cyl(sx,sy,.1,z,z+Hh(26),'#9aa2ac','#1a1d22');
+   if(on&&!build){if(Math.random()<(MOB?.15:.35))emit('smoke',top[0],top[1]-2);em.push(()=>{g.globalCompositeOperation='lighter';const gl=g.createRadialGradient(top[0],top[1],0,top[0],top[1],8);gl.addColorStop(0,'rgba(255,150,60,.5)');gl.addColorStop(1,'rgba(255,90,20,0)');g.fillStyle=gl;g.fillRect(top[0]-8,top[1]-8,16,16)})}}
+  if(on&&!build)em.push(()=>{g.globalCompositeOperation='lighter';faceR(x,y,W2,H2,.3,H2-.3,4,8,`rgba(255,140,60,${.35+.15*Math.sin(T/9+ph)})`)})}
+ else if(bt==='asm'){const z=Hh(36);prism(x,y,W2,H2,0,z,'#77735f');for(let i=0;i<W2*2;i++)faceL(x,y,W2,H2,i*.5+.05,i*.5+.4,4,z-8,sh('#4f4c3f',1));
+  // gantry crane
+  g.strokeStyle=sh('#ffb547',1);g.lineWidth=2;const a=P(x+.2,y+H2*.5,z+14),c=P(x+W2-.2,y+H2*.5,z+14);g.beginPath();g.moveTo(...P(x+.2,y+H2*.5,z));g.lineTo(...a);g.lineTo(...c);g.lineTo(...P(x+W2-.2,y+H2*.5,z));g.stroke();
+  const cp=(Math.sin(T/80+ph)+1)/2;const hk=P(x+.3+cp*(W2-.6),y+H2*.5,z+14);g.lineWidth=1;g.beginPath();g.moveTo(...hk);g.lineTo(hk[0],hk[1]+8);g.stroke();
+  em.push(()=>{g.globalCompositeOperation='lighter';const bl=(T>>4)%2;g.fillStyle=bl?'rgba(255,190,80,.95)':'rgba(255,190,80,.25)';const p=P(x+W2,y,z+4);g.beginPath();g.arc(p[0],p[1],2.4,0,7);g.fill()})}
+ else if(bt==='cast'){const z=Hh(30);prism(x,y,W2,H2,0,z,b.bastrop?'#8a6448':'#7f5f47');const top=cyl(x+W2*.8,y+.5,.2,z,z+Hh(40),'#6a6f78','#141518');
+  const out=castOut(b);if(!build&&out>0){if(Math.random()<.25)emit('smoke',top[0],top[1]-2);if(Math.random()<.5){const p=P(x+W2*.4,y+H2,6);emit('spark',p[0],p[1])}}
+  em.push(()=>{const p0=P(x+W2*.25,y+H2,2),p1=P(x+W2*.6,y+H2,14);const k=out>0?.55+.25*Math.sin(T/6+ph)+.1*Math.random():.08;g.globalCompositeOperation='lighter';
+   const gl=g.createRadialGradient((p0[0]+p1[0])/2,(p0[1]+p1[1])/2,1,(p0[0]+p1[0])/2,(p0[1]+p1[1])/2,26);gl.addColorStop(0,`rgba(255,170,60,${k})`);gl.addColorStop(1,'rgba(255,80,10,0)');g.fillStyle=gl;g.fillRect(p0[0]-30,p1[1]-30,90,70);
+   faceL(x,y,W2,H2,W2*.25,W2*.6,1,12,`rgba(255,${150+60*Math.random()|0},60,${k})`)})}
+ else if(bt==='sub'){prism(x,y,W2,H2,0,2,'#3a414a',{edge:false});for(let i=0;i<2;i++)for(let j=0;j<2;j++){const px=x+.3+i*W2*.5,py=y+.3+j*H2*.5;prism(px,py,.5,.4,2,Hh(14),'#808a97');for(let f=0;f<3;f++)faceL(px,py,.5,.4,.08+f*.15,.13+f*.15,4,Hh(12),sh('#3b424c',1));cyl(px+.25,py+.2,.05,Hh(14),Hh(22),'#c9b98a')}
+  // pylon
+  const pb=[x+W2-.2,y+.2];g.strokeStyle=sh('#9aa4b0',1);g.lineWidth=1.2;const p0=P(pb[0]-.15,pb[1],0),p1=P(pb[0]+.15,pb[1],0),pt=P(pb[0],pb[1],Hh(58));g.beginPath();g.moveTo(...p0);g.lineTo(...pt);g.lineTo(...p1);g.moveTo(pt[0]-9,pt[1]+8);g.lineTo(pt[0]+9,pt[1]+8);g.stroke();
+  if(on&&!build&&Math.random()<.04){const p=P(x+W2*.5,y+H2*.5,16);emit('spark',p[0],p[1],3)}}
+ else if(bt==='solar'){poly([P(x,y,0),P(x+W2,y,0),P(x+W2,y+H2,0),P(x,y+H2,0)],sh('#1d2630',1));const rows=Math.round(H2*2.2);for(let r=0;r<rows;r++){const yy=y+.15+r*(H2-.3)/rows;
+   if(r/rows>prog+.01)break;poly([P(x+.15,yy,2),P(x+W2-.15,yy,2),P(x+W2-.15,yy+.28,6),P(x+.15,yy+.28,6)],sh('#1f3f78',1),`rgba(120,180,255,${.15+.25*LIGHT})`,.8)}
+  prism(x+W2-.7,y+H2-.5,.55,.35,0,Hh(9),'#d7dbe0')}
+ else if(bt==='boxfab'){const z=Hh(30);prism(x,y,W2*.62,H2,0,z,'#5a5078');for(let i=0;i<3;i++)for(let j=0;j<2;j++)prism(x+W2*.66+j*.45,y+.2+i*(H2-.4)/3,.38,(H2-.6)/3,0,Hh(10+j*10),'#6a4ea8');
+  em.push(()=>{g.globalCompositeOperation='lighter';faceL(x,y,W2*.62,H2,.2,W2*.62-.2,z*.45,z*.45+2,`rgba(180,140,255,${.5+.3*Math.sin(T/14)})`)})}
+ else if(bt==='pad'){const[X,Y]=P(cx0,cy0,0);g.fillStyle=sh('#3a4048',1);g.beginPath();g.ellipse(X,Y,w*TW*.36,w*TH*.36,0,0,7);g.fill();g.strokeStyle='rgba(255,210,120,.25)';g.lineWidth=2;g.beginPath();g.ellipse(X,Y,w*TW*.26,w*TH*.26,0,0,7);g.stroke();
+  prism(x+.2,y+.2,.5,.5,0,Hh(110),'#4d5560');prism(x+.2,y+.2,.9,.12,Hh(92),Hh(96),'#ffb547',{edge:false});
+  if(!build){const top=cyl(cx0,cy0,.28,4,120,'#c8cfd8','#e8edf3');em.push(()=>{if(fx.some(f=>f.k==='rocket'&&f.b===b))return;g.globalCompositeOperation='lighter';g.fillStyle=`rgba(120,190,255,${.25+.15*Math.sin(T/10)})`;g.beginPath();g.ellipse(X,Y,14,7,0,0,7);g.fill()})}}
+ else{prism(x,y,W2,H2,0,Hh(20),d.col)}
+ // scaffolding for construction
+ if(build){const z=(bt==='pad'?110:bt==='cool'?58:40);g.strokeStyle='rgba(255,200,80,.55)';g.lineWidth=1;g.setLineDash([3,3]);const c=[[x,y],[x+W2,y],[x+W2,y+H2],[x,y+H2]];g.beginPath();c.forEach(p=>{g.moveTo(...P(...p,0));g.lineTo(...P(...p,z))});c.forEach((p,i)=>{const q=c[(i+1)%4];g.moveTo(...P(...p,z));g.lineTo(...P(...q,z))});g.stroke();g.setLineDash([])}
+ return em}
+function shadow(b){const[w,h]=B[b.t].sz;const k={shell:1.3,hall:.8,col:1.1,turb:1.6,sth:1.6,cast:1.3,asm:1,cool:1.4,sub:.6,solar:.15,boxfab:.8,pad:2.4}[b.t]||1;const s=.55*k;
+ poly([P(b.x+.2,b.y+h,0),P(b.x+w,b.y+h,0),P(b.x+w,b.y+.2,0),P(b.x+w+s,b.y+.2-s*.2,0),P(b.x+w+s,b.y+h+s*.3,0),P(b.x+.2+s,b.y+h+s*.3,0)],`rgba(0,0,0,${.18+.17*LIGHT})`)}
+// ---- docks ----
+function dockDraw(dk,locked,inbound){const x=dk.x+.1,y=dk.y+.1,w=dk.w-.2,h=dk.h-.2;const col=ITC[dk.it];
+ prism(x,y,w,h,0,10,'#46525f');prism(x+.2,y+.25,w*.45,h-.5,10,22,'#5b6878');
+ for(let i=0;i<3;i++)prism(x+w*.55+(i%2)*.4,y+.25+i*.45,.35,.35,10,18,locked?'#333a44':col,{t:.75,l:.4,r:.55,edge:false});
+ return()=>{g.globalCompositeOperation='lighter';const c=hx(col);const a=locked?.05:inbound?.65+.3*Math.sin(tick/8):.3;g.fillStyle=`rgba(${c},${a})`;faceL(x,y,w,h,.1,w-.1,7,9,`rgba(${c[0]},${c[1]},${c[2]},${a})`);faceR(x,y,w,h,.1,h-.1,7,9,`rgba(${c[0]},${c[1]},${c[2]},${a})`)}}
+// ---- frame ----
+const NIGHT={sky:[5,8,13]};
+function draw(){tick++;const r=wrap.getBoundingClientRect();if(Math.abs(VW-r.width)>1||Math.abs(VH-r.height)>1)resize();
+ // camera easing
+ cam.x+=(tcam.x-cam.x)*.18;cam.y+=(tcam.y-cam.y)*.18;cam.z+=(tcam.z-cam.z)*.18;
+ // day/night: slow cycle (~2 min); lighting tint
+ const ph=(Date.now()/120000)%1;const day=.5+.5*Math.cos(ph*Math.PI*2);LIGHT=.78+.3*day;TINT=[0,6*(1-day),18*(1-day)];
+ g=cx;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,cv.width,cv.height);
+ g.setTransform(DP*cam.z,0,0,DP*cam.z,DP*(VW/2-cam.x*cam.z),DP*(VH/2-cam.y*cam.z));
+ drawTerrain();
+ const st=stats();const L=links(st);const EM=[];const labs=[];
+ // ground pipes
+ L.filter(l=>l.k==='pipe').forEach(l=>{g.strokeStyle=l.ok?'rgba(70,170,210,.55)':'rgba(255,90,106,.6)';g.lineWidth=3;g.beginPath();g.moveTo(...P(l.a[0],l.a[1]));g.lineTo(...P(l.a[0],l.b[1]));g.lineTo(...P(l.b[0],l.b[1]));g.stroke()});
+ // belts: base
+ const belts=L.filter(l=>l.k==='belt');
+ belts.forEach(l=>{const p=l.pts.map(q=>P(q[0],q[1],1));g.lineJoin='round';g.lineCap='round';
+  g.strokeStyle='#0a0d12';g.lineWidth=11;g.beginPath();p.forEach((q,i)=>i?g.lineTo(...q):g.moveTo(...q));g.stroke();
+  g.strokeStyle=l.stall?'#3a1a20':'#252c37';g.lineWidth=8;g.stroke();
+  g.strokeStyle=l.stall?'rgba(255,90,106,.35)':'rgba(255,255,255,.08)';g.lineWidth=1;g.setLineDash([3,5]);g.lineDashOffset=l.flow?-tick*.5:0;g.stroke();g.setLineDash([])});
+ // belt glow + items (additive)
+ g.save();g.globalCompositeOperation='lighter';belts.forEach(l=>{if(!l.flow&&!l.stall)return;const p=l.pts.map(q=>P(q[0],q[1],1));const c=hx(ITC[l.it]||'#ffffff');
+  g.strokeStyle=`rgba(${c[0]},${c[1]},${c[2]},${l.stall?.05:.09})`;g.lineWidth=14;g.beginPath();p.forEach((q,i)=>i?g.lineTo(...q):g.moveTo(...q));g.stroke();
+  const len=pathLen(l.pts);const n=Math.max(2,Math.floor(len/1.1));const im=spr(l.it);const sz=cam.z>1.2?16:20;
+  for(let k=0;k<n;k++){if(l.stall&&k%3)continue;const t=l.flow?((tick/(60*len/2.2))+k/n)%1:k/n;const[wx,wy]=along(l.pts,t);const[X,Y]=P(wx,wy,4);g.globalAlpha=l.stall?.45:1;g.drawImage(im,X-sz/2,Y-sz/2,sz,sz)}g.globalAlpha=1});g.restore();
  // docks
- const labs=[];DOCKS.forEach(dk=>{const[x,y]=w2s(dk.x,dk.y);const w=dk.w*TS*z,h=dk.h*TS*z;const locked=['chip','hbm'].includes(dk.it)&&!has('ownchip');
-  const inbound=S.pipe.some(p=>p.it===dk.it);const bk=S.book&&dk.sup.map(id=>S.book.find(b=>b.s.id===id)).filter(Boolean);const over=bk&&bk.some(b=>b.tot>b.open);
-  cx.fillStyle=locked?'#151b26':'#1b2638';rr(x+2,y+2,w-4,h-4,5*z);cx.fill();const pulse=.5+.5*Math.sin(tick/9);
-  cx.strokeStyle=over?`rgba(255,77,94,${.4+.6*pulse})`:inbound?'#4da3ff':'#33415a';cx.lineWidth=over?2.5:1.5;cx.stroke();
-  cx.font=`${14*z}px serif`;cx.textAlign='left';cx.fillText(dk.ic,x+5*z,y+19*z);cx.fillStyle=locked?'#667':'#dbe6f5';cx.font=`bold ${7.5*z}px system-ui`;
-  cx.fillText('IMPORT',x+24*z,y+11*z);cx.font=`${7*z}px system-ui`;cx.fillStyle='#9ab';cx.fillText(dk.n.split(':')[0].slice(0,18),x+24*z,y+21*z);
-  cx.fillStyle=ITC[dk.it];cx.font=`bold ${8*z}px system-ui`;cx.fillText(locked?'🔒 own-chip tech':fmtQ(dk.it,S.inv[dk.it]).replace(/ GW .*/,' GW'),x+5*z,y+h-7*z);
-  if(z<1.05)labs.push(()=>{cx.font='bold 11px system-ui';const lab=`${dk.ic} ${dk.n.split(':')[0].split(' (')[0]}`,val=locked?'🔒 own-chip tech':fmtQ(dk.it,S.inv[dk.it]).replace(/ GW .*/,' GW');const tw=Math.max(cx.measureText(lab).width,cx.measureText(val).width)+10;
-   const lx=dk.top?x+w+4:x+w+3,ly=dk.top?y+2:y+h/2-15;cx.fillStyle='#0b1220ee';rr(lx,ly,tw,30,4);cx.fill();cx.strokeStyle=over?'#ff4d5e':inbound?'#4da3ff':'#33415a';cx.lineWidth=1;cx.stroke();cx.textAlign='left';cx.fillStyle=locked?'#778':'#e8f2ff';cx.fillText(lab,lx+5,ly+13);cx.fillStyle=ITC[dk.it];cx.font='10px system-ui';cx.fillText(val+(inbound?'  · inbound ▸':''),lx+5,ly+25)});
-  if(inbound&&!locked){for(let k=0;k<3;k++){const f=((tick/80)+k/3)%1;cx.fillStyle='#4da3ff';const px=dk.top?x+w/2:x-12*z+f*14*z,py=dk.top?y-12*z+f*14*z:y+h/2;cx.beginPath();cx.arc(px,py,2.5*z,0,7);cx.fill()}}});
- {const[x,y]=w2s(EXPORT.x,EXPORT.y);cx.fillStyle='#22183a';rr(x+2,y+2,EXPORT.w*TS*z-4,EXPORT.h*TS*z-4,5*z);cx.fill();cx.strokeStyle='#7a5ab8';cx.stroke();cx.font=`${18*z}px serif`;cx.textAlign='center';cx.fillText('🌍',x+EXPORT.w*TS*z/2,y+38*z);cx.font=`${7.5*z}px system-ui`;cx.fillStyle='#d0b8ff';cx.fillText(`World: ${S.boxes} box fleets`,x+EXPORT.w*TS*z/2,y+58*z);cx.fillText(`Orbit: ${S.orbital} batches`,x+EXPORT.w*TS*z/2,y+70*z)}
- // buildings
- S.blds.forEach(b=>{const d=B[b.t];const[w,h]=d.sz;const[x,y]=w2s(b.x,b.y);const pw=w*TS*z,ph=h*TS*z;const s8=bState(b,st);const pulse=.5+.5*Math.sin(tick/8);
-  cx.fillStyle='#0008';rr(x+5*z,y+6*z,pw-6*z,ph-6*z,6*z);cx.fill();
-  cx.fillStyle=d.col+(b.left>0?'44':'dd');rr(x+3*z,y+3*z,pw-6*z,ph-6*z,6*z);cx.fill();
-  if(b.left>0){cx.strokeStyle='#ffd84d';cx.setLineDash([5*z,4*z]);cx.lineWidth=2;rr(x+3*z,y+3*z,pw-6*z,ph-6*z,6*z);cx.stroke();cx.setLineDash([])}
-  // roof detail
-  cx.fillStyle='#0003';for(let i=1;i<w*2;i++)cx.fillRect(x+i*TS*z/2,y+6*z,1,ph-12*z);
-  if(s8==='starved'){cx.strokeStyle=`rgba(255,77,94,${.4+.6*pulse})`;cx.lineWidth=3;rr(x+2*z,y+2*z,pw-4*z,ph-4*z,6*z);cx.stroke()}
-  if(s8==='backed'){cx.strokeStyle=`rgba(255,176,32,${.25+.4*pulse})`;cx.lineWidth=2;rr(x+2*z,y+2*z,pw-4*z,ph-4*z,6*z);cx.stroke()}
-  if(s8==='ok'&&(b.t==='turb'||b.t==='sth'||b.t==='asm'||b.t==='cast')){for(let k=0;k<2;k++){const f=((tick/70)+k/2)%1;cx.fillStyle=`rgba(200,200,210,${.5*(1-f)})`;cx.beginPath();cx.arc(x+pw*(.3+.4*k),y+4*z-f*18*z,(3+6*f)*z,0,7);cx.fill()}}
-  if(b.t==='hall'||b.t==='col'){const on=s8!=='build';for(let i=0;i<w*3;i++)for(let j=0;j<h*2;j++){cx.fillStyle=on&&((i*7+j*3+(tick>>4))%5)?(s8==='starved'&&(i+j)%2?'#552':'#7fffb0'):'#244';cx.fillRect(x+(8+i*9)*z,y+(ph/z-16-j*9)*z,4*z,3*z)}}
-  cx.font=`${Math.min(pw,ph)*.42}px serif`;cx.textAlign='center';cx.fillText(d.ic,x+pw/2,y+ph/2+Math.min(pw,ph)*.08);
-  cx.fillStyle='#000a';rr(x+4*z,y+ph-17*z,pw-8*z,13*z,3*z);cx.fill();cx.fillStyle=s8==='starved'?'#ff9aa4':s8==='build'?'#ffd84d':'#e8f2ff';cx.font=`bold ${8*z}px system-ui`;cx.fillText(bThru(b,st),x+pw/2,y+ph-7.5*z);
-  if(z>.9){cx.fillStyle='#fffc';cx.font=`${7*z}px system-ui`;cx.fillText(d.n.length>24?d.n.slice(0,22)+'…':d.n,x+pw/2,y+11*z)}});
- labs.forEach(f=>f());
+ DOCKS.forEach(dk=>{const locked=['chip','hbm'].includes(dk.it)&&!has('ownchip');const inbound=S.pipe.some(p=>p.it===dk.it);const bk=S.book&&dk.sup.map(id=>S.book.find(b=>b.s.id===id)).filter(Boolean);const over=bk&&bk.some(b=>b.tot>b.open);
+  EM.push(dockDraw(dk,locked,inbound));labs.push({p:P(dk.x+(dk.top?dk.w/2:0),dk.y+(dk.top?0:dk.h/2),24),dk,locked,inbound,over})});
+ // export port
+ {const e=EXPORT;prism(e.x+.1,e.y+.1,e.w-.2,e.h-.2,0,8,'#2c2640');const[X,Y]=P(e.x+e.w/2,e.y+e.h/2,8);EM.push(()=>{g.globalCompositeOperation='lighter';g.strokeStyle=`rgba(180,140,255,${.5+.3*Math.sin(tick/20)})`;g.lineWidth=2;g.beginPath();g.ellipse(X,Y,40,20,0,0,7);g.stroke()});labs.push({p:P(e.x+e.w,e.y+e.h/2,10),ex:1})}
+ // buildings: shadows, then depth-sorted
+ const order=S.blds.slice().sort((a,b)=>{const[aw,ah]=B[a.t].sz,[bw,bh]=B[b.t].sz;return(a.x+a.y+aw+ah)-(b.x+b.y+bw+bh)});
+ order.forEach(shadow);
+ order.forEach(b=>{const s8=bState(b,st);const em=bDraw(b,s8,st);EM.push(...em);
+  const[w,h]=B[b.t].sz;if(s8==='starved'){const pul=.5+.5*Math.sin(tick/8);EM.push(()=>{g.globalCompositeOperation='lighter';g.strokeStyle=`rgba(255,90,106,${.25+.35*pul})`;g.lineWidth=1.6;const c=[[b.x,b.y],[b.x+w,b.y],[b.x+w,b.y+h],[b.x,b.y+h]];c.forEach((p,i)=>{const n=c[(i+1)%4],pv=c[(i+3)%4];const k=.35;g.beginPath();g.moveTo(...P(p[0]+(pv[0]-p[0])*k/ (Math.abs(pv[0]-p[0])+Math.abs(pv[1]-p[1])),p[1]+(pv[1]-p[1])*k/(Math.abs(pv[0]-p[0])+Math.abs(pv[1]-p[1]))));g.lineTo(...P(...p));g.lineTo(...P(p[0]+(n[0]-p[0])*k/(Math.abs(n[0]-p[0])+Math.abs(n[1]-p[1])),p[1]+(n[1]-p[1])*k/(Math.abs(n[0]-p[0])+Math.abs(n[1]-p[1]))));g.stroke()})})}
+  const hb=hov&&!S.tool&&hit(...hov);if(s8==='starved'||(hb&&hb.b===b))labs.push({p:P(b.x+w/2,b.y+h/2,b.t==='pad'?130:b.t==='cool'?70:60),b,s8,full:hb&&hb.b===b})});
+ // power lines (elevated, catenary)
+ const pw=L.filter(l=>l.k==='power');pw.forEach(l=>{const a=P(l.a[0],l.a[1],46),c=P(l.b[0],l.b[1],46);const m=[(a[0]+c[0])/2,(a[1]+c[1])/2+14];
+  g.strokeStyle=l.ok?'rgba(255,214,110,.35)':'rgba(255,90,106,.45)';g.lineWidth=1;g.beginPath();g.moveTo(...a);g.quadraticCurveTo(...m,...c);g.stroke();
+  EM.push(()=>{g.globalCompositeOperation='lighter';g.strokeStyle=l.ok?'rgba(255,200,90,.06)':'rgba(255,90,106,.07)';g.lineWidth=5;g.beginPath();g.moveTo(...a);g.quadraticCurveTo(...m,...c);g.stroke();
+   if(l.on)for(let k=0;k<2;k++){const f=((tick/110)+k/2)%1;const q=[(1-f)*(1-f)*a[0]+2*(1-f)*f*m[0]+f*f*c[0],(1-f)*(1-f)*a[1]+2*(1-f)*f*m[1]+f*f*c[1]];const gl=g.createRadialGradient(q[0],q[1],0,q[0],q[1],7);gl.addColorStop(0,l.ok?'rgba(255,240,170,.95)':'rgba(255,140,150,.9)');gl.addColorStop(1,'rgba(255,200,90,0)');g.fillStyle=gl;g.fillRect(q[0]-7,q[1]-7,14,14)}})});
+ // night ambient overlay over world (lights drawn after stay bright)
+ if(LIGHT<1.05){g.save();g.setTransform(1,0,0,1,0,0);g.fillStyle=`rgba(8,14,34,${Math.max(0,1.08-LIGHT)*.5})`;g.fillRect(0,0,cv.width,cv.height);g.restore()}
+ // emissive pass
+ EM.forEach(f=>{g.save();f();g.restore()});
+ drawParts();
  // fx
- fx=fx.filter(f=>{f.t++;if(f.k==='rocket'&&f.b){const[cx0,cy0]=w2s(...ctr(f.b));cx.font=`${18*z}px serif`;cx.textAlign='center';cx.fillText('🚀',cx0,cy0-f.t*3*z);return f.t<120}
-  if(f.k==='box'){const[ex,ey]=w2s(EXPORT.x+1.5,EXPORT.y+1.5);cx.font=`${14*z}px serif`;cx.fillText('📦',ex,ey-f.t*.6*z);return f.t<60}return false});
+ fx=fx.filter(f=>{f.t++;if(f.k==='rocket'&&f.b){const[w,h]=B.pad.sz;const[X,Y]=P(f.b.x+w/2,f.b.y+h/2,4+f.t*f.t*.05);g.fillStyle='#e8edf3';g.fillRect(X-4,Y-60,8,60);g.save();g.globalCompositeOperation='lighter';const gl=g.createRadialGradient(X,Y,0,X,Y,26);gl.addColorStop(0,'rgba(255,220,150,1)');gl.addColorStop(1,'rgba(255,120,40,0)');g.fillStyle=gl;g.fillRect(X-26,Y-10,52,46);g.restore();if(f.t<60)emit('smoke',X,Y+8,2);return f.t<160}
+  if(f.k==='box'){const[X,Y]=P(EXPORT.x+1.5,EXPORT.y+1.5,10+f.t);g.drawImage(spr('box'),X-12,Y-12,24,24);return f.t<70}return false});
  // ghost
- if(S.tool&&S.tool!=='sell'&&hov){const d=B[S.tool];const[w,h]=d.sz;const gx=Math.floor(hov[0]-w/2+.5),gy=Math.floor(hov[1]-h/2+.5);const ok=fits(S.tool,gx,gy)&&!canBuild(S.tool);const[x,y]=w2s(gx,gy);
-  cx.fillStyle=ok?'#4da3ff33':'#ff4d5e33';cx.fillRect(x,y,w*TS*z,h*TS*z);cx.strokeStyle=ok?'#4da3ff':'#ff4d5e';cx.lineWidth=2;cx.strokeRect(x,y,w*TS*z,h*TS*z);cx.font=`${16*z}px serif`;cx.textAlign='center';cx.fillText(d.ic,x+w*TS*z/2,y+h*TS*z/2+6*z)}
+ if(S.tool&&S.tool!=='sell'&&hov){const d=B[S.tool];const[w,h]=d.sz;const gx=Math.floor(hov[0]-w/2+.5),gy=Math.floor(hov[1]-h/2+.5);const ok=fits(S.tool,gx,gy)&&!canBuild(S.tool);
+  g.save();g.globalAlpha=.55;bDraw({t:S.tool,x:gx,y:gy,left:0},'ok',st,true);g.restore();g.save();g.globalCompositeOperation='lighter';poly([P(gx,gy),P(gx+w,gy),P(gx+w,gy+h),P(gx,gy+h)],ok?'rgba(83,198,255,.16)':'rgba(255,90,106,.2)',ok?'rgba(83,198,255,.9)':'rgba(255,90,106,.9)',2);g.restore()}
+ // screen-space overlays
+ g.setTransform(DP,0,0,DP,0,0);
+ const vg=g.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.35,VW/2,VH/2,Math.max(VW,VH)*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.4)');g.fillStyle=vg;g.fillRect(0,0,VW,VH);
+ labs.forEach(drawLabel);
  requestAnimationFrame(draw)}
-// ============ INPUT ============
-const tip=document.getElementById('tip');let drag=null;
+function toS(p){return[(p[0]-cam.x)*cam.z+VW/2,(p[1]-cam.y)*cam.z+VH/2]}
+function chip(x,y,lines,col,accent){g.font='600 11px ui-sans-serif,system-ui,sans-serif';const w=Math.max(...lines.map((l,i)=>{g.font=i?'10.5px ui-sans-serif,system-ui':'600 11px ui-sans-serif,system-ui';return g.measureText(l).width}))+18;const h=8+lines.length*13;
+ g.fillStyle='rgba(8,12,20,.78)';rr(x,y,w,h,6);g.fill();g.strokeStyle=accent||'rgba(130,170,230,.22)';g.lineWidth=1;g.stroke();g.fillStyle=col;g.fillRect(x+5,y+6,2.5,h-12);
+ lines.forEach((l,i)=>{g.font=i?'10.5px ui-sans-serif,system-ui':'600 11px ui-sans-serif,system-ui';g.fillStyle=i?'#9fb0c6':'#e8f0fb';g.textAlign='left';g.fillText(l,x+12,y+15+i*13)});return[w,h]}
+function drawLabel(o){const[sx,sy]=toS(o.p);if(sx<-200||sy<-50||sx>VW+50||sy>VH+50)return;
+ if(o.dk&&cam.z<.36){g.drawImage(spr(o.dk.it),sx-14,sy-14,28,28);return}
+ if(o.dk&&cam.z<.75){const dk=o.dk;const nm=dk.n.split(':')[0].split(' (')[0].replace('Howmet / PCC blades & vanes','Howmet/PCC blades').replace('TSMC N3 + CoWoS','TSMC CoWoS');const val=o.locked?'locked':fmtQ(dk.it,S.inv[dk.it]).replace(/ GW .*/,' GW').replace(' blade sets',' sets');
+  g.font='600 10.5px ui-sans-serif,system-ui';const t=nm+'  ',w=g.measureText(t).width;g.font='10.5px ui-sans-serif,system-ui';const w2=g.measureText(val).width;const W3=w+w2+30;let x=dk.top?sx-W3/2:sx-W3-6;const y=dk.top?sy-30:sy-10;if(x<6)x=sx+26;
+  g.fillStyle='rgba(8,12,20,.8)';rr(x,y,W3,20,5);g.fill();g.strokeStyle=o.over?'rgba(255,90,106,.7)':o.inbound?'rgba(83,198,255,.55)':'rgba(130,170,230,.2)';g.lineWidth=1;g.stroke();g.drawImage(spr(dk.it),x+1,y-1,22,22);
+  g.textAlign='left';g.fillStyle=o.locked?'#7f8ea6':'#e8f0fb';g.font='600 10.5px ui-sans-serif,system-ui';g.fillText(t,x+22,y+14);g.fillStyle=ITC[dk.it];g.font='10.5px ui-sans-serif,system-ui';g.fillText(val,x+22+w,y+14);return}
+ if(o.dk){const dk=o.dk;const val=o.locked?'locked · own-chip tech':fmtQ(dk.it,S.inv[dk.it]).replace(/ GW .*/,' GW')+(o.inbound?'  ▸ inbound':'');const nm=dk.n.split(':')[0].split(' (')[0];
+  g.font='600 11px ui-sans-serif,system-ui';const w=Math.max(g.measureText(nm).width,g.measureText(val).width)+40;let x=dk.top?sx-w/2:sx-w-8;const y=dk.top?sy-44:sy-17;if(x<6)x=sx+26;
+  const[cw]=chip(x,y,[nm,val],ITC[dk.it],o.over?'rgba(255,90,106,.7)':o.inbound?'rgba(83,198,255,.5)':null);g.drawImage(spr(dk.it),x+cw-2,y+3,26,26);return}
+ if(o.ex){chip(sx+6,sy-16,['Export · World',`${S.boxes} box fleets · ${S.orbital} orbital`],'#b48cff');return}
+ if(o.b){const b=o.b,d=B[b.t];const st=stats();const t=bThru(b,st).replace('⏳ ','building ');const col=o.s8==='starved'?'#ff5a6a':o.s8==='build'?'#ffb547':o.s8==='backed'?'#ffb547':'#4ef0a0';
+  if(!o.full&&o.s8==='starved'){const pul=.75+.25*Math.sin(tick/10);g.fillStyle=`rgba(255,90,106,${.85*pul})`;g.beginPath();g.arc(sx,sy-6,5,0,7);g.fill();g.fillStyle='#fff';g.font='bold 8px system-ui';g.textAlign='center';g.fillText('!',sx,sy-3.2);return}
+  g.font='600 11px system-ui';const nm=d.n.replace(' (racks)','').replace('Transformer yard / substation','Transformer yard');const w=Math.max(g.measureText(nm).width,g.measureText(t).width)+20;chip(sx-w/2,sy-30,[nm,t],col)}}
+// ============ INPUT (pointer: mouse + touch + pinch) ============
+const tip=document.getElementById('tip');let drag=null;const ptrs=new Map();let pinch=null;
 function hit(wx,wy){const b=S.blds.slice().reverse().find(b=>{const[w,h]=B[b.t].sz;return wx>=b.x&&wx<b.x+w&&wy>=b.y&&wy<b.y+h});if(b)return{b};
  const dk=DOCKS.find(d=>wx>=d.x&&wx<d.x+d.w&&wy>=d.y&&wy<d.y+d.h);if(dk)return{dk};if(wx>=EXPORT.x&&wx<EXPORT.x+EXPORT.w&&wy>=EXPORT.y&&wy<EXPORT.y+EXPORT.h)return{ex:1};return null}
 function tipFor(h){const st=stats();if(h.b){const b=h.b,d=B[b.t];const s8=bState(b,st);
-  const ST={build:'🚧 Under construction: '+b.left+' qtr',starved:'🔴 Starved: '+(d.needBlades&&b.bl<41?`waiting for blade sets (${b.bl}/41)`:d.mw?'site limited by '+st.lim:'missing inputs at the dock'),backed:'🟠 Backed up: output exceeds what the site can use',ok:'🟢 Running',idle:'⚪ Idle: no cores + blades to assemble'};
-  return`<b>${d.ic} ${d.n}</b><br>${d.d}<br><b>${bThru(b,st)}</b><br>${ST[s8]}${d.ins.length?'<br>Inputs: '+d.ins.map(i=>ITI[i]+' '+i).join(', '):''}${d.hide?'':'<br><small style="color:var(--mut)">Sizes, costs and rates are game assumptions unless in 📚 Sources</small>'}`}
- if(h.dk){const dk=h.dk;return`<b>${dk.ic} Import dock: ${dk.n}</b><br>At the dock now: ${fmtQ(dk.it,S.inv[dk.it])}<br>`+(dk.sup.length?dk.sup.map(id=>{const s=SUP.find(x=>x.id===id);const bk=S.book&&S.book.find(b=>b.s.id===id);return`${s.n}: open ${fmtN(s.cap(S.q)*s.open)} ${s.u}/qtr, lead ${s.lead}q, $${fmtN(s.price(S.q))}bn/unit${bk?` · last qtr book ${fmtN(bk.tot)}/${fmtN(bk.open)}, you got ${fmtN(bk.got)}`:''}`}).join('<br>'):`Tesla Megapack: you get ${has('mega')?60:25}% of 110 GWh/yr = ${(27.5*(has('mega')?.6:.25)).toFixed(1)} GWh/qtr (share is an assumption)`)+'<br><small>Order in 📋 Order books</small>'}
- if(h.ex)return`<b>🌍 Export</b><br>Inference box fleets ship to the world; Starship takes orbital batches up.<br>${S.boxes} fleets (${(S.boxes*.1).toFixed(1)} GW) · ${S.orbital} orbital batches`}
-cv.addEventListener('mousedown',e=>{if(e.button===0)drag={x:e.offsetX,y:e.offsetY,cx:cam.x,cy:cam.y,m:0}});
+  const ST={build:'Under construction · '+b.left+' qtr',starved:'Starved · '+(d.needBlades&&b.bl<41?`waiting for blade sets (${b.bl}/41)`:d.mw?'site limited by '+st.lim:'missing inputs at the dock'),backed:'Backed up · output exceeds what the site can use',ok:'Running',idle:'Idle · no cores + blades to assemble'};
+  const sc={build:'var(--warn)',starved:'var(--bad)',backed:'var(--warn)',ok:'var(--ok)',idle:'var(--mut)'}[s8];
+  return`<b>${d.n}${b.bastrop?' · Bastrop, TX':''}</b><br><span style="color:var(--mut)">${b.bastrop?BASTROP_D:d.d}</span><br><b style="color:${sc}">● ${ST[s8]}</b> · ${bThru(b,st)}${d.ins.length?'<br><span style="color:var(--mut)">Inputs: '+d.ins.join(', ')+'</span>':''}${d.hide?'':'<br><small style="color:var(--mut)">Sizes, costs and rates are game assumptions unless in Sources</small>'}`}
+ if(h.dk){const dk=h.dk;return`<b>Import dock · ${dk.n}</b><br>At the dock now: ${fmtQ(dk.it,S.inv[dk.it])}<br>`+(dk.sup.length?dk.sup.map(id=>{const s=SUP.find(x=>x.id===id);const bk=S.book&&S.book.find(b=>b.s.id===id);return`${s.n}: open ${fmtN(s.cap(S.q)*s.open)} ${s.u}/qtr, lead ${s.lead}q, $${fmtN(s.price(S.q))}bn/unit${bk?` · last qtr book ${fmtN(bk.tot)}/${fmtN(bk.open)}, you got ${fmtN(bk.got)}`:''}`}).join('<br>'):`Tesla Megapack: you get ${has('mega')?60:25}% of 110 GWh/yr = ${(27.5*(has('mega')?.6:.25)).toFixed(1)} GWh/qtr (share is an assumption)`)+'<br><small style="color:var(--mut)">Order in Orders</small>'}
+ if(h.ex)return`<b>Export · World</b><br>Inference box fleets ship to the world; Starship takes orbital batches up.<br>${S.boxes} fleets (${(S.boxes*.1).toFixed(1)} GW) · ${S.orbital} orbital batches`}
+function showTip(e){const h=hov&&hit(...hov);if(h&&!drag?.m&&!pinch){tip.style.display='block';tip.innerHTML=tipFor(h);tip.style.left=Math.min(e.clientX+16,innerWidth-320)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-170)+'px'}else tip.style.display='none'}
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,[e.clientX,e.clientY]);
+ if(ptrs.size===2){const[a,b]=[...ptrs.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),z:tcam.z};drag=null;return}
+ if(e.button===0)drag={x:e.clientX,y:e.clientY,cx:tcam.x,cy:tcam.y,m:0}});
+cv.addEventListener('pointermove',e=>{if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,[e.clientX,e.clientY]);const r=cv.getBoundingClientRect();
+ if(pinch&&ptrs.size===2){const[a,b]=[...ptrs.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);tcam.z=cam.z=Math.min(2.6,Math.max(.22,pinch.z*d/pinch.d));return}
+ if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>(e.pointerType==='touch'?10:5))drag.m=1;if(drag.m){tcam.x=cam.x=drag.cx-dx/cam.z;tcam.y=cam.y=drag.cy-dy/cam.z}}
+ hov=s2w(e.clientX-r.left,e.clientY-r.top);if(e.pointerType!=='touch')showTip(e)});
+cv.addEventListener('pointerup',e=>{const r=cv.getBoundingClientRect();ptrs.delete(e.pointerId);if(pinch){if(ptrs.size<2)pinch=null;drag=null;return}
+ if(drag&&!drag.m){hov=s2w(e.clientX-r.left,e.clientY-r.top);if(S.tool)clickAt(...hov);else if(e.pointerType==='touch'){showTip(e);setTimeout(()=>tip.style.display='none',2600)}}drag=null});
+cv.addEventListener('pointercancel',e=>{ptrs.delete(e.pointerId);pinch=null;drag=null});
+cv.addEventListener('pointerleave',e=>{if(e.pointerType!=='touch'){hov=null;tip.style.display='none'}});
 cv.addEventListener('contextmenu',e=>{e.preventDefault();S.tool=null;refresh()});
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){S.tool=null;refresh()}if((e.key==='r'||e.key==='R')&&e.target.tagName!=='INPUT'){fitView()}});
-cv.addEventListener('mousemove',e=>{if(drag){const dx=e.offsetX-drag.x,dy=e.offsetY-drag.y;if(Math.abs(dx)+Math.abs(dy)>5)drag.m=1;if(drag.m){cam.x=drag.cx-dx/cam.z;cam.y=drag.cy-dy/cam.z}}
- hov=s2w(e.offsetX,e.offsetY);const h=hit(...hov);if(h&&!drag?.m){tip.style.display='block';tip.innerHTML=tipFor(h);const r=cv.getBoundingClientRect();tip.style.left=Math.min(e.offsetX+14,r.width-310)+'px';tip.style.top=Math.min(e.offsetY+14,r.height-150)+'px'}else tip.style.display='none'});
-cv.addEventListener('mouseup',e=>{if(drag&&!drag.m)clickAt(...s2w(e.offsetX,e.offsetY));drag=null});
-cv.addEventListener('mouseleave',()=>{hov=null;drag=null;tip.style.display='none'});
-cv.addEventListener('wheel',e=>{e.preventDefault();const[wx,wy]=s2w(e.offsetX,e.offsetY);cam.z=Math.min(3,Math.max(.35,cam.z*(e.deltaY<0?1.12:1/1.12)));cam.x=wx*TS-e.offsetX/cam.z;cam.y=wy*TS-e.offsetY/cam.z},{passive:false});
-function clickAt(wx,wy){if(S.tool==='sell'){const h=hit(wx,wy);if(h&&h.b&&!B[h.b.t].hide){S.blds.splice(S.blds.indexOf(h.b),1);refresh()}return}
+cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect();const sx=e.clientX-r.left,sy=e.clientY-r.top;const X=(sx-VW/2)/tcam.z+tcam.x,Y=(sy-VH/2)/tcam.z+tcam.y;
+ const nz=Math.min(2.6,Math.max(.22,tcam.z*(e.deltaY<0?1.15:1/1.15)));tcam.z=nz;tcam.x=X-(sx-VW/2)/nz;tcam.y=Y-(sy-VH/2)/nz},{passive:false});
+function clickAt(wx,wy){if(S.tool==='sell'){const h=hit(wx,wy);if(h&&h.b&&!B[h.b.t].hide&&!h.b.fixed){S.blds.splice(S.blds.indexOf(h.b),1);refresh()}return}
  if(!S.tool)return;const[w,h]=B[S.tool].sz;place(S.tool,Math.floor(wx-w/2+.5),Math.floor(wy-h/2+.5))}
-function fitView(){const r=wrap.getBoundingClientRect();cam.z=Math.min(r.width/(W*TS),r.height/(H*TS))*.98;cam.x=-(r.width/cam.z-W*TS)/2;cam.y=-(r.height/cam.z-H*TS)/2}
+function viewBox(){const narrow=innerWidth<=760;const top=narrow?96:70,bottom=narrow?100:118,right=narrow?0:306;return{l:10,t:top,r:VW-right,b:VH-bottom}}
+function fitView(inst){const v=viewBox();let xs=[],ys=[];const add=(x,y)=>{const p=P(x,y);xs.push(p[0]);ys.push(p[1])};DOCKS.forEach(d=>{add(d.x,d.y);add(d.x+d.w,d.y+d.h)});S.blds.forEach(b=>{const[w,h]=B[b.t].sz;add(b.x,b.y);add(b.x+w,b.y+h)});if(S.blds.length>8){add(EXPORT.x+3,EXPORT.y+3)}else add(20,14);
+ const X0=Math.min(...xs)-230,X1=Math.max(...xs)+60,Y0=Math.min(...ys)-90,Y1=Math.max(...ys)+30;const z=Math.min(1.4,(v.r-v.l)/(X1-X0),(v.b-v.t)/(Y1-Y0));
+ tcam.z=z;tcam.x=(X0+X1)/2-((v.l+v.r)/2-VW/2)/z;tcam.y=(Y0+Y1)/2-((v.t+v.b)/2-VH/2)/z;if(inst){cam.x=tcam.x;cam.y=tcam.y;cam.z=tcam.z}}
+function zoomTo(z,wx=W*.3,wy=H*.35){const v=viewBox();const[X,Y]=P(wx,wy);tcam.z=z;tcam.x=X-((v.l+v.r)/2-VW/2)/z;tcam.y=Y-((v.t+v.b)/2-VH/2)/z}
+// building thumbnails for the build bar (rendered with the same art code)
+const THUMB={};function thumb(t){if(THUMB[t])return THUMB[t];const c=document.createElement('canvas');c.width=128;c.height=100;const q=c.getContext('2d');const[w,h]=B[t].sz;
+ const sv=g,sl=LIGHT,stt=TINT;g=q;LIGHT=1;TINT=[0,0,0];const k=Math.min(110/((w+h)*TW/2),58/((w+h)*TH/2+70));const cxp=P(w/2,h/2);q.setTransform(k,0,0,k,64-cxp[0]*k,64-cxp[1]*k);
+ const op=parts;parts=[];bDraw({t,x:0,y:0,left:0},'ok',{site:1,mw:1,pow:1},true).forEach(f=>{q.save();f();q.restore()});parts=op;g=sv;LIGHT=sl;TINT=stt;return THUMB[t]=c.toDataURL()}
 // ============ UI ============
 function fmtN(n){return n>=100?Math.round(n).toString():n>=10?n.toFixed(1):n.toFixed(2)}
 function fmtQ(it,q){return it==='blade'?Math.floor(q)+' blade sets':it==='mega'?q.toFixed(1)+' GWh':q.toFixed(2)+' GW '+({gpu:'GPU racks',chip:'own chips',hbm:'HBM',core:'turbine cores',xf:'transformers',cdu:'CDUs'}[it])}
 function fmt(n){return n>=1000?(n/1000).toFixed(2)+' GW':Math.round(n)+' MW'}
-function flash(t){addLog('⚠ '+t,'badc');refresh();return null}
+let toastT;function flash(t){addLog('⚠ '+t,'badc');refresh();const el=document.getElementById('toast');el.textContent=t;el.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>el.style.display='none',2600);return null}
 function setReq(id,v){S.req[id]=Math.max(0,+v||0);estCost()}function setPri(id,v){S.pri[id]=+v;estCost()}
 function estCost(){let c=0;SUP.forEach(s=>{c+=(S.req[s.id]||0)*s.price(S.q)*[1,1.1,1.25][S.pri[s.id]||0]});const e=document.getElementById('estc');if(e)e.textContent='$'+c.toFixed(1)+'bn max (you pay only for what you are allocated)'}
 function renderOrders(){const lastQ=S.book?QS[S.lastQ]:null;
@@ -374,14 +574,15 @@ function renderOrders(){const lastQ=S.book?QS[S.lastQ]:null;
 const LB={AN:'ANNOUNCED',MI:'MUSK IDEA',SP:'SPECULATIVE'};
 function refresh(){const st=stats();const $=id=>document.getElementById(id);
  $('sQ').textContent=QS[S.q];$('sCash').textContent='$'+S.cash.toFixed(1)+'bn';$('sGW').textContent=fmt(st.online);$('sPow').textContent=fmt(st.pow+S.boxes*100+S.orbital*100);$('sGPU').textContent=(st.gpus/1e6).toFixed(2)+'M';
- $('buildbar').innerHTML=ORDER.map(k=>{const d=B[k];const e=canBuild(k);const tl=d.tech?TECH.find(x=>x.id===d.tech):null;const lk=d.tech&&!has(d.tech);
-  return`<button class="bb ${S.tool===k?'sel':''} ${lk?'lock':''}" title="${d.n}: ${d.d}${e?' · ⛔ '+e:''}" onclick="S.tool='${k}';refresh()"><span class="ic">${d.ic}</span>${d.n.replace(/ \(.*\)/,'').replace('Transformer yard / substation','Transformer yard').replace('Blade & vane casting shop','Casting shop')}<small>$${d.c}bn · ${d.lead}q · ${d.sz[0]}×${d.sz[1]}</small>${tl?`<span class="tag ${tl.lab}">${lk?'🔒 ':''}${LB[tl.lab]}</span>`:''}${e&&!lk?'<small style="color:var(--bad)">⛔</small>':''}</button>`}).join('')+`<button class="bb ${S.tool==='sell'?'sel':''}" onclick="S.tool='sell';refresh()"><span class="ic">🗑</span>Demolish<small>no refund</small></button>`;
- let a='';if(has('boxes'))a+=`<button style="width:100%;margin:2px 0" onclick="deployBox()">📦 Ship inference box fleet <span class="tag MI">MUSK IDEA</span><br><small>100 MW · 0.1 GW GPUs + $1.5bn + gas genset (0.1 GW cores + 3 blades + 0.4 GWh) or 1.9 GWh Megapack · ${2*live('boxfab').length-S.boxQ} left this qtr</small></button>`;
- if(has('orbital'))a+=`<button style="width:100%;margin:2px 0" onclick="launchOrb()">🛰 Launch orbital batch <span class="tag SP">SPECULATIVE</span><br><small>100 MW · 0.1 GW GPUs + $3bn · ${Math.min(4,2*live('pad').length)-S.orbQ} left this qtr</small></button>`;
- a+=`<button style="width:100%;margin:2px 0" onclick="raise()" ${S.raised?'disabled':''}>💵 Raise $40bn <small>(once per quarter)</small></button>`;$('acts').innerHTML=a;
- $('inv').innerHTML=DOCKS.map(d=>`<span>${d.ic} ${d.it==='chip'?'own chips (unpaired)':d.it==='gpu'?'GPU racks':d.it}</span><b>${fmtQ(d.it,S.inv[d.it]).replace(/ GW .*/,' GW')}</b>`).join('');
+ const SN={shell:'DC shell',hall:'Data hall',cool:'Cooling',turb:'Gas turbines',asm:'Turbine assembly',cast:'Casting shop',sub:'Transformers',solar:'Solar + storage',boxfab:'Box factory',pad:'Starship pad'};
+ $('buildbar').innerHTML=ORDER.map((k,i)=>{const d=B[k];const e=canBuild(k);const tl=d.tech?TECH.find(x=>x.id===d.tech):null;const lk=d.tech&&!has(d.tech);
+  return`<button class="bb ${S.tool===k?'sel':''} ${lk?'lock':''} ${e?'no':''}" title="${d.n}: ${d.d}${e?' — '+e:''}" onclick="S.tool=S.tool==='${k}'?null:'${k}';refresh()"><span class="kbd">${(i+1)%10}</span>${tl?`<span class="tg tag ${tl.lab}">${lk?'LOCKED':LB[tl.lab]}</span>`:''}<img alt="" src="${thumb(k)}"><span class="nm">${SN[k]}</span><small>$${d.c}bn · ${d.lead}q</small></button>`}).join('')+`<button class="bb ${S.tool==='sell'?'sel':''}" onclick="S.tool=S.tool==='sell'?null:'sell';refresh()"><span class="kbd">X</span><svg viewBox="0 0 24 24" style="width:40px;height:50px;stroke:#ff8a96;fill:none;stroke-width:1.5"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg><span class="nm">Demolish</span><small>no refund</small></button>`;
+ let a='';if(has('boxes'))a+=`<button style="width:100%;margin:3px 0;text-align:left" onclick="deployBox()">Ship inference box fleet <span class="tag MI">MUSK IDEA</span><br><small>100 MW · 0.1 GW GPUs + $1.5bn + gas genset (0.1 GW cores + 3 blades + 0.4 GWh) or 1.9 GWh Megapack · ${2*live('boxfab').length-S.boxQ} left this qtr</small></button>`;
+ if(has('orbital'))a+=`<button style="width:100%;margin:3px 0;text-align:left" onclick="launchOrb()">Launch orbital batch <span class="tag SP">SPECULATIVE</span><br><small>100 MW · 0.1 GW GPUs + $3bn · ${Math.min(4,2*live('pad').length)-S.orbQ} left this qtr</small></button>`;
+ a+=`<button style="width:100%;margin:3px 0;text-align:left" onclick="raise()" ${S.raised?'disabled':''}>Raise $${RAISE}bn <small style="color:var(--mut)">· once per quarter, counts as debt</small></button>`;$('acts').innerHTML=a;
+ $('inv').innerHTML=DOCKS.map(d=>`<span><img class="ico" src="${spr(d.it).toDataURL()}">${d.it==='chip'?'own chips (unpaired)':d.it==='gpu'?'GPU racks':d.it}</span><b>${fmtQ(d.it,S.inv[d.it]).replace(/ GW .*/,' GW')}</b>`).join('');
  $('pipe').innerHTML=S.pipe.length?S.pipe.slice().sort((a,b)=>a.q-b.q).map(x=>`<div>${QS[x.q]||'2029+'}: ${fmtQ(x.it,x.qty)} <span style="color:var(--mut)">(${x.from})</span></div>`).join(''):'<span style="color:var(--mut)">None. Open 📋 Order books.</span>';
- const g=(t,v,tgt,done)=>`<div class="goal ${done?'done':''}">${done?'✅':'🎯'} ${t}<div class="bar"><i style="width:${Math.min(100,v/tgt*100)}%;background:${done?'var(--ok)':'var(--acc)'}"></i></div><small>${fmt(v)} / ${fmt(tgt)}${done?' · done '+done:''}</small></div>`;
+ const g=(t,v,tgt,done)=>`<div class="goal ${done?'done':''}">${t}<div class="bar"><i style="width:${Math.min(100,v/tgt*100)}%;background:${done?'var(--ok)':'var(--acc)'}"></i></div><small>${fmt(v)} / ${fmt(tgt)}${done?' · done '+done:''}</small></div>`;
  $('goals').innerHTML=g('13 GW of compute by end-2027 (Musk floor)',st.online,13000,S.won)+g('Stretch: 23 GW ("small possibility")',st.online,23000,st.online>=23000?QS[S.q]:null)+`<small style="color:var(--mut)">${Math.max(0,GOALQ-S.q+1)} quarters left until end-2027</small>`;
  const row=(n,v,mx,c)=>`<div style="font-size:12px">${n}: ${fmt(v)}</div><div class="bar"><i style="width:${mx?Math.min(100,v/mx*100):0}%;background:${c}"></i></div>`;const mx=Math.max(st.mw,st.pow,st.cap,st.cool,1);
  $('bn').innerHTML=row('Racks installed',st.mw,mx,'#3ddc84')+row('Power',st.pow,mx,'#ffb020')+row('Shell space',st.cap,mx,'#7aa7d9')+row('Cooling',st.cool,mx,'#5fe0ff')+`<div style="font-size:12px">Turbine assembly: ${fmt(Math.max(0,asmCap()-S.asmUsed))} free this qtr</div>`+(st.lim?`<div class="badc">Binding constraint: <b>${st.lim}</b></div>`:'<div class="good">The site is balanced. Add racks, and supply to feed them</div>');
@@ -389,8 +590,9 @@ function refresh(){const st=stats();const $=id=>document.getElementById(id);
 function openM(){document.getElementById('modal').style.display='flex'}function closeM(){document.getElementById('modal').style.display='none'}
 document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')closeM()};document.getElementById('next').onclick=endQuarter;
 document.getElementById('fitBtn').onclick=()=>fitView();
-window.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;const k=e.key.toLowerCase(),st=60/cam.z;if(k==='a'||k==='arrowleft')cam.x-=st;if(k==='d'||k==='arrowright')cam.x+=st;if(k==='w'||k==='arrowup')cam.y-=st;if(k==='s'||k==='arrowdown')cam.y+=st});
-document.getElementById('ordBtn').onclick=()=>{document.getElementById('orders').classList.toggle('hide');setTimeout(resize,0)};
+window.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;const k=e.key.toLowerCase(),st=60/cam.z;if(k==='a'||k==='arrowleft')tcam.x-=st;if(k==='d'||k==='arrowright')tcam.x+=st;if(k==='w'||k==='arrowup')tcam.y-=st;if(k==='s'||k==='arrowdown')tcam.y+=st});
+document.getElementById('ordBtn').onclick=()=>{document.getElementById('orders').classList.toggle('hide');document.getElementById('ordBtn').classList.toggle('sel')};document.getElementById('sheetBtn').onclick=()=>{document.getElementById('right').classList.toggle('open');document.getElementById('sheetBtn').classList.toggle('sel')};
+window.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;const k=e.key;if(k>='0'&&k<='9'){const t=ORDER[(+k+9)%10];if(t){S.tool=S.tool===t?null:t;refresh()}}if(k==='x'||k==='X'){S.tool='sell';refresh()}});
 document.getElementById('srcBtn').onclick=()=>{const L={S:'Sourced',D:'Derived',A:'Game assumption'};document.getElementById('mbox').innerHTML=`<h2>📚 Sources and assumptions</h2><p><span class="tag S">Sourced</span> means a named source printed it. <span class="tag D">Derived</span> means our arithmetic on sourced figures. <span class="tag A">Game assumption</span> means a balance value, <b>not a real fact</b>. Factory files: plan/decompose/BREAKDOWN-SPACEX-13GW.md, SOURCES-SPACEX-13GW.md, QUEUED-ROOT-*-GW.md.</p><table><tr><th>Type</th><th>Value</th><th>Source / date</th></tr>${SRC.map(([k,v,s])=>`<tr><td><span class="tag ${k}">${L[k]}</span></td><td>${v}</td><td>${s}</td></tr>`).join('')}</table><p><button onclick="closeM()">Close</button></p>`;openM()};
 function showTech(){document.getElementById('mbox').innerHTML=`<h2>🧬 Tech tree</h2><p><span class="tag AN">ANNOUNCED</span> Musk/SpaceX/Tesla have said this publicly. <span class="tag MI">MUSK IDEA</span> was floated on a call, with no product announced. <span class="tag SP">SPECULATIVE</span> is game fiction. Every effect size is a game assumption.</p><table><tr><th>Tech</th><th>Label</th><th>Cost / time</th><th>Effect</th><th></th></tr>${TECH.map(t=>`<tr><td><b>${t.n}</b></td><td><span class="tag ${t.lab}">${LABN[t.lab]}</span></td><td>${t.auto!==undefined?'Q2 2027':'$'+t.c+'bn · '+t.t+'q'}</td><td>${t.fx}</td><td>${S.tech[t.id]?'✅':S.res[t.id]!==undefined?'⏳ '+S.res[t.id]+'q':t.auto!==undefined?'':`<button onclick="startTech('${t.id}')" ${t.req&&!has(t.req)?'disabled':''}>Research</button>`}</td></tr>`).join('')}</table><p><button onclick="closeM()">Close</button></p>`;openM()}
 document.getElementById('techBtn').onclick=showTech;
@@ -398,17 +600,17 @@ document.getElementById('empBtn').onclick=()=>{document.getElementById('mbox').i
 <h3>xAI / SpaceX Super Intelligence</h3><p>~2.2 GW nameplate at end-Oct 2026 (CFO), aiming for 2.5–3 GW by end-Q4. Colossus I/II in Memphis/Southaven. Southaven permit: 41 turbines ≈ 1.2 GW (MDEQ, 10 Mar 2026). ~200k GB300 a month, then mostly Vera Rubin in 2027; 440k-VR training cluster by end-Q2 2027. Q4 capex guide $35–40bn. <i>SPCX Q3 call, 20 Oct 2026.</i></p>
 <h3>SpaceX launch and Starlink</h3><p>Starship Flight 14 reached orbit and deployed Starlink V3. Flight 15 ("next month") will try to catch both stages. Weekly flights targeted for H1 2027. 90% of global mass to orbit. Starlink: 13.6M consumer subscribers. Terafab: test chip mid-2027, volume by Q3 2028. <i>SPCX Q3 call, 20 Oct 2026.</i></p>
 <h3>Tesla factories (installed annual capacity)</h3><table><tr><th>Site</th><th>Capacity</th></tr><tr><td>Giga Texas</td><td>Model Y >375k · Cybertruck >125k · Cybercab >125k · Megapack 50 GWh (Megafactory TX started) · Optimus: construction</td></tr><tr><td>Giga Nevada</td><td>Tesla Semi 25k · Powerwall >6 GWh · LFP cells for Megapack</td></tr><tr><td>Giga Shanghai</td><td>Model 3/Y >950k · Megapack 20 GWh</td></tr><tr><td>Giga Berlin</td><td>Model Y >375k</td></tr><tr><td>Fremont / Lathrop (CA)</td><td>Model 3/Y >550k · Megapack 40 GWh · Optimus: early ramp</td></tr></table><p><i>Tesla Q3 2026 Update, 21 Oct 2026.</i> In the game, Megapacks feed solar farms and inference boxes, and Optimus can speed up builds (speculative).</p><button onclick="closeM()">Close</button>`;openM()};
-TECH.find(t=>t.id==='casting').fx='Unlocks the 🪶 casting shop building: +50 blade sets/qtr per shop (assumption). Musk: "we\'re casting the blades and vanes"';
+
 TECH.find(t=>t.id==='boxes').fx='Unlocks the 📦 inference box factory: fleets of 100 MW with power and cooling built in: 0.1 GW GPUs + $1.5bn + either a gas genset (0.1 GW turbine cores + 3 blade sets + 0.4 GWh Megapack) or solar+storage (1.9 GWh Megapack); 2/qtr per factory. No shell, grid or turbines needed. Musk idea on the 20 Oct call; no product announced';
 TECH.find(t=>t.id==='orbital').fx='Unlocks the 🚀 Starship pad: 100 MW orbital batches ($3bn + 0.1 GW GPUs), 2/qtr per pad, max 4/qtr. Speculative';
-const HELP=`<h2>❓ How to play: Colossus Tycoon v3 (visual factory)</h2><ol>
-<li>It's <b>Oct 2026</b>. You're Elon, with ~2.2 GW of xAI compute online (Colossus 1+2) and Southaven's 41 turbines waiting for blades. Musk's floor is <b>13 GW by end-2027</b>.</li>
-<li>The map is your site. Supplier <b>import docks</b> sit on the left edge (NVIDIA, TSMC, HBM makers, turbine OEMs, Howmet/PCC, transformers, CDUs) and Tesla Megapack on the top. Order in <b>📋 Order books</b>: rivals with real GW plans bid on the same supply.</li>
-<li>Pick a building in the <b>build bar</b> and click the map. Belts auto-route from docks to buildings and animate the items they carry; yellow power lines carry MW to data halls, blue pipes carry coolant.</li>
-<li>Gas turbine plants need cores + blade sets <i>assembled</i> in a ⚙️ turbine assembly hall (1 GW/qtr each). Research the casting tech to build your own 🪶 blade & vane shops.</li>
-<li>Compute online = the lowest of racks, power, shell space and cooling. <span class="badc">Red pulsing</span> = starved, <span class="ev">orange</span> = backed up, <span style="color:#ffd84d">dashed yellow</span> = under construction.</li>
-<li>🖱 Drag to pan, wheel to zoom, right-click / Esc to cancel, R to fit the view. 📚 Sources tags every number as sourced, derived or game assumption.</li></ol><button onclick="closeM()">Let's build</button>`;
+const HELP=`<h2>How to play · Colossus Tycoon</h2><ol>
+<li>It's <b>Oct 2026</b>. You're Elon, with ~2.2 GW of xAI compute online (Colossus 1+2), Southaven's 41 turbines waiting for blades, and your own <b>Bastrop blades-and-vanes foundry</b> starting to ramp. Musk's floor is <b>13 GW by end-2027</b>.</li>
+<li>Supplier <b>import docks</b> line the left edge (NVIDIA, TSMC, HBM, turbine OEMs, Howmet/PCC, transformers, CDUs) and Tesla Megapack sits at the top. Order in <b>Orders</b>: rivals with real GW plans bid for the same supply.</li>
+<li>Pick a building in the bottom bar (or keys 1–0) and click the map. Belts auto-route and carry glowing items; power lines carry MW to data halls; pipes carry coolant.</li>
+<li>Gas turbine plants need cores + blade sets assembled in a turbine assembly hall (1 GW/qtr each). Build more casting shops any time; research ramp acceleration and the superalloy deal to cast faster.</li>
+<li>Compute online = the lowest of racks, power, shell space and cooling. Red rings = starved, amber = backed up, dashed scaffolding = under construction.</li>
+<li>Drag to pan, wheel or pinch to zoom, right-click / Esc to cancel, R to fit. <b>Sources</b> tags every number as sourced, derived or game assumption.</li></ol><button onclick="closeM()">Let's build</button>`;
 document.getElementById('helpBtn').onclick=()=>{document.getElementById('mbox').innerHTML=HELP;openM()};
-resize();newGame();fitView();draw();if(!location.hash.includes('nohelp')){document.getElementById('mbox').innerHTML=HELP;openM()}
-window.__G={get S(){return S},end,stats,place,findSpot,endQuarter,startTech,setReq,setPri,deployBox,launchOrb,raise,newGame,B,cam,fitView,canBuild,live};
+resize();newGame();fitView(true);draw();if(!location.hash.includes('nohelp')){document.getElementById('mbox').innerHTML=HELP;openM()}
+window.__G={get S(){return S},end,stats,place,findSpot,endQuarter,startTech,setReq,setPri,deployBox,launchOrb,raise,newGame,B,cam:tcam,fitView,zoomTo,canBuild,live};
 </script></body></html>
