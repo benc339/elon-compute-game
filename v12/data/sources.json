@@ -1,0 +1,20 @@
+{
+ "time_scale": "1 game month = 2 real seconds (all build times use this one scale)",
+ "root": "/workspace/ai-ecosystem",
+ "build_times_months": {
+  "turbine":   {"months": 24, "status": "sourced", "fact": "Combustion turbine lead time 2 years", "source": "EIA AEO2026 Electricity Market Module Table 3 (carried from v11 DUR.gt)", "path": "/workspace/elon-game/v11/index.html (DUR.gt)"},
+  "substation":{"months": 37, "status": "sourced", "fact": "US generator step-up transformer lead time ~160 weeks, Q1 2026 (WoodMac via Reuters)", "path": "/workspace/ai-ecosystem/reports/2026-10-02-ecosystem-report.md"},
+  "datacenter":{"months": 15, "status": "sourced", "fact": "Galaxy Helios I: 2025-03-30 start -> 133 MW IT complete ~15 months", "path": "/workspace/ai-ecosystem/model/MODEL-v0.md (line 83)"},
+  "foundry":   {"months": 30, "status": "sourced", "fact": "TSMC new-fab build 2-3 years (Q4'25 call), midpoint used", "path": "/workspace/ai-ecosystem/model/LEAD-LAG.md (line 47)"},
+  "hbm":       {"months": 30, "status": "placeholder", "fact": "No HBM-fab build time found; reuses TSMC fab 2-3 yr figure", "path": "/workspace/ai-ecosystem/model/LEAD-LAG.md (line 47)"},
+  "packaging": {"months": 15, "status": "sourced-proxy", "fact": "CoWoS booking lead time ~52-78 weeks (secondary; booking, not line build), midpoint 65 wk", "path": "/workspace/ai-ecosystem/model/LEAD-LAG.md (line 31)"},
+  "lab":       {"months": 12, "status": "placeholder", "fact": "No source; game assumption (same as v11)", "path": null}
+ },
+ "process_times_months": {
+  "hbm_stack": {"months": 3.5, "status": "sourced", "fact": "HBM fab TAT 3-4 months", "path": "/workspace/ai-ecosystem/scale/corrections/IdeaFarmManager-20261003-1102-street-sweep-hbm_dram.json (IFM-SW-183 note)"},
+  "die":       {"months": 3.5, "status": "placeholder", "fact": "No logic-wafer cycle time found; set equal to HBM TAT", "path": null},
+  "package":   {"months": 1, "status": "placeholder", "fact": "No CoWoS cycle-time mid (LEAD-LAG says OPEN)", "path": "/workspace/ai-ecosystem/model/LEAD-LAG.md"}
+ },
+ "power_mw": {"status": "placeholder", "fact": "Turbine 25 MW (v11 assumption), building draws are game assumptions", "path": null},
+ "not_checked": "server 204 /home/dev/eco-scale was not mined for this build"
+}
