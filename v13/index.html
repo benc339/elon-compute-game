@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" href="data:,"><title>Race to SI · v13 · you are the West</title>
+<link rel="icon" href="data:,"><title>Race to SI · v13 · start from scratch</title>
 <style>
 :root{--glass:rgba(12,18,32,.55);--line:rgba(140,190,255,.18);--txt:#dfe8ff;--dim:#8a9bbd;--acc:#5cc8ff;--hot:#ff4d5e;--ok:#46f0a6;--amb:#ffb547}
 *{box-sizing:border-box}html,body{margin:0;height:100%;background:#02040a;color:var(--txt);font:14px/1.4 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;overflow:hidden}
@@ -91,7 +91,7 @@ const rnd=(a,b)=>a+Math.random()*(b-a);
 
 // ---------- STATE ----------
 const START=new Date(2026,9,23);
-const S={m:0,speed:1,paused:false,q:[],inv:{lpt:0,brk:0,bush:0,oltc:0,goes:0},works:null,sub:{lpt:false,brk:false,en:false},log:[]};
+const S={m:0,speed:1,paused:false,q:[],inv:{lpt:0,brk:1,bush:1,oltc:1,goes:1},works:null,sub:{lpt:false,brk:false,en:false},log:[]};
 const ERCOT_END=monthsBetween(START,new Date(2026,11,10)); // pause on new >=75 MW DC energization until 2026-12-10
 function monthsBetween(a,b){return (b-a)/(1000*3600*24*30.44)}
 function dateAt(m){return new Date(START.getTime()+m*30.44*24*3600*1000)}
@@ -109,8 +109,8 @@ const ORDERS={
   china:{lead:15/30.44,txt:`Chinese mill ships a coil in ~15 days (vendor claim).${s('goes')} China made 56% of world GOES in 2023.${s('fastm')}`}}
 };
 // sourced dated China export-control events (from chokepoint-tree TREE.json)
-const CHINA_RISK=`No sourced GOES export control yet. China has controlled gallium/germanium/antimony (Dec 2024 ban to US)${s('usgs_ga')} and indium (Feb 2025)${s('usgs_in')}; the gallium-ban suspension ends Nov 27, 2026.${s('xinhua_ga')}`;
-// your existing / expanding Western factories (real dates)
+const CHINA_RISK=`(none sourced for GOES yet) China has controlled gallium/germanium/antimony (Dec 2024 ban to US)${s('usgs_ga')} and indium (Feb 2025)${s('usgs_in')}; the gallium-ban suspension ends Nov 27, 2026.${s('xinhua_ga')}`;
+// real-world Western capacity: CONTEXT only (not owned at start)
 const MINE=[
  {k:'hyosung',nm:'Hyosung HICO Memphis +50%',due:new Date(2026,11,1),src:'hyosung'},
  {k:'hdh',nm:'HD Hyundai Montgomery plant 2 (+50%, 765 kV)',due:new Date(2027,3,1),src:'hyundai'},
@@ -118,7 +118,7 @@ const MINE=[
  {k:'hitachi',nm:'Hitachi Energy South Boston VA',due:new Date(2028,0,1),src:'hitachi_va',approx:'"operational by 2028"'}];
 MINE.forEach(f=>f.m=monthsBetween(START,f.due));
 function order(k){const o=ORDERS[k],L=o.lead();S.q.push({k,name:o.name,start:S.m,len:L,from:o.from,type:'own'});log(`Queued ${o.name} in your own factories' backlog: ~${L.toFixed(0)} months`);if(o.from)addArc(o.from,'texas',S.q[S.q.length-1]);render()}
-function importCN(k){const o=ORDERS[k];S.q.push({k,name:o.name+' (China import)',start:S.m,len:o.china.lead,from:'china',type:'cn'});log(`Imported ${o.name} from China (export-control risk)`,'hot');addArc('china','texas',S.q[S.q.length-1]);render()}
+function importCN(k){const o=ORDERS[k];S.q.push({k,name:o.name+' (China import)',start:S.m,len:o.china.lead,from:'china',type:'cn'});log(`Imported ${o.name} from China`);addArc('china','texas',S.q[S.q.length-1]);render()}
 function buildWorks(){
  const eq=rnd(12,24),con=rnd(12,36);
  S.works={phase:'equip',eq,con,start:S.m,train:rnd(6,8),trainStart:null,prod:null};
@@ -134,19 +134,21 @@ function tick(dtMonths){
   if(w.phase==='equip'&&t>=Math.max(w.eq,w.con)){w.phase='train';w.trainStart=S.m;log('Works built & tooled. Hiring winders: 6–8 months training');render()}
   if(w.phase==='train'&&S.m-w.trainStart>=w.train){w.phase='ready';log('Winders trained. Works can build transformers (needs bushings + tap changer)','ok');render()}
   if(w.prod&&S.m-w.prod.start>=w.prod.len){w.prod=null;S.inv.lpt++;log('Home-built transformer passed drying & test','ok');render()}}
- for(const f of MINE)if(!f.done&&S.m>=f.m){f.done=true;log(`Your ${f.nm} came online${s(f.src)}`,'ok');render()}
+ if(!S.gaEv&&S.m>=monthsBetween(START,new Date(2026,10,27))){S.gaEv=true;log(`Event: China's suspension of its gallium export ban to the US ends today${s('xinhua_ga')} (no GOES control sourced)`,'hot')}
+ for(const f of MINE)if(!f.done&&S.m>=f.m){f.done=true;log(`World: ${f.nm} came online (not yours)${s(f.src)}`);render()}
  if(Math.floor(S.m*60)%30===0)renderQueue();
 }
 
 // ---------- UI ----------
 function render(){
  const A=[];const w=S.works;
- A.push(card('Your Western factories',MINE.map(f=>`${f.done?'✅':'🏗'} ${f.nm}: ${f.done?'online':(f.approx||'due '+fmt(f.due))}${s(f.src)}`).join('<br>')+`<br><i>Capacity gain per plant in units/yr: not sourced yet.</i>`,[]));
- A.push(card('Request a transformer from your factories',ORDERS.lpt.txt+`<br>Import from China: <i>not sourced yet</i> (China share of US LPT imports is a gap).`,[btn('Join your backlog',"order('lpt')")]));
- A.push(card('Request an HV breaker',ORDERS.brk.txt+` Import from China: <i>not sourced yet</i>.`,[btn('Join your backlog',"order('brk')")]));
- A.push(card('GOES core steel',ORDERS.goes.txt+`<div class="s" style="color:var(--hot,#ff4d5e)">🇨🇳 Import option: ${ORDERS.goes.china.txt}<br>⚠ ${CHINA_RISK}</div>`,[btn('🇨🇳 Import from China (~15 days)',"importCN('goes')")]));
- if(!w)A.push(card('Build another transformer works',`New factory: 1–3 years.${s('doe')} Biggest constraint is equipment: winding machines &amp; core tables take 1–2 years.${s('doe')} Then winders need 6–8 months of training.${s('niac')}`,[btn('Break ground',"buildWorks()")]));
- else A.push(card('Transformer works',w.phase==='ready'?`Ready. Each unit needs bushings + a tap changer + GOES core steel, then vapor-phase drying (64 h).${s('vpd')} Winding &amp; assembly time: <i>not sourced yet</i>.`:'Under way, see queues.',[btn('Bushings (your backlog)',"order('bush')"),btn('Tap changer (your backlog)',"order('oltc')"),btn('🇨🇳 Import GOES coil',"importCN('goes')")].concat(w.phase==='ready'?[btn(w.prod?'Drying…':'Build transformer',"produce()",!(S.inv.bush>0&&S.inv.oltc>0&&S.inv.goes>0)||!!w.prod)]:[])));
+ A.push(card('Starter kit (in stock)','You start with an empty Texas site and one starter set: 1 HV breaker, 1 set of bushings, 1 tap changer, 1 GOES coil. Enough for exactly one home-built transformer. Further units: build or import.',[]));
+ A.push(card('Transformer',`Buy one? Only by importing, and a China lead time for large transformers is <i>not sourced yet</i> (China share of US imports is a gap).${s('nlr')} So you build the works yourself.`,[]));
+ A.push(card('GOES core steel',ORDERS.goes.txt+`<div class="s">Import from China: ${ORDERS.goes.china.txt}<br>Events that can affect imports: ${CHINA_RISK}</div>`,[btn('Import from China (~15 days)',"importCN('goes')")]));
+ A.push(card('Bushings · tap changers · breakers','China import lead times: <i>not sourced yet</i>. Your own lines for these: later research (build times not sourced yet).',[]));
+ A.push(card('Real-world Western capacity (context, not yours)',MINE.map(f=>`${f.done?'✅':'🏗'} ${f.nm}: ${f.done?'online':(f.approx||'due '+fmt(f.due))}${s(f.src)}`).join('<br>')+`<br>US plants could make ~343 LPTs/yr (2019) and imported 82%.${s('doe')} Lead time 30–36 months.${s('nlr')} Possible later unlocks.`,[]));
+ if(!w)A.push(card('Build your first transformer works',`New factory: 1–3 years.${s('doe')} Biggest constraint is equipment: winding machines &amp; core tables take 1–2 years.${s('doe')} Then winders need 6–8 months of training.${s('niac')}`,[btn('Break ground',"buildWorks()")]));
+ else A.push(card('Transformer works',w.phase==='ready'?`Ready. Each unit needs bushings + a tap changer + GOES core steel, then vapor-phase drying (64 h).${s('vpd')} Winding &amp; assembly time: <i>not sourced yet</i>.`:'Under way, see queues.',[btn('Import GOES coil from China',"importCN('goes')")].concat(w.phase==='ready'?[btn(w.prod?'Drying…':'Build transformer',"produce()",!(S.inv.bush>0&&S.inv.oltc>0&&S.inv.goes>0)||!!w.prod)]:[])));
  const inv=[];if(S.inv.lpt&&!S.sub.lpt)inv.push(btn('Install transformer',"install('lpt')"));if(S.inv.brk&&!S.sub.brk)inv.push(btn('Install breaker',"install('brk')"));
  if(inv.length)A.push(card('Delivered parts','Ready to install at the substation.',inv));
  const gridOK=S.m>=ERCOT_END;
@@ -196,10 +198,10 @@ const atm=new THREE.Mesh(new THREE.SphereGeometry(2.18,96,64),new THREE.ShaderMa
 // stars
 {const n=4000,p=new Float32Array(n*3);for(let i=0;i<n;i++){const v=new THREE.Vector3().randomDirection().multiplyScalar(rnd(60,90));p.set([v.x,v.y,v.z],i*3)}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));G.add(new THREE.Points(g,new THREE.PointsMaterial({size:.12,color:0xaabbff,transparent:true,opacity:.8})))}
 function ll(lat,lon,r=2){const ph=(90-lat)*Math.PI/180,th=(lon+180)*Math.PI/180;return new THREE.Vector3(-r*Math.sin(ph)*Math.cos(th),r*Math.cos(ph),r*Math.sin(ph)*Math.sin(th))}
-const PL={texas:[31.0,-97.5,'TEXAS SITE'],korea:[35.5,129.3,'YOURS · HD HYUNDAI ULSAN'],germany:[49.0,12.1,'YOURS · REINHAUSEN'],sweden:[60.15,15.2,'YOURS · HITACHI ENERGY LUDVIKA'],china:[31.5,120.3,'CHINA · GOES MILLS (IMPORT)'],memphis:[35.1,-90.0,'YOURS · HYOSUNG MEMPHIS'],charlotte:[35.2,-80.8,'YOURS · SIEMENS CHARLOTTE'],montgomery:[32.4,-86.3,'YOURS · HD HYUNDAI AL'],hormuz:[26.6,56.3,'HORMUZ · HELIUM'],taiwan:[23.7,121.0,'TAIWAN · CoWoS']};
+const PL={texas:[31.0,-97.5,'TEXAS SITE'],korea:[35.5,129.3,'WORLD · HD HYUNDAI ULSAN'],germany:[49.0,12.1,'WORLD · REINHAUSEN'],sweden:[60.15,15.2,'WORLD · HITACHI ENERGY LUDVIKA'],china:[31.5,120.3,'CHINA · GOES MILLS (IMPORT)'],memphis:[35.1,-90.0,'WORLD · HYOSUNG MEMPHIS'],charlotte:[35.2,-80.8,'WORLD · SIEMENS CHARLOTTE'],montgomery:[32.4,-86.3,'WORLD · HD HYUNDAI AL'],hormuz:[26.6,56.3,'HORMUZ · HELIUM'],taiwan:[23.7,121.0,'TAIWAN · CoWoS']};
 const markers={};const globeGroup=new THREE.Group();earth.add(globeGroup);
 for(const[k,[la,lo,nm]] of Object.entries(PL)){const hot=k==='hormuz'||k==='taiwan'||k==='china',isSite=k==='texas';
- const c=new THREE.Color(hot?0xff3348:isSite?0x5cffc8:0x46f0a6);
+ const c=new THREE.Color(hot?0xff3348:isSite?0x5cffc8:0x5cc8ff);
  const m=new THREE.Mesh(new THREE.SphereGeometry(isSite?.045:.03,16,16),new THREE.MeshBasicMaterial({color:c.clone().multiplyScalar(3)}));m.position.copy(ll(la,lo,2.01));
  const ringM=new THREE.Mesh(new THREE.RingGeometry(.06,.075,48),new THREE.MeshBasicMaterial({color:c.clone().multiplyScalar(2.5),transparent:true,side:THREE.DoubleSide,depthWrite:false}));ringM.position.copy(ll(la,lo,2.012));ringM.lookAt(new THREE.Vector3());
  globeGroup.add(m,ringM);markers[k]={m,ring:ringM,hot,nm,site:isSite}}
@@ -288,7 +290,7 @@ R.domElement.addEventListener('click',e=>{if(mode!=='globe')return;mp.set(e.clie
  const p=hit[0].point;const t=markers.texas.m.getWorldPosition(new THREE.Vector3());if(p.distanceTo(t)<.5){gctl.autoRotate=false;zooming={from:gc.position.clone(),to:t.clone().setLength(2.7),t:0}}});
 R.domElement.addEventListener('mousemove',e=>{if(mode!=='globe')return;mp.set(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1);ray.setFromCamera(mp,gc);const tip=document.getElementById('tip');
  let best=null;for(const[k,v]of Object.entries(markers)){const w=v.m.getWorldPosition(new THREE.Vector3());const d=ray.ray.distanceToPoint(w);if(d<.08&&(!best||d<best.d))best={k,d}}
- if(best){const k=best.k;const T={hormuz:`<b>Strait of Hormuz</b><br>Qatar, ~⅓ of world helium, halted production in 2026.${s('helium')}`,taiwan:`<b>Taiwan</b><br>CoWoS packaging sold out; 52–78 week lead times.${s('cowos')}`,texas:'<b>Your site</b><br>Click to zoom in.',korea:'<b>Your HD Hyundai Electric</b><br>Transformer maker; Alabama plant 2 due Apr 2027.'+s('hyundai'),china:'<b>China (import only)</b><br>'+ORDERS.goes.china.txt+'<br>⚠ '+CHINA_RISK,memphis:'<b>Your Hyosung HICO Memphis</b><br>+50% expansion due Dec 2026.'+s('hyosung'),charlotte:'<b>Your Siemens Energy Charlotte</b><br>Transformer plant due mid-2027.'+s('siemens'),montgomery:'<b>Your HD Hyundai Montgomery</b><br>Plant 2 due Apr 2027.'+s('hyundai'),germany:'<b>Your Maschinenfabrik Reinhausen</b><br>Tap changers, mostly sourced from Europe.'+s('nlr'),sweden:'<b>Your Hitachi Energy</b><br>Bushings; US output limited to ≤235 kV.'+s('nlr')}[k];
+ if(best){const k=best.k;const T={hormuz:`<b>Strait of Hormuz</b><br>Qatar, ~⅓ of world helium, halted production in 2026.${s('helium')}`,taiwan:`<b>Taiwan</b><br>CoWoS packaging sold out; 52–78 week lead times.${s('cowos')}`,texas:'<b>Your site</b><br>Click to zoom in.',korea:'<b>HD Hyundai Electric</b><br>Transformer maker; Alabama plant 2 due Apr 2027.'+s('hyundai'),china:'<b>China · import source</b><br>'+ORDERS.goes.china.txt+'<br>Export-control events: '+CHINA_RISK,memphis:'<b>Hyosung HICO Memphis</b><br>+50% expansion due Dec 2026.'+s('hyosung'),charlotte:'<b>Siemens Energy Charlotte</b><br>Transformer plant due mid-2027.'+s('siemens'),montgomery:'<b>HD Hyundai Montgomery</b><br>Plant 2 due Apr 2027.'+s('hyundai'),germany:'<b>Maschinenfabrik Reinhausen</b><br>Tap changers, mostly sourced from Europe.'+s('nlr'),sweden:'<b>Hitachi Energy</b><br>Bushings; US output limited to ≤235 kV.'+s('nlr')}[k];
   tip.innerHTML=T;tip.style.display='block';tip.style.left=e.clientX+14+'px';tip.style.top=e.clientY+14+'px';R.domElement.style.cursor=k==='texas'?'pointer':'default'}else{tip.style.display='none';R.domElement.style.cursor='grab'}});
 addEventListener('resize',()=>{for(const c of[gc,wc]){c.aspect=innerWidth/innerHeight;c.updateProjectionMatrix()}R.setSize(innerWidth,innerHeight);comp.setSize(innerWidth,innerHeight)});
 
