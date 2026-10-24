@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,"><title>Race to SI · v13 · you are the West</title>
+<style>
+:root{--glass:rgba(12,18,32,.55);--line:rgba(140,190,255,.18);--txt:#dfe8ff;--dim:#8a9bbd;--acc:#5cc8ff;--hot:#ff4d5e;--ok:#46f0a6;--amb:#ffb547}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#02040a;color:var(--txt);font:14px/1.4 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;overflow:hidden}
+canvas{display:block}
+.glass{background:var(--glass);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
+#top{position:fixed;top:16px;left:50%;transform:translateX(-50%);display:flex;gap:18px;align-items:center;padding:10px 20px;z-index:5}
+#top .t{font-weight:700;letter-spacing:.18em;font-size:12px;color:var(--acc)}
+#date{font-variant-numeric:tabular-nums;font-size:18px;font-weight:600}
+#top button,.btn{background:rgba(92,200,255,.08);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:6px 11px;cursor:pointer;font:inherit}
+#top button.on{background:rgba(92,200,255,.28);border-color:var(--acc)}
+.btn:hover,#top button:hover{border-color:var(--acc);background:rgba(92,200,255,.18)}
+.btn[disabled]{opacity:.35;cursor:not-allowed}
+#goal{position:fixed;top:84px;left:20px;width:300px;padding:16px;z-index:5}
+#goal h3{margin:0 0 4px;font-size:11px;letter-spacing:.2em;color:var(--dim);font-weight:600}
+#goal .g{font-size:17px;font-weight:600;margin-bottom:10px}
+.chk{display:flex;gap:8px;align-items:center;margin:5px 0;color:var(--dim)}.chk.done{color:var(--ok)}
+.chk i{width:14px;height:14px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;flex:none}.chk.done i{background:currentColor;box-shadow:0 0 10px currentColor}
+#acts{position:fixed;right:20px;top:84px;width:340px;padding:16px;z-index:5;max-height:calc(100vh - 84px - 34vh);overflow:auto}
+#acts h3,#queue h3{margin:0 0 10px;font-size:11px;letter-spacing:.2em;color:var(--dim);font-weight:600}
+.card{padding:12px;border-radius:12px;border:1px solid var(--line);margin-bottom:10px;background:rgba(255,255,255,.02)}
+.card b{display:block;font-size:14px}.card p{margin:4px 0 8px;color:var(--dim);font-size:12.5px}
+.card .row{display:flex;gap:8px}
+sup a,a.src{color:var(--acc);text-decoration:none;font-size:10px;margin-left:2px;opacity:.85}sup a:hover{opacity:1;text-decoration:underline}
+#queue{position:fixed;left:20px;bottom:20px;width:420px;padding:16px;z-index:5;max-height:42vh;overflow:auto}
+.q{display:flex;align-items:center;gap:12px;margin:8px 0}
+.ring{width:38px;height:38px;flex:none}
+.q .n{font-weight:600;font-size:13px}.q .s{color:var(--dim);font-size:12px}
+.q.stall .n{color:var(--hot)}
+#ticker{position:fixed;bottom:20px;right:20px;width:340px;padding:12px 16px;z-index:5;font-size:12.5px;color:var(--dim);max-height:28vh;overflow:auto}
+#ticker div{margin:4px 0}#ticker .hot{color:var(--hot)}#ticker .ok{color:var(--ok)}
+#hint{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);color:var(--dim);font-size:13px;z-index:4;letter-spacing:.04em;pointer-events:none;transition:opacity .6s}
+#fade{position:fixed;inset:0;background:#02040a;opacity:0;pointer-events:none;transition:opacity .45s;z-index:8}
+#back{position:fixed;top:84px;left:340px;z-index:6;display:none}
+#label{position:fixed;pointer-events:none;z-index:4;font-size:12px;letter-spacing:.12em;color:#fff;text-shadow:0 0 8px #000;transform:translate(-50%,-140%)}
+#win{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:9;background:radial-gradient(ellipse at center,rgba(70,240,166,.12),rgba(2,4,10,.85))}
+#win .glass{padding:30px 36px;max-width:520px;text-align:center}#win h1{margin:0 0 8px;color:var(--ok);letter-spacing:.1em}
+#tip{position:fixed;z-index:10;pointer-events:none;padding:8px 10px;font-size:12px;max-width:260px;display:none}
+</style></head><body>
+<div id="fade"></div>
+<div id="top" class="glass"><span class="t">RACE TO SI</span><span id="date">Oct 2026</span>
+<span style="color:var(--dim);font-size:12px">1 game min = 1 real month<sup><a href="https://github.com/benc339/elon-game-context/blob/main/MECHANICS-LEADTIMES.md" target="_blank">src</a></sup></span>
+<button id="pause">❚❚</button><button data-sp="1" class="on">1×</button><button data-sp="4">4×</button><button data-sp="16">16×</button></div>
+<div id="goal" class="glass"><h3>CHAPTER 1 · FIRST GOAL</h3><div class="g">Energize a substation</div>
+<div class="chk" id="c-lpt"><i></i>Large power transformer on the pad</div>
+<div class="chk" id="c-brk"><i></i>HV circuit breaker installed</div>
+<div class="chk" id="c-grid"><i></i>Grid allows energization</div>
+<div class="chk" id="c-en"><i></i>Substation energized</div></div>
+<button id="back" class="btn glass">⟵ Globe</button>
+<div id="acts" class="glass"><h3>DECISIONS</h3><div id="actlist"></div></div>
+<div id="queue" class="glass"><h3>QUEUES</h3><div id="qlist"><div class="s" style="color:var(--dim)">Nothing ordered yet. Every part waits in its real-world queue.</div></div></div>
+<div id="ticker" class="glass"></div>
+<div id="hint">Click the glowing Texas site to zoom in · drag to rotate</div>
+<div id="label"></div><div id="tip" class="glass"></div>
+<div id="win"><div class="glass"><h1>SUBSTATION ENERGIZED</h1><p id="wintxt"></p><button class="btn" onclick="document.getElementById('win').style.display='none'">Keep watching</button></div></div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+
+// ---------- SOURCES (every number in the UI links to one of these; from chokepoint-tree TREE.json / transformer-factory.md) ----------
+const SRC={
+ nlr:'https://www.osti.gov/servlets/purl/3363379',
+ doe:'https://www.energy.gov/sites/default/files/2024-10/EXEC-2022-001242%20-%20Large%20Power%20Transformer%20Resilience%20Report%20signed%20by%20Secretary%20Granholm%20on%207-10-24.pdf',
+ niac:'https://www.cisa.gov/sites/default/files/2024-09/NIAC_Addressing%20the%20Critical%20Shortage%20of%20Power%20Transformers%20to%20Ensure%20Reliability%20of%20the%20U.S.%20Grid_Report_06112024_508c_pdf_0.pdf',
+ ercot:'https://www.ercot.com/files/docs/2026/04/09/ERCOTLargeLoadUpdate-April9HouseStateAffairsHearing.pdf',
+ vpd:'https://www.mdpi.com/1996-1073/18/4/789',
+ brk:'https://github.com/benc339/elon-game-context/blob/main/MECHANICS-LEADTIMES.md',
+ helium:'https://apnews.com/article/iran-chips-semiconductor-helium-exports-war-fe934332f7c83bb722ca87db22cd57d0',
+ cowos:'https://www.techtimes.com/articles/323112/20260805/ai-chip-design-era-ends-tsmc-affiliate-guc-posts-record-revenue-turnkey-surpasses-80.htm',
+ hyundai:'https://www.prnewswire.com/news-releases/hd-hyundai-electric-expands-us-production-subsidiary-solidifies-leadership-in-north-american-extra-high-voltage-power-transformer-market-302707507.html',
+ goes:'https://goessteel.com/blog/goes-supply-lead-times-tariffs-landed-cost/',
+ fastm:'https://www.fastmarkets.com/insights/chinese-electrical-steel-boost/',
+ usgs_ga:'https://pubs.usgs.gov/periodicals/mcs2026/mcs2026-gallium.pdf',
+ xinhua_ga:'https://english.news.cn/20251109/5edd761a05be48a0b369f12cdea0e78c/c.html',
+ usgs_in:'https://pubs.usgs.gov/periodicals/mcs2026/',
+ se_pr:'https://www.siemens-energy.com/us/en/home/press-releases/siemens_energy_addresses_shortage_US_powertransformers_invests_new_factory.html',
+ hitachi_va:'https://www.manufacturingdive.com/news/hitachi-unveils-1b-grid-manufacturing-investment-virginia-transformer/759512/',
+ hyosung:'https://www.the-today.com/news/articleView.html?idxno=91835',
+ siemens:'https://www.bizjournals.com/charlotte/news/2026/02/23/siemens-energy-expansion-transformers-jobs-hiring.html'
+};
+const s=k=>`<sup><a href="${SRC[k]}" target="_blank" title="source">src</a></sup>`;
+const rnd=(a,b)=>a+Math.random()*(b-a);
+
+// ---------- STATE ----------
+const START=new Date(2026,9,23);
+const S={m:0,speed:1,paused:false,q:[],inv:{lpt:0,brk:0,bush:0,oltc:0,goes:0},works:null,sub:{lpt:false,brk:false,en:false},log:[]};
+const ERCOT_END=monthsBetween(START,new Date(2026,11,10)); // pause on new >=75 MW DC energization until 2026-12-10
+function monthsBetween(a,b){return (b-a)/(1000*3600*24*30.44)}
+function dateAt(m){return new Date(START.getTime()+m*30.44*24*3600*1000)}
+function fmt(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
+function log(t,c=''){S.log.unshift({t:`<b>${fmt(dateAt(S.m))}</b> · ${t}`,c});S.log=S.log.slice(0,30);renderLog()}
+
+// v13: YOU are the West (US + Europe + Korea, Japan, Taiwan). Western makers are YOUR factories.
+// "Request" = put a unit into your own factories' real backlog. Only China is an import.
+const ORDERS={
+ lpt:{name:'Large power transformer',lead:()=>rnd(30,36),txt:`Your factories are full: lead time 30–36 months.${s('nlr')} US plants could make ~343 LPTs/yr (2019) and 82% of units were imported${s('doe')}; in v13 those imports from Korea count as your own output.`,from:'korea',china:null},
+ brk:{name:'HV circuit breaker',lead:()=>125/4.345,txt:`Your breaker lines (Hitachi Energy, Siemens Energy, GE Vernova…) quote ~125 weeks.${s('brk')}`,from:'sweden',china:null},
+ bush:{name:'HV bushings',lead:()=>130/4.345,txt:`Your Hitachi Energy plant: up to 130 weeks; US output only ≤235 kV, no 765 kV maker.${s('nlr')}`,from:'sweden',china:null},
+ oltc:{name:'On-load tap changer',lead:()=>rnd(80,90)/4.345,txt:`Your Reinhausen lines: 80–90 weeks.${s('nlr')}`,from:'germany',china:null},
+ goes:{name:'GOES core steel (coil)',lead:null,txt:`Your only US mill (Cleveland-Cliffs) makes limited conventional Hi-B; premium grades are imported.${s('nlr')} Western lead time: <i>not sourced yet</i>.`,from:null,
+  china:{lead:15/30.44,txt:`Chinese mill ships a coil in ~15 days (vendor claim).${s('goes')} China made 56% of world GOES in 2023.${s('fastm')}`}}
+};
+// sourced dated China export-control events (from chokepoint-tree TREE.json)
+const CHINA_RISK=`No sourced GOES export control yet. China has controlled gallium/germanium/antimony (Dec 2024 ban to US)${s('usgs_ga')} and indium (Feb 2025)${s('usgs_in')}; the gallium-ban suspension ends Nov 27, 2026.${s('xinhua_ga')}`;
+// your existing / expanding Western factories (real dates)
+const MINE=[
+ {k:'hyosung',nm:'Hyosung HICO Memphis +50%',due:new Date(2026,11,1),src:'hyosung'},
+ {k:'hdh',nm:'HD Hyundai Montgomery plant 2 (+50%, 765 kV)',due:new Date(2027,3,1),src:'hyundai'},
+ {k:'siemens',nm:'Siemens Energy Charlotte (slipped from early 2026)',due:new Date(2027,5,1),src:'siemens'},
+ {k:'hitachi',nm:'Hitachi Energy South Boston VA',due:new Date(2028,0,1),src:'hitachi_va',approx:'"operational by 2028"'}];
+MINE.forEach(f=>f.m=monthsBetween(START,f.due));
+function order(k){const o=ORDERS[k],L=o.lead();S.q.push({k,name:o.name,start:S.m,len:L,from:o.from,type:'own'});log(`Queued ${o.name} in your own factories' backlog: ~${L.toFixed(0)} months`);if(o.from)addArc(o.from,'texas',S.q[S.q.length-1]);render()}
+function importCN(k){const o=ORDERS[k];S.q.push({k,name:o.name+' (China import)',start:S.m,len:o.china.lead,from:'china',type:'cn'});log(`Imported ${o.name} from China (export-control risk)`,'hot');addArc('china','texas',S.q[S.q.length-1]);render()}
+function buildWorks(){
+ const eq=rnd(12,24),con=rnd(12,36);
+ S.works={phase:'equip',eq,con,start:S.m,train:rnd(6,8),trainStart:null,prod:null};
+ log(`Broke ground on a transformer works. Winding machines & core tables: ${eq.toFixed(0)} mo wait; building: ${con.toFixed(0)} mo`);render()}
+function produce(){S.inv.bush--;S.inv.oltc--;S.inv.goes--;S.works.prod={start:S.m,len:64/730};log('Coil into vapor-phase drying (64 h at ≤130 °C)…');render()}
+function install(k){S.inv[k]--;S.sub[k]=true;log(k==='lpt'?'Transformer set on the substation pad':'Breaker installed','ok');render()}
+function energize(){S.sub.en=true;log('SUBSTATION ENERGIZED','ok');document.getElementById('wintxt').innerHTML=`Energized on <b>${fmt(dateAt(S.m))}</b>, ${S.m.toFixed(1)} months after the start. Every wait you sat through is a real 2026 queue. Next chapter: power for something that needs it.`;document.getElementById('win').style.display='flex';render()}
+
+function tick(dtMonths){
+ S.m+=dtMonths;
+ for(const q of [...S.q]){if(S.m-q.start>=q.len){S.q.splice(S.q.indexOf(q),1);S.inv[q.k]++;log(`${q.name} delivered`,'ok');render()}}
+ const w=S.works;if(w){const t=S.m-w.start;
+  if(w.phase==='equip'&&t>=Math.max(w.eq,w.con)){w.phase='train';w.trainStart=S.m;log('Works built & tooled. Hiring winders: 6–8 months training');render()}
+  if(w.phase==='train'&&S.m-w.trainStart>=w.train){w.phase='ready';log('Winders trained. Works can build transformers (needs bushings + tap changer)','ok');render()}
+  if(w.prod&&S.m-w.prod.start>=w.prod.len){w.prod=null;S.inv.lpt++;log('Home-built transformer passed drying & test','ok');render()}}
+ for(const f of MINE)if(!f.done&&S.m>=f.m){f.done=true;log(`Your ${f.nm} came online${s(f.src)}`,'ok');render()}
+ if(Math.floor(S.m*60)%30===0)renderQueue();
+}
+
+// ---------- UI ----------
+function render(){
+ const A=[];const w=S.works;
+ A.push(card('Your Western factories',MINE.map(f=>`${f.done?'✅':'🏗'} ${f.nm}: ${f.done?'online':(f.approx||'due '+fmt(f.due))}${s(f.src)}`).join('<br>')+`<br><i>Capacity gain per plant in units/yr: not sourced yet.</i>`,[]));
+ A.push(card('Request a transformer from your factories',ORDERS.lpt.txt+`<br>Import from China: <i>not sourced yet</i> (China share of US LPT imports is a gap).`,[btn('Join your backlog',"order('lpt')")]));
+ A.push(card('Request an HV breaker',ORDERS.brk.txt+` Import from China: <i>not sourced yet</i>.`,[btn('Join your backlog',"order('brk')")]));
+ A.push(card('GOES core steel',ORDERS.goes.txt+`<div class="s" style="color:var(--hot,#ff4d5e)">🇨🇳 Import option: ${ORDERS.goes.china.txt}<br>⚠ ${CHINA_RISK}</div>`,[btn('🇨🇳 Import from China (~15 days)',"importCN('goes')")]));
+ if(!w)A.push(card('Build another transformer works',`New factory: 1–3 years.${s('doe')} Biggest constraint is equipment: winding machines &amp; core tables take 1–2 years.${s('doe')} Then winders need 6–8 months of training.${s('niac')}`,[btn('Break ground',"buildWorks()")]));
+ else A.push(card('Transformer works',w.phase==='ready'?`Ready. Each unit needs bushings + a tap changer + GOES core steel, then vapor-phase drying (64 h).${s('vpd')} Winding &amp; assembly time: <i>not sourced yet</i>.`:'Under way, see queues.',[btn('Bushings (your backlog)',"order('bush')"),btn('Tap changer (your backlog)',"order('oltc')"),btn('🇨🇳 Import GOES coil',"importCN('goes')")].concat(w.phase==='ready'?[btn(w.prod?'Drying…':'Build transformer',"produce()",!(S.inv.bush>0&&S.inv.oltc>0&&S.inv.goes>0)||!!w.prod)]:[])));
+ const inv=[];if(S.inv.lpt&&!S.sub.lpt)inv.push(btn('Install transformer',"install('lpt')"));if(S.inv.brk&&!S.sub.brk)inv.push(btn('Install breaker',"install('brk')"));
+ if(inv.length)A.push(card('Delivered parts','Ready to install at the substation.',inv));
+ const gridOK=S.m>=ERCOT_END;
+ A.push(card('Energize substation',gridOK?'Grid connection allowed.':`ERCOT has paused energizing new ≥75 MW data-center loads until Dec 10, 2026.${s('ercot')}`,[btn('Energize',"energize()",!(S.sub.lpt&&S.sub.brk&&gridOK)||S.sub.en)]));
+ document.getElementById('actlist').innerHTML=A.join('');
+ chk('c-lpt',S.sub.lpt);chk('c-brk',S.sub.brk);chk('c-grid',gridOK);chk('c-en',S.sub.en);
+ renderQueue();
+}
+const card=(t,p,b)=>`<div class="card"><b>${t}</b><p>${p}</p><div class="row">${b.join('')}</div></div>`;
+const btn=(t,f,dis)=>`<button class="btn" onclick="${f}" ${dis?'disabled':''}>${t}</button>`;
+const chk=(id,v)=>document.getElementById(id).classList.toggle('done',!!v);
+function ring(f,c){const r=15,C=2*Math.PI*r;return `<svg class="ring" viewBox="0 0 38 38"><circle cx="19" cy="19" r="${r}" stroke="rgba(255,255,255,.08)" stroke-width="4" fill="none"/><circle cx="19" cy="19" r="${r}" stroke="${c}" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-f)}" transform="rotate(-90 19 19)" style="filter:drop-shadow(0 0 4px ${c})"/></svg>`}
+function renderQueue(){
+ const L=[];for(const q of S.q){const f=Math.min(1,(S.m-q.start)/q.len);L.push(`<div class="q">${ring(f,'#5cc8ff')}<div><div class="n">${q.name}</div><div class="s">${(q.len-(S.m-q.start)).toFixed(1)} months left · arrives ${fmt(dateAt(q.start+q.len))}</div></div></div>`)}
+ const w=S.works;if(w&&w.phase!=='ready'){const t=S.m-w.start;
+  if(w.phase==='equip'){L.push(`<div class="q stall">${ring(Math.min(1,t/w.eq),'#ff4d5e')}<div><div class="n">Winding machines &amp; core tables</div><div class="s">${Math.max(0,w.eq-t).toFixed(1)} mo · equipment is the binding constraint${s('doe')}</div></div></div>`);
+   L.push(`<div class="q">${ring(Math.min(1,t/w.con),'#ffb547')}<div><div class="n">Factory construction</div><div class="s">${Math.max(0,w.con-t).toFixed(1)} mo left${s('doe')}</div></div></div>`)}
+  if(w.phase==='train'){const tt=S.m-w.trainStart;L.push(`<div class="q">${ring(tt/w.train,'#46f0a6')}<div><div class="n">Training winders</div><div class="s">${(w.train-tt).toFixed(1)} mo left${s('niac')}</div></div></div>`)}}
+ if(w&&w.prod)L.push(`<div class="q">${ring((S.m-w.prod.start)/w.prod.len,'#46f0a6')}<div><div class="n">Vapor-phase drying</div><div class="s">64 h${s('vpd')}</div></div></div>`);
+ const inv=Object.entries(S.inv).filter(([k,v])=>v>0).map(([k,v])=>`${v}× ${ORDERS[k].name}`).join(' · ');
+ document.getElementById('qlist').innerHTML=(L.join('')||'<div class="s" style="color:var(--dim)">No open queues.</div>')+(inv?`<div class="s" style="margin-top:8px;color:var(--ok)">In stock: ${inv}</div>`:'');
+}
+function renderLog(){document.getElementById('ticker').innerHTML=S.log.map(l=>`<div class="${l.c}">${l.t}</div>`).join('')}
+Object.assign(window,{order,importCN,buildWorks,produce,install,energize});window.__S=S;
+document.getElementById('pause').onclick=e=>{S.paused=!S.paused;e.target.textContent=S.paused?'▶':'❚❚'};
+document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.sp;document.querySelectorAll('[data-sp]').forEach(x=>x.classList.toggle('on',x===b))});
+
+// ---------- RENDERER ----------
+const R=new THREE.WebGLRenderer({antialias:true});R.setPixelRatio(Math.min(devicePixelRatio,2));R.setSize(innerWidth,innerHeight);
+R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.05;R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+document.body.prepend(R.domElement);
+
+// ---------- GLOBE SCENE ----------
+const G=new THREE.Scene();const gc=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,.1,200);gc.position.set(-1.2,1.6,6.2);
+const gctl=new OrbitControls(gc,R.domElement);gctl.enableDamping=true;gctl.minDistance=2.4;gctl.maxDistance=12;gctl.enablePan=false;gctl.autoRotate=true;gctl.autoRotateSpeed=.25;
+const TL=new THREE.TextureLoader();const day=TL.load('assets/earth_atmos_2048.jpg'),night=TL.load('assets/earth_lights_2048.png');day.colorSpace=night.colorSpace=THREE.SRGBColorSpace;
+const sun=new THREE.Vector3(1,.35,.6).normalize();
+const earthMat=new THREE.ShaderMaterial({uniforms:{day:{value:day},night:{value:night},sun:{value:sun}},
+ vertexShader:`varying vec2 vUv;varying vec3 vN;varying vec3 vW;void main(){vUv=uv;vN=normalize(mat3(modelMatrix)*normal);vW=(modelMatrix*vec4(position,1.)).xyz;gl_Position=projectionMatrix*viewMatrix*vec4(vW,1.);}`,
+ fragmentShader:`uniform sampler2D day,night;uniform vec3 sun;varying vec2 vUv;varying vec3 vN;varying vec3 vW;
+ void main(){float d=dot(normalize(vN),sun);float k=smoothstep(-.18,.22,d);vec3 dc=texture2D(day,vUv).rgb*(.08+1.1*max(d,0.));vec3 nc=texture2D(night,vUv).rgb;nc=pow(nc,vec3(1.4))*vec3(1.6,1.25,.85)*2.2;
+ vec3 V=normalize(cameraPosition-vW);float rim=pow(1.-max(dot(V,normalize(vN)),0.),3.);vec3 col=mix(nc,dc,k)+rim*vec3(.2,.45,1.)*(.08+.3*k);gl_FragColor=vec4(col,1.);}`});
+const earth=new THREE.Mesh(new THREE.SphereGeometry(2,128,96),earthMat);G.add(earth);
+const atm=new THREE.Mesh(new THREE.SphereGeometry(2.18,96,64),new THREE.ShaderMaterial({transparent:true,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false,uniforms:{sun:{value:sun}},
+ vertexShader:`varying vec3 vN;varying vec3 vW;void main(){vN=normalize(mat3(modelMatrix)*normal);vW=(modelMatrix*vec4(position,1.)).xyz;gl_Position=projectionMatrix*viewMatrix*vec4(vW,1.);}`,
+ fragmentShader:`uniform vec3 sun;varying vec3 vN;varying vec3 vW;void main(){vec3 V=normalize(cameraPosition-vW);float i=pow(max(.68-dot(V,vN),0.),4.);float l=.35+.65*smoothstep(-.3,.5,dot(vN,sun));gl_FragColor=vec4(vec3(.3,.6,1.)*i*l*.9,i*.8);}`}));G.add(atm);
+// stars
+{const n=4000,p=new Float32Array(n*3);for(let i=0;i<n;i++){const v=new THREE.Vector3().randomDirection().multiplyScalar(rnd(60,90));p.set([v.x,v.y,v.z],i*3)}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));G.add(new THREE.Points(g,new THREE.PointsMaterial({size:.12,color:0xaabbff,transparent:true,opacity:.8})))}
+function ll(lat,lon,r=2){const ph=(90-lat)*Math.PI/180,th=(lon+180)*Math.PI/180;return new THREE.Vector3(-r*Math.sin(ph)*Math.cos(th),r*Math.cos(ph),r*Math.sin(ph)*Math.sin(th))}
+const PL={texas:[31.0,-97.5,'TEXAS SITE'],korea:[35.5,129.3,'YOURS · HD HYUNDAI ULSAN'],germany:[49.0,12.1,'YOURS · REINHAUSEN'],sweden:[60.15,15.2,'YOURS · HITACHI ENERGY LUDVIKA'],china:[31.5,120.3,'CHINA · GOES MILLS (IMPORT)'],memphis:[35.1,-90.0,'YOURS · HYOSUNG MEMPHIS'],charlotte:[35.2,-80.8,'YOURS · SIEMENS CHARLOTTE'],montgomery:[32.4,-86.3,'YOURS · HD HYUNDAI AL'],hormuz:[26.6,56.3,'HORMUZ · HELIUM'],taiwan:[23.7,121.0,'TAIWAN · CoWoS']};
+const markers={};const globeGroup=new THREE.Group();earth.add(globeGroup);
+for(const[k,[la,lo,nm]] of Object.entries(PL)){const hot=k==='hormuz'||k==='taiwan'||k==='china',isSite=k==='texas';
+ const c=new THREE.Color(hot?0xff3348:isSite?0x5cffc8:0x46f0a6);
+ const m=new THREE.Mesh(new THREE.SphereGeometry(isSite?.045:.03,16,16),new THREE.MeshBasicMaterial({color:c.clone().multiplyScalar(3)}));m.position.copy(ll(la,lo,2.01));
+ const ringM=new THREE.Mesh(new THREE.RingGeometry(.06,.075,48),new THREE.MeshBasicMaterial({color:c.clone().multiplyScalar(2.5),transparent:true,side:THREE.DoubleSide,depthWrite:false}));ringM.position.copy(ll(la,lo,2.012));ringM.lookAt(new THREE.Vector3());
+ globeGroup.add(m,ringM);markers[k]={m,ring:ringM,hot,nm,site:isSite}}
+// regions glow: US & Europe soft halos
+for(const[la,lo,r] of [[39,-98,.55],[50,10,.38]]){const h=new THREE.Mesh(new THREE.CircleGeometry(r,64),new THREE.MeshBasicMaterial({color:new THREE.Color(0x2a8cff).multiplyScalar(.6),transparent:true,opacity:.13,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));h.position.copy(ll(la,lo,2.015));h.lookAt(new THREE.Vector3());globeGroup.add(h)}
+const arcs=[];
+function addArc(a,b,q){const A=ll(PL[a][0],PL[a][1],2.01),B=ll(PL[b][0],PL[b][1],2.01);const mid=A.clone().add(B).multiplyScalar(.5);const h=2+A.distanceTo(B)*.38;mid.setLength(h);
+ const curve=new THREE.QuadraticBezierCurve3(A,mid,B);const tube=new THREE.Mesh(new THREE.TubeGeometry(curve,96,.006,8),new THREE.MeshBasicMaterial({color:new THREE.Color(0x5cc8ff).multiplyScalar(2.2),transparent:true,opacity:.75}));
+ const pod=new THREE.Mesh(new THREE.SphereGeometry(.028,16,16),new THREE.MeshBasicMaterial({color:new THREE.Color(0xffd27a).multiplyScalar(5)}));globeGroup.add(tube,pod);arcs.push({curve,tube,pod,q})}
+// ambient trade arcs (decorative flows, no numbers)
+const ambient=[['taiwan','texas'],['hormuz','germany'],['korea','texas']].map(([a,b])=>{addArc(a,b,null);return arcs[arcs.length-1]});
+ambient.forEach(x=>{x.tube.material.opacity=.18;x.pod.material.color.set(new THREE.Color(0x7fb8ff).multiplyScalar(2.5));x.pod.scale.setScalar(.6)});
+earth.rotation.y=-1.2;
+
+// ---------- SITE SCENE ----------
+const W=new THREE.Scene();W.background=new THREE.Color(0x0b1220);W.fog=new THREE.Fog(0x0b1220,60,170);
+const wc=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,.1,400);wc.position.set(38,26,44);
+const wctl=new OrbitControls(wc,R.domElement);wctl.enableDamping=true;wctl.target.set(0,2,0);wctl.maxPolarAngle=1.42;wctl.minDistance=15;wctl.maxDistance=110;wctl.enabled=false;
+W.add(new THREE.HemisphereLight(0x9cc4ff,0x1a1408,.55));
+const dl=new THREE.DirectionalLight(0xffe2b8,2.4);dl.position.set(-40,50,25);dl.castShadow=true;dl.shadow.mapSize.set(2048,2048);Object.assign(dl.shadow.camera,{left:-60,right:60,top:60,bottom:-60,far:160});dl.shadow.bias=-.0004;W.add(dl);
+const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.7,metalness:.2,...o});
+function box(w,h,d,mat,x=0,y=0,z=0,p=W){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;p.add(m);return m}
+function cyl(r,h,mat,x,y,z,p=W,rt=r){const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,r,h,20),mat);m.position.set(x,y,z);m.castShadow=true;p.add(m);return m}
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(400,400),M(0x2a3324,{roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;W.add(ground);
+box(140,.06,7,M(0x1d1f24,{roughness:.9}),0,.03,18);for(let i=-65;i<70;i+=6)box(2.4,.08,.25,M(0xd8c87a,{emissive:0x332a08}),i,.07,18);
+box(46,.1,34,M(0x5d5f62,{roughness:.95}),-24,.05,-6);box(36,.1,28,M(0x7a776c,{roughness:1}),22,.05,-4);
+// --- transformer works (left)
+const works=new THREE.Group();works.position.set(-24,0,-6);W.add(works);
+const shell=new THREE.Group();works.add(shell);
+const wall=M(0xc9ced6,{metalness:.5,roughness:.45}),roofM=M(0x3b4552,{metalness:.6,roughness:.4}),glow=new THREE.MeshStandardMaterial({color:0x111111,emissive:0xffc070,emissiveIntensity:2.2});
+box(36,9,22,wall,0,4.5,0,shell);
+for(let i=0;i<6;i++){const r=new THREE.Mesh(new THREE.CylinderGeometry(1.9,1.9,22,3,1,false),roofM);r.rotation.x=Math.PI/2;r.rotation.y=0;r.position.set(-15+i*6,10.1,0);r.scale.set(1.6,1,1);r.castShadow=true;shell.add(r);
+ const gl=box(.25,1.6,21,glow,-13.2+i*6,10.2,0,shell)}
+for(let i=0;i<9;i++)box(2.2,1,.1,glow,-15+i*3.8,6.5,11.05,shell);
+box(7,7,.2,M(0x222831),10,3.5,11.1,shell);box(6.4,.3,.25,glow,10,7.2,11.2,shell);
+cyl(.8,6,M(0x8d939c,{metalness:.7}),15,12,-7,shell);
+const scaff=new THREE.Group();works.add(scaff);
+for(let x=-18;x<=18;x+=4)for(let z of[-11,11]){box(.18,11,.18,M(0xffa200,{metalness:.6}),x,5.5,z,scaff)}for(let y=2;y<12;y+=3)for(let z of[-11,11])box(36,.14,.14,M(0xffa200),0,y,z,scaff);
+// gantry crane outside
+const crane=new THREE.Group();crane.position.set(0,0,15);works.add(crane);
+for(const x of[-14,14]){box(.6,12,.6,M(0xf2b705,{metalness:.6}),x,6,-2,crane);box(.6,12,.6,M(0xf2b705,{metalness:.6}),x,6,2,crane)}
+const beam=box(29,1,1.2,M(0xf2b705,{metalness:.6}),0,12,0,crane);const trolley=box(2,1,2,M(0x333333),0,11.2,0,crane);const hook=box(.2,5,.2,M(0x222222),0,8.5,0,crane);
+// --- substation (right)
+const sub=new THREE.Group();sub.position.set(22,0,-4);W.add(sub);
+const steel=M(0x9aa3ad,{metalness:.8,roughness:.35});
+for(let x=-17;x<=17;x+=2.5){box(.08,2.2,.08,steel,x,1.1,-14,sub);box(.08,2.2,.08,steel,x,1.1,14,sub)}for(let z=-14;z<=14;z+=2.5){box(.08,2.2,.08,steel,-18,1.1,z,sub);box(.08,2.2,.08,steel,18,1.1,z,sub)}
+for(const z of[-14,14])box(36,.05,.05,steel,0,2.1,z,sub);for(const x of[-18,18])box(.05,.05,28,steel,x,2.1,0,sub);
+function lattice(x,z,h){for(const dx of[-.6,.6])for(const dz of[-.6,.6])box(.18,h,.18,steel,x+dx,h/2,z+dz,sub);for(let y=1.5;y<h;y+=1.5){box(1.4,.08,.08,steel,x,y,z-.6,sub);box(1.4,.08,.08,steel,x,y,z+.6,sub)}}
+for(const z of[-9,9]){lattice(-12,z,13);lattice(12,z,13)}for(const z of[-9,9])box(25,.5,.5,steel,0,13,z,sub);
+const wires=[];const wireMat=new THREE.MeshStandardMaterial({color:0x666a70,metalness:.9,roughness:.3,emissive:0x000000});
+for(const x of[-6,0,6]){const c=new THREE.CatmullRomCurve3([new THREE.Vector3(x,12.6,-9),new THREE.Vector3(x,11,0),new THREE.Vector3(x,12.6,9)]);const t=new THREE.Mesh(new THREE.TubeGeometry(c,32,.05,6),wireMat);sub.add(t);wires.push(t);
+ const off=new THREE.CatmullRomCurve3([new THREE.Vector3(x,12.6,9),new THREE.Vector3(x+2,10,40),new THREE.Vector3(x+4,12.6,70)]);const t2=new THREE.Mesh(new THREE.TubeGeometry(off,32,.05,6),wireMat);sub.add(t2);wires.push(t2)}
+for(let i=1;i<3;i++){const z=-4+i*33;lattice(0,z,15)}
+// transformer model (procedural LPT: tank, radiators, conservator, bushings)
+function makeLPT(){const g=new THREE.Group();const tankM=M(0x6d7e74,{metalness:.55,roughness:.5});
+ box(7,5,4.2,tankM,0,3,0,g);box(7.4,.4,4.6,tankM,0,5.7,0,g);box(7.6,.6,4.8,M(0x3a3f44),0,.3,0,g);
+ for(let i=0;i<9;i++){box(.12,4,1.6,tankM,-3.2+i*.8,3,-3.1,g);box(.12,4,1.6,tankM,-3.2+i*.8,3,3.1,g)}
+ const cons=new THREE.Mesh(new THREE.CylinderGeometry(.7,.7,5,20),tankM);cons.rotation.z=Math.PI/2;cons.position.set(0,7.3,-1.4);cons.castShadow=true;g.add(cons);
+ const por=M(0x8b4a2b,{roughness:.35}),cap=M(0xb8bec6,{metalness:.9});const bush=[];
+ for(const x of[-2.2,0,2.2]){for(let k=0;k<7;k++){const s=new THREE.Mesh(new THREE.CylinderGeometry(k%2?.32:.42,k%2?.32:.42,.35,16),por);s.position.set(x,6.3+k*.38,.8);s.castShadow=true;g.add(s)}const t=cyl(.22,.4,cap,x,9,.8,g);bush.push(t)}
+ return {g,bush}}
+const lpt=makeLPT();lpt.g.position.set(0,0,0);lpt.g.visible=false;sub.add(lpt.g);
+const brk=new THREE.Group();for(const x of[-6,0,6]){box(1.2,3.5,1.2,M(0x9aa6b0,{metalness:.6}),x,1.75,6,brk);cyl(.3,2.4,M(0x8b4a2b),x,4.7,6,brk)}brk.visible=false;sub.add(brk);
+// pads
+box(9,.3,6,M(0x8e8e88),0,.15,0,sub);box(16,.3,3,M(0x8e8e88),0,.15,6,sub);
+// sparks/energy particles
+const spN=300,spP=new Float32Array(spN*3);const spG=new THREE.BufferGeometry();spG.setAttribute('position',new THREE.BufferAttribute(spP,3));
+const sparks=new THREE.Points(spG,new THREE.PointsMaterial({size:.25,color:new THREE.Color(0x7fe9ff).multiplyScalar(4),transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}));sub.add(sparks);
+const spV=[];for(let i=0;i<spN;i++)spV.push(new THREE.Vector3());
+// trucks
+const truck=new THREE.Group();box(3,2,2.2,M(0x2f6fd1,{metalness:.4}),3.5,1.4,0,truck);box(8,.5,2.4,M(0x333333),-1,.7,0,truck);const truckLoad=box(4,2.4,2,M(0x6d7e74),-1.5,2.2,0,truck);truck.position.set(-70,0,18);W.add(truck);
+const lamps=[];for(let x=-60;x<=60;x+=20){const p=new THREE.PointLight(0xffb36b,0,22,1.8);p.position.set(x,6,22);W.add(p);lamps.push(p);cyl(.12,6,M(0x333333),x,3,22.5);box(.6,.2,.6,new THREE.MeshStandardMaterial({emissive:0xffb36b,emissiveIntensity:3}),x,6,22.5)}
+
+// ---------- POST ----------
+const comp=new EffectComposer(R);const rp=new RenderPass(G,gc);comp.addPass(rp);
+const bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),.6,.5,.88);comp.addPass(bloom);comp.addPass(new OutputPass());
+let mode='globe';
+function setMode(m){const f=document.getElementById('fade');f.style.opacity=1;setTimeout(()=>{mode=m;rp.scene=m==='globe'?G:W;rp.camera=m==='globe'?gc:wc;gctl.enabled=m==='globe';wctl.enabled=m==='site';
+ bloom.strength=m==='globe'?.6:.55;bloom.threshold=m==='globe'?.88:.9;document.getElementById('back').style.display=m==='site'?'block':'none';document.getElementById('hint').style.opacity=m==='globe'?1:0;
+ document.getElementById('label').style.display=m==='globe'?'block':'none';if(m==='site'){wc.position.set(60,40,70)}f.style.opacity=0},460)}
+document.getElementById('back').onclick=()=>setMode('globe');
+// picking
+const ray=new THREE.Raycaster(),mp=new THREE.Vector2();let zooming=null;
+R.domElement.addEventListener('click',e=>{if(mode!=='globe')return;mp.set(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1);ray.setFromCamera(mp,gc);
+ const hit=ray.intersectObjects([markers.texas.m,markers.texas.ring,...Object.values(markers).map(x=>x.m),earth]);if(!hit.length)return;
+ const p=hit[0].point;const t=markers.texas.m.getWorldPosition(new THREE.Vector3());if(p.distanceTo(t)<.5){gctl.autoRotate=false;zooming={from:gc.position.clone(),to:t.clone().setLength(2.7),t:0}}});
+R.domElement.addEventListener('mousemove',e=>{if(mode!=='globe')return;mp.set(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1);ray.setFromCamera(mp,gc);const tip=document.getElementById('tip');
+ let best=null;for(const[k,v]of Object.entries(markers)){const w=v.m.getWorldPosition(new THREE.Vector3());const d=ray.ray.distanceToPoint(w);if(d<.08&&(!best||d<best.d))best={k,d}}
+ if(best){const k=best.k;const T={hormuz:`<b>Strait of Hormuz</b><br>Qatar, ~⅓ of world helium, halted production in 2026.${s('helium')}`,taiwan:`<b>Taiwan</b><br>CoWoS packaging sold out; 52–78 week lead times.${s('cowos')}`,texas:'<b>Your site</b><br>Click to zoom in.',korea:'<b>Your HD Hyundai Electric</b><br>Transformer maker; Alabama plant 2 due Apr 2027.'+s('hyundai'),china:'<b>China (import only)</b><br>'+ORDERS.goes.china.txt+'<br>⚠ '+CHINA_RISK,memphis:'<b>Your Hyosung HICO Memphis</b><br>+50% expansion due Dec 2026.'+s('hyosung'),charlotte:'<b>Your Siemens Energy Charlotte</b><br>Transformer plant due mid-2027.'+s('siemens'),montgomery:'<b>Your HD Hyundai Montgomery</b><br>Plant 2 due Apr 2027.'+s('hyundai'),germany:'<b>Your Maschinenfabrik Reinhausen</b><br>Tap changers, mostly sourced from Europe.'+s('nlr'),sweden:'<b>Your Hitachi Energy</b><br>Bushings; US output limited to ≤235 kV.'+s('nlr')}[k];
+  tip.innerHTML=T;tip.style.display='block';tip.style.left=e.clientX+14+'px';tip.style.top=e.clientY+14+'px';R.domElement.style.cursor=k==='texas'?'pointer':'default'}else{tip.style.display='none';R.domElement.style.cursor='grab'}});
+addEventListener('resize',()=>{for(const c of[gc,wc]){c.aspect=innerWidth/innerHeight;c.updateProjectionMatrix()}R.setSize(innerWidth,innerHeight);comp.setSize(innerWidth,innerHeight)});
+
+// ---------- LOOP ----------
+const clock=new THREE.Clock();let el=0;
+log('Chapter 1. You have land in Texas and no grid connection. Energize a substation.');
+log(`ERCOT: ~410 GW of large loads queued; new ≥75 MW data-center energization paused until Dec 10, 2026.${s('ercot')}`,'hot');
+render();
+function loop(){requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.1);el+=dt;
+ if(!S.paused&&!S.sub.en)tick(dt/60*S.speed);else if(!S.paused)tick(dt/60*S.speed);
+ document.getElementById('date').textContent=fmt(dateAt(S.m));
+ // globe anim
+ for(const[k,v]of Object.entries(markers)){const p=(Math.sin(el*(v.hot?4:2))+1)/2;v.ring.scale.setScalar(1+p*(v.hot?1.4:.7));v.ring.material.opacity=v.hot?.4+.6*p:.3+.4*p}
+ for(const a of arcs){let f;if(a.q){if(!S.q.includes(a.q)){globeGroup.remove(a.tube,a.pod);arcs.splice(arcs.indexOf(a),1);continue}f=(S.m-a.q.start)/a.q.len}else f=(el*.08+arcs.indexOf(a)*.3)%1;a.pod.position.copy(a.curve.getPoint(Math.min(1,f)))}
+ if(zooming){zooming.t+=dt/1.4;const k=1-Math.pow(1-Math.min(1,zooming.t),3);gc.position.lerpVectors(zooming.from,zooming.to,k);gc.lookAt(0,0,0);if(zooming.t>=1){zooming=null;setMode('site');setTimeout(()=>{gc.position.set(-1.2,1.6,6.2)},600)}}
+ if(mode==='globe'&&!zooming)gctl.update();
+ const tp=markers.texas.m.getWorldPosition(new THREE.Vector3()).project(gc);const lb=document.getElementById('label');lb.textContent='◆ TEXAS SITE';lb.style.left=(tp.x+1)/2*innerWidth+'px';lb.style.top=(1-tp.y)/2*innerHeight+'px';lb.style.opacity=tp.z<1&&markers.texas.m.getWorldPosition(new THREE.Vector3()).dot(gc.position)>0?1:0;
+ // site anim
+ const w=S.works;shell.visible=!!w;scaff.visible=!!w&&w.phase==='equip';crane.visible=!!w;
+ if(w){const f=w.phase==='equip'?Math.min(1,(S.m-w.start)/w.con):1;shell.scale.y=Math.max(.02,f);glow.emissiveIntensity=w.phase==='ready'?2.6+Math.sin(el*3)*.4:w.phase==='train'?1.2:.0}
+ trolley.position.x=Math.sin(el*.4)*12;hook.position.x=trolley.position.x;hook.scale.y=1+.3*Math.sin(el*.9);
+ lpt.g.visible=S.sub.lpt;brk.visible=S.sub.brk;
+ const inTransit=S.q.find(q=>q.k==='lpt');truck.visible=!!inTransit||S.inv.lpt>0;if(truck.visible){const f=inTransit?Math.min(1,(S.m-inTransit.start)/inTransit.len):1;truck.position.x=-70+f*84}
+ const en=S.sub.en;wireMat.emissive.set(en?0x2bd8ff:0x000000);wireMat.emissiveIntensity=en?1.6+Math.sin(el*8)*.4:0;
+ lpt.bush.forEach(b=>{b.material.emissive=new THREE.Color(en?0x6fe8ff:0);b.material.emissiveIntensity=en?3:0});
+ sparks.material.opacity=en?.9:0;if(en){for(let i=0;i<spN;i++){const v=spV[i];if(v.lengthSq()===0||Math.random()<.02){const x=[-6,0,6][i%3];spP.set([x+rnd(-.3,.3),12,rnd(-9,9)],i*3);v.set(rnd(-.05,.05),rnd(-.08,.02),rnd(-.05,.05))}spP[i*3]+=v.x;spP[i*3+1]+=v.y;spP[i*3+2]+=v.z}spG.attributes.position.needsUpdate=true}
+ const dusk=(Math.sin(el*.05)+1)/2;dl.intensity=1.2+1.8*dusk;lamps.forEach(l=>l.intensity=(1-dusk)*30);
+ if(mode==='site')wctl.update();
+ comp.render()}
+loop();window.__site=()=>setMode('site');
+</script></body></html>
